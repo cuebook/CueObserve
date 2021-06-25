@@ -8,8 +8,13 @@ export default function Sidebar(props) {
   const menuItems = [
     {
       "label": "Anomalys",
-      "path": "/anomaly",
+      "path": "/anomalys",
       "icon": "fa-file"
+    },
+    {
+      "label": "Connections",
+      "path": "/connections",
+      "icon": "fa-plug"
     }
   ]
 
