@@ -8,7 +8,7 @@ export default function Sidebar(props) {
   const menuItems = [
     {
       "label": "Anomalys",
-      "path": "/anomalys",
+      "path": "/anomaly",
       "icon": "fa-file"
     },
     {

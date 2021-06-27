@@ -1,3 +1,4 @@
+from typing import DefaultDict, Dict
 from django.db import models
 
 
@@ -12,28 +13,34 @@ class ConnectionType(models.Model):  # no ui
 
 # eg. host, username, password
 class ConnectionParam(models.Model):  # no ui
-    paramName = models.CharField(max_length=200)
+    name = models.CharField(max_length=200)
     label = models.CharField(max_length=200, blank=True, null=True)
     isEncrypted = models.BooleanField(default=False)
     connectionType = models.ForeignKey(
         ConnectionType, on_delete=models.CASCADE, db_index=True, related_name="connectionTypeParam"
     )
     properties = models.TextField(null=True, blank=True)  # for ui
+    file = models.JSONField(default=dict)
 
     def __str__(self):
-        return self.connectionType.name + "_" + self.paramName
+        return self.connectionType.name + "_" + self.name
 
 
 class Connection(models.Model):
-    title = models.CharField(max_length=200)
+    name = models.CharField(max_length=200)
     description = models.TextField()
     connectionType = models.ForeignKey(
         ConnectionType, on_delete=models.CASCADE, db_index=True, related_name="connectionTypeConnection"
     )
     isActive = models.BooleanField(default=True)
+    file = models.JSONField(default=dict)
 
     def __str__(self):
-        return self.title
+        return self.name
+class ConnectionParamValue(models.Model):
+    connectionParam = models.ForeignKey(ConnectionParam, on_delete=models.CASCADE, related_name="cpvcp")
+    value = models.TextField()
+    connection = models.ForeignKey(Connection, on_delete=models.CASCADE, related_name="cpvc")
 
 
 class Anomaly(models.Model):

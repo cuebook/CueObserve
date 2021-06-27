@@ -1,0 +1,31 @@
+[
+    {
+        "model": "anomaly.connectiontype",
+        "pk": 1,
+        "fields": {
+            "name": "Oracle"
+        }
+    },
+    {
+        "model": "anomaly.connectiontype",
+        "pk": 2,
+        "fields": {
+            "name": "Postgres"
+        }
+    },
+    {
+        "model": "anomaly.connectiontype",
+        "pk": 3,
+        "fields": {
+            "name": "MySQL"
+        }
+    },
+    {
+        "model": "anomaly.connectiontype",
+        "pk": 4,
+        "fields": {
+            "name": "Bigquery"
+        }
+    }
+
+]
