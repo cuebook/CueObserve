@@ -5,16 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.http import HttpRequest
 
-from anomaly.services import Anomalys, Datasets, Connections
-
-
-class AnomalysView(APIView):
-    """ """
-
-    def get(self, request):
-        """ """
-        res = Anomalys.getAnomalys()
-        return Response(res.json())
+from anomaly.services import Datasets, Connections
 
 
 class DatasetsView(APIView):
@@ -60,7 +51,8 @@ class CreateDatasetView(APIView):
         data = request.data
         res = Datasets.createDataset(data)
 
-# TODO 
+
+# TODO
 # class for connections
 @api_view(["GET", "POST"])
 def connections(request: HttpRequest) -> Response:

@@ -11,7 +11,7 @@ import {
 import { MoreOutlined, PlayCircleOutlined, UnorderedListOutlined, StopOutlined, FileTextOutlined, DeleteOutlined, CopyOutlined, CloseOutlined, EditOutlined } from '@ant-design/icons';
 import PopconfirmButton from "components/Utils/PopconfirmButton";
 
-export default function AnomalyTable(props) {
+export default function DatasetsTable(props) {
   const [data, setData] = useState([]);
   const history = useHistory();
 
