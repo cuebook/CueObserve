@@ -40,18 +40,39 @@ class Connections:
 
     @staticmethod
     def addConnection(payload):
+        connectionResponse = False
         res = ApiResponse()
         connectionType = ConnectionType.objects.get(id=payload["connectionType_id"])
         file = payload["params"].get("file",{})  #now it's only for BigQuery connection
-        connection = Connection.objects.create(
-            name=payload["name"], description=payload["description"], connectionType=connectionType, file=file
-        )
-        for param in payload["params"]:
-            cp = ConnectionParam.objects.get(name=param, connectionType=connectionType)
-            ConnectionParamValue.objects.create(
-                connectionParam=cp, value=payload["params"][param], connection=connection
-            )
-        res.update(True, "Connection added successfully")
+        if payload["connectionType_id"] == 4:
+            connectionResponse = BigQueryConnection.bigQueryConnection(file)
+
+            if connectionResponse:
+                connection = Connection.objects.create(
+                    name=payload["name"], description=payload["description"], connectionType=connectionType, file=file
+                )
+                for param in payload["params"]:
+                    cp = ConnectionParam.objects.get(name=param, connectionType=connectionType)
+                    ConnectionParamValue.objects.create(
+                        connectionParam=cp, value=payload["params"][param], connection=connection
+                    )
+           
+                res.update(True, "Connection added successfully")
+            else:
+                logger.error("DB connection failed :")
+                res.update(False, "Connection Failed")
+
+        else:
+            connection = Connection.objects.create(
+                    name=payload["name"], description=payload["description"], connectionType=connectionType, file=file
+                )
+            for param in payload["params"]:
+                cp = ConnectionParam.objects.get(name=param, connectionType=connectionType)
+                ConnectionParamValue.objects.create(
+                    connectionParam=cp, value=payload["params"][param], connection=connection
+                )
+            res.update(True, "Connection added successfully")
+
         return res
 
     @staticmethod

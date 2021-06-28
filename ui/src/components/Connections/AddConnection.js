@@ -45,7 +45,7 @@ export default function AddConnection(props) {
   };
 
   const renderInputType = (field) => {
-    console.log('field', field)
+
     switch(field.properties.type) {
       case 'text':
         return <Form.Item 

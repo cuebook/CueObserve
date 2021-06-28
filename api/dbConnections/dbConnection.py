@@ -1,9 +1,11 @@
 import json
-
+import logging
 from django.db import connection
 from google.cloud import bigquery
 from google.oauth2 import service_account
 from anomaly.models import Connection
+
+logger = logging.getLogger(__name__)
 
 class BigQueryConnection:
 
@@ -11,14 +13,18 @@ class BigQueryConnection:
         """
         Connection for bigQuery database
         """
-        file = Connection.objects.filter(connectionType_id=4)[0].file
-        file = json.loads(file)
-        service_account_info = file
-        credentials = service_account.Credentials.from_service_account_info(service_account_info)
-        project_id= file.get("project_id")
-        client = bigquery.Client(credentials= credentials,project=project_id)
+        res = True
+        try:
+            file = json.loads(file)
+            service_account_info = file
+            credentials = service_account.Credentials.from_service_account_info(service_account_info)
+            project_id= file.get("project_id")
+            client = bigquery.Client(credentials= credentials,project=project_id)
+        except Exception as ex:
+            logger.error("Can't connect to db with this credentials %s", str(ex))
+            res = False
 
-        return client
+        return res
 
 
 
