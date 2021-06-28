@@ -1,0 +1,355 @@
+[
+    {
+      "model": "anomaly.connectionparam",
+      "pk": 1,
+      "fields": {
+        "name": "host",
+        "label": "Host",
+        "isEncrypted": false,
+        "connectionType": 1,
+        "properties": {
+          "rules": [
+            {
+              "required": true,
+              "message": "Host name can't be empty"
+            }
+          ],
+          "type": "text",
+          "width": "100%"
+        }
+      }
+    },
+    {
+      "model": "anomaly.connectionparam",
+      "pk": 2,
+      "fields": {
+        "name": "port",
+        "label": "Port",
+        "isEncrypted": false,
+        "connectionType": 1,
+        "properties": {
+          "rules": [
+            {
+              "required": true,
+              "message": "Port  can't be empty"
+            }
+          ],
+          "type": "text",
+          "width": "25%"
+        }
+      }
+    },
+    {
+      "model": "anomaly.connectionparam",
+      "pk": 3,
+      "fields": {
+        "name": "sid",
+        "label": "SID",
+        "isEncrypted": false,
+        "connectionType": 1,
+        "properties": {
+          "rules": [
+            {
+              "required": true,
+              "message": "SID  can't be empty"
+            }
+          ],
+          "type": "text",
+          "width": "75%"
+        }
+      }
+    },
+    {
+      "model": "anomaly.connectionparam",
+      "pk": 4,
+      "fields": {
+        "name": "username",
+        "label": "Username",
+        "isEncrypted": false,
+        "connectionType": 1,
+        "properties": {
+          "rules": [
+            {
+              "required": true,
+              "message": "Username  can't be empty"
+            }
+          ],
+          "type": "text",
+          "width": "50%"
+        }
+      }
+    },
+    {
+      "model": "anomaly.connectionparam",
+      "pk": 5,
+      "fields": {
+        "name": "password",
+        "label": "Password",
+        "isEncrypted": true,
+        "connectionType": 1,
+        "properties": {
+          "rules": [
+            {
+              "required": true,
+              "message": "Password  can't be empty"
+            }
+          ],
+          "type": "text",
+          "width": "50%"
+        }
+      }
+    },
+    {
+        "model": "anomaly.connectionparam",
+        "pk": 6,
+        "fields": {
+          "name": "host",
+          "label": "Host",
+          "isEncrypted": false,
+          "connectionType": 2,
+          "properties": {
+            "rules": [
+              {
+                "required": true,
+                "message": "Host name can't be empty"
+              }
+            ],
+            "type": "text",
+            "width": "100%"
+          }
+        }
+      },
+      {
+        "model": "anomaly.connectionparam",
+        "pk": 7,
+        "fields": {
+          "name": "database",
+          "label": "Database",
+          "isEncrypted": false,
+          "connectionType": 2,
+          "properties": {
+            "rules": [
+              {
+                "required": true,
+                "message": "Database can't be empty"
+              }
+            ],
+            "type": "text",
+            "width": "75%"
+          }
+        }
+      },
+      {
+        "model": "anomaly.connectionparam",
+        "pk": 8,
+        "fields": {
+          "name": "port",
+          "label": "Port",
+          "isEncrypted": false,
+          "connectionType": 2,
+          "properties": {
+            "rules": [
+              {
+                "required": true,
+                "message": "Port  can't be empty"
+              }
+            ],
+            "type": "text",
+            "width": "25%"
+          }
+        }
+      },
+      {
+        "model": "anomaly.connectionparam",
+        "pk": 9,
+        "fields": {
+          "name": "username",
+          "label": "Username",
+          "isEncrypted": false,
+          "connectionType": 2,
+          "properties": {
+            "rules": [
+              {
+                "required": true,
+                "message": "Username  can't be empty"
+              }
+            ],
+            "type": "text",
+            "width": "50%"
+          }
+        }
+      },
+      {
+        "model": "anomaly.connectionparam",
+        "pk": 10,
+        "fields": {
+          "name": "password",
+          "label": "Password",
+          "isEncrypted": true,
+          "connectionType": 2,
+          "properties": {
+            "rules": [
+              {
+                "required": true,
+                "message": "Password  can't be empty"
+              }
+            ],
+            "type": "text",
+            "width": "50%"
+          }
+        }
+      },
+      {
+        "model": "anomaly.connectionparam",
+        "pk": 11,
+        "fields": {
+          "name": "sslRequired",
+          "label": "SSL Required",
+          "isEncrypted": false,
+          "connectionType": 2,
+          "properties": {
+            "rules": [
+            ],
+            "type": "boolean",
+            "width": "50%"
+          }
+        }
+      },
+      {
+        "model": "anomaly.connectionparam",
+        "pk": 12,
+        "fields": {
+          "name": "host",
+          "label": "Host",
+          "isEncrypted": false,
+          "connectionType": 3,
+          "properties": {
+            "rules": [
+              {
+                "required": true,
+                "message": "Host name can't be empty"
+              }
+            ],
+            "type": "text",
+            "width": "100%"
+          }
+        }
+      },
+      {
+        "model": "anomaly.connectionparam",
+        "pk": 13,
+        "fields": {
+          "name": "database",
+          "label": "Database",
+          "isEncrypted": false,
+          "connectionType": 3,
+          "properties": {
+            "rules": [
+              {
+                "required": true,
+                "message": "Database can't be empty"
+              }
+            ],
+            "type": "text",
+            "width": "75%"
+          }
+        }
+      },
+      {
+        "model": "anomaly.connectionparam",
+        "pk": 14,
+        "fields": {
+          "name": "port",
+          "label": "Port",
+          "isEncrypted": false,
+          "connectionType": 3,
+          "properties": {
+            "rules": [
+              {
+                "required": true,
+                "message": "Port  can't be empty"
+              }
+            ],
+            "type": "text",
+            "width": "25%"
+          }
+        }
+      },
+      {
+        "model": "anomaly.connectionparam",
+        "pk": 15,
+        "fields": {
+          "name": "username",
+          "label": "Username",
+          "isEncrypted": false,
+          "connectionType": 3,
+          "properties": {
+            "rules": [
+              {
+                "required": true,
+                "message": "Username  can't be empty"
+              }
+            ],
+            "type": "text",
+            "width": "50%"
+          }
+        }
+      },
+      {
+        "model": "anomaly.connectionparam",
+        "pk": 16,
+        "fields": {
+          "name": "password",
+          "label": "Password",
+          "isEncrypted": true,
+          "connectionType": 3,
+          "properties": {
+            "rules": [
+              {
+                "required": true,
+                "message": "Password  can't be empty"
+              }
+            ],
+            "type": "text",
+            "width": "50%"
+          }
+        }
+      },
+      {
+        "model": "anomaly.connectionparam",
+        "pk": 17,
+        "fields": {
+          "name": "sslRequired",
+          "label": "SSL Required",
+          "isEncrypted": false,
+          "connectionType": 3,
+          "properties": {
+            "rules": [
+            ],
+            "type": "boolean",
+            "width": "50%"
+          }
+        }
+      },
+      {
+        "model": "anomaly.connectionparam",
+        "pk": 18,
+        "fields": {
+          "name": "file",
+          "label": "Json Content",
+          "isEncrypted": false,
+          "connectionType": 4,
+          "properties": {
+            "rules": [ 
+              {
+              "required": true,
+              "message": "File details can't be empty !"
+              }
+            ],
+            "type": "text",
+            "width": "100%"
+          }
+        }
+      }
+
+]

@@ -15,6 +15,11 @@ export default function Sidebar(props) {
       "label": "Datasets",
       "path": "/datasets",
       "icon": "fa-file"
+    },
+    {
+      "label": "Connections",
+      "path": "/connections",
+      "icon": "fa-plug"
     }
   ]
 
