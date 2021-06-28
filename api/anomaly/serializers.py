@@ -1,8 +1,8 @@
 import json
 from rest_framework import serializers
-from anomaly.models import Connection, ConnectionType
+from anomaly.models import Dataset, Connection, ConnectionType
 
-# Connection Serializers
+
 class ConnectionSerializer(serializers.ModelSerializer):
     connectionTypeId = serializers.SerializerMethodField()
     connectionType = serializers.SerializerMethodField()
@@ -74,3 +74,23 @@ class ConnectionTypeSerializer(serializers.ModelSerializer):
         fields = ["id", "name", "params"]
 
 
+class DatasetsSerializer(serializers.ModelSerializer):
+    """
+    Serializes data related to anomaly tree 
+    """
+    connection = ConnectionSerializer()
+
+    class Meta:
+        model = Dataset
+        fields = ['id', 'name', 'connection']
+
+
+class DatasetSerializer(serializers.ModelSerializer):
+    """
+    Serializes data related to anomaly tree 
+    """
+    connection = ConnectionSerializer()
+
+    class Meta:
+        model = Dataset
+        fields = ['id', 'name', 'sql', 'connection']

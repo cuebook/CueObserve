@@ -7,8 +7,8 @@ export default function Sidebar(props) {
   let urlPrefix = ""
   const menuItems = [
     {
-      "label": "Anomalys",
-      "path": "/anomaly",
+      "label": "Datasets",
+      "path": "/datasets",
       "icon": "fa-file"
     },
     {
