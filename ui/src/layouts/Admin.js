@@ -10,6 +10,7 @@ import HeaderStats from "components/Headers/HeaderStats.js";
 
 // views
 import Anomalys from "views/admin/Anomalys.js";
+import Connections from "views/admin/Connections.js"
 
 // contexts
 import { GlobalContextProvider } from "./GlobalContext";
@@ -27,6 +28,7 @@ export default function Admin() {
           <div className="px-0 md:px-0 mx-auto w-full" style={{minHeight: "calc(100vh - 0px)", padding: "1rem 0rem 0 0rem"}}>
             <Switch>
               <Route path="/anomalys" exact component={Anomalys} />
+              <Route path="/connections" exact component={Connections} />
               <Redirect from="/" to="/anomalys" />
             </Switch>
           </div>

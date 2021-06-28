@@ -10,6 +10,11 @@ export default function Sidebar(props) {
       "label": "Anomalys",
       "path": "/anomaly",
       "icon": "fa-file"
+    },
+    {
+      "label": "Connections",
+      "path": "/connections",
+      "icon": "fa-plug"
     }
   ]
 
