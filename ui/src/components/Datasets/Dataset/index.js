@@ -15,11 +15,13 @@ import { Form, Button, Input,
   Switch,
  } from 'antd';
 import datasetService from "services/datasets";
+import SelectConnection from "components/Connections/SelectConnection";
 
 export default function Dataset(props) {
-  const [datasetName, setDatasetName] = useState([]);
+  const [datasetName, setDatasetName] = useState("");
   const [datasetSql, setDatasetSql] = useState("");
-  const [isDataReceived, setIsDataReceived] = useState(false)
+  const [datasetConnection, setDatasetConnection] = useState(null);
+  const [isDataReceived, setIsDataReceived] = useState(false);
   const params = useParams()
   const history = useHistory();
 
@@ -35,13 +37,15 @@ export default function Dataset(props) {
       setIsDataReceived(true);
       setDatasetName(data.name);
       setDatasetSql(data.sql);
+      setDatasetConnection(data.connection.id)
     } 
   }
 
   const saveDataset = async () => {
     const payload = {
       name: datasetName,
-      sql: datasetSql
+      sql: datasetSql,
+      connectionId: datasetConnection
     }
     if (params.datasetId)
       await datasetService.updateDataset(params.datasetId, payload)
@@ -55,7 +59,7 @@ export default function Dataset(props) {
   const runDataset = async () => {
     const payload = {
       sql: datasetSql,
-      // connection: connection
+      connectionId: datasetConnection
     }
     // await datasetService.runDataset(payload)
   }
@@ -66,6 +70,9 @@ export default function Dataset(props) {
       <div className={style.dataset}>
         <div className={style.datasetName}>
           <Input className={style.nameInput} placeholder="Enter Dataset name" onChange={e=>setDatasetName(e.target.value)} value={datasetName}/>
+        </div>
+        <div className={style.selectConnection}>
+          <SelectConnection value={datasetConnection} onChange={setDatasetConnection} />
         </div>
         <div className={style.SQLEditor}>
           <SQLEditor value={datasetSql} setValue={setDatasetSql}/>
@@ -83,8 +90,6 @@ export default function Dataset(props) {
   );
 
 }
-
-
 
 
 export function SQLEditor(props){

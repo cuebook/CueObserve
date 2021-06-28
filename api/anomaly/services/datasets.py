@@ -41,10 +41,12 @@ class Datasets:
         res = ApiResponse("Error in updating dataset")
         name = data["name"]
         sql = data["sql"]
+        connectionId = data["connectionId"]
 
         dataset = Dataset.objects.get(id=datasetId)
         dataset.name = name
         dataset.sql = sql
+        dataset.connection = connectionId
         dataset.save()
 
         res.update(True, "Successfully updated dataset")
@@ -72,7 +74,8 @@ class Datasets:
         res = ApiResponse("Error in creating dataset")
         name = data["name"]
         sql = data["sql"]
-        Dataset.objects.create(name=name, sql=sql)
+        connectionId = data["connectionId"]
+        Dataset.objects.create(name=name, sql=sql, connection_id=connectionId)
 
         res.update(True, "Successfully created dataset")
         return res

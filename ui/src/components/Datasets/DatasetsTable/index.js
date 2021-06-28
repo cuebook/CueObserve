@@ -12,11 +12,11 @@ import { MoreOutlined, PlayCircleOutlined, UnorderedListOutlined, StopOutlined, 
 import PopconfirmButton from "components/Utils/PopconfirmButton";
 
 export default function DatasetsTable(props) {
-  const [data, setData] = useState([]);
+  const [datasets, setDatasets] = useState(null);
   const history = useHistory();
 
   useEffect(()=>{
-    if (!data.length){
+    if (!datasets){
       getDatasets();
     }
   }, []);
@@ -24,7 +24,7 @@ export default function DatasetsTable(props) {
   const getDatasets = async () => {
     const data = await datasetService.getDatasets()
     if (data && data.length){
-      setData(data);
+      setDatasets(data);
     }
   }
 
@@ -54,6 +54,19 @@ export default function DatasetsTable(props) {
       render: text => {
         return (
           <p>{text}</p>
+        );
+      }
+    },
+    {
+      title: "Connection",
+      dataIndex: "connection",
+      key: "connection",
+      sorter: ()=>{},
+      ellipsis: true,
+
+      render: connection => {
+        return (
+          <p>{connection.name}</p>
         );
       }
     },
@@ -98,7 +111,7 @@ export default function DatasetsTable(props) {
         rowKey={"id"}
         scroll={{ x: "100%" }}
         columns={columns}
-        dataSource={data}
+        dataSource={datasets}
         size={"small"}
       />
     </div>

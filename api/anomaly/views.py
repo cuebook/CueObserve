@@ -50,6 +50,7 @@ class CreateDatasetView(APIView):
         """post request"""
         data = request.data
         res = Datasets.createDataset(data)
+        return Response(res.json())
 
 
 # TODO
