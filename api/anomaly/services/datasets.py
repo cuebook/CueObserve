@@ -46,7 +46,7 @@ class Datasets:
         dataset = Dataset.objects.get(id=datasetId)
         dataset.name = name
         dataset.sql = sql
-        dataset.connection = connectionId
+        dataset.connection_id = connectionId
         dataset.save()
 
         res.update(True, "Successfully updated dataset")
