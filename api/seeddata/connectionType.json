@@ -24,7 +24,7 @@
         "model": "anomaly.connectiontype",
         "pk": 4,
         "fields": {
-            "name": "Bigquery"
+            "name": "BigQuery"
         }
     }
 

@@ -26,9 +26,7 @@ export default function AddConnection(props) {
   }
 
   const addConnectionFormSubmit = async (values) => {
-    if(! values.name ){
-      return 
-    }
+    
     let params = {...values}
     delete params["name"]
     let payload = {
@@ -47,6 +45,7 @@ export default function AddConnection(props) {
   };
 
   const renderInputType = (field) => {
+    console.log('field', field)
     switch(field.properties.type) {
       case 'text':
         return <Form.Item 
@@ -54,12 +53,11 @@ export default function AddConnection(props) {
               label={field.label} 
               rules={field.properties.rules}
               name={field.name}
-              rules={[{ required: true, message: 'Please input your username!' }]}
 
             >
           <Input
             type={field.isEncrypted ? "password" : "text"}
-            className={style.inputArea}
+            className={style.inputArea} 
           />
         </Form.Item>
       case 'boolean':
@@ -69,7 +67,6 @@ export default function AddConnection(props) {
               rules={field.properties.rules}
               name={field.name}
               valuePropName="checked"
-              rules={[{ required: true, message: 'Please input your username!' }]}
 
             >
           <Switch />
@@ -80,7 +77,7 @@ export default function AddConnection(props) {
           label={field.label} 
           rules={field.properties.rules}
           name={field.name}
-          rules={[{ required: true, message: 'Please input your username!' }]}
+          
 
         >
       <Input
@@ -139,7 +136,7 @@ export default function AddConnection(props) {
         >
           <div className={style.addConnectionForm}>
             <div className={style.formItem} style={{ width: "100%" }}>
-              <Form.Item hasFeedback name="name" label="Connection Name">
+              <Form.Item hasFeedback name="name" label="Connection Name" rules={[{ required: true, message: 'Please input your Connection name!' }]}> 
                 <Input className={style.inputArea} />
               </Form.Item>
             </div>

@@ -336,14 +336,18 @@
         "pk": 18,
         "fields": {
           "name": "file",
-          "label": "Json File",
+          "label": "Json Content",
           "isEncrypted": false,
           "connectionType": 4,
           "properties": {
-            "rules": [
+            "rules": [ 
+              {
+              "required": true,
+              "message": "File details can't be empty !"
+              }
             ],
-            "type": "boolean",
-            "width": "75%"
+            "type": "text",
+            "width": "100%"
           }
         }
       }
