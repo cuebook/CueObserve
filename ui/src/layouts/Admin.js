@@ -9,7 +9,9 @@ import Sidebar from "components/Sidebar/Sidebar.js";
 import HeaderStats from "components/Headers/HeaderStats.js";
 
 // views
-import Anomalys from "views/admin/Anomalys.js";
+import Anomalys from "views/admin/Anomalys";
+import Datasets from "views/admin/Datasets";
+import Dataset from "views/admin/Dataset";
 
 // contexts
 import { GlobalContextProvider } from "./GlobalContext";
@@ -27,6 +29,9 @@ export default function Admin() {
           <div className="px-0 md:px-0 mx-auto w-full" style={{minHeight: "calc(100vh - 0px)", padding: "1rem 0rem 0 0rem"}}>
             <Switch>
               <Route path="/anomalys" exact component={Anomalys} />
+              <Route path="/datasets" exact component={Datasets} />
+              <Route path="/dataset/create" exact component={Dataset} />
+              <Route path="/dataset/:datasetId" exact component={Dataset} />
               <Redirect from="/" to="/anomalys" />
             </Switch>
           </div>

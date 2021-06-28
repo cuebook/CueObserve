@@ -1,13 +1,12 @@
 import React from "react";
-import AnomalyTable from "components/Anomalys/AnomalyTable";
+import Dataset from "components/Datasets/Dataset";
 
-
-export default function Anomalys() {
+export default function DatasetView() {
   return (
     <>
       <div className="flex flex-wrap mh-full">
         <div className="w-full mb-12 px-4">
-		      <AnomalyTable />
+		      <Dataset />
         </div>
       </div>
     </>

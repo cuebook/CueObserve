@@ -1,5 +1,5 @@
 from utils.apiResponse import ApiResponse
-from anomaly.models import Anomaly
+# from anomaly.models import Anomaly
 
 class Anomalys:
 	"""

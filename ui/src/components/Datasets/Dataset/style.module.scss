@@ -1,0 +1,35 @@
+.dataset {
+
+	.datasetName {
+		padding: 5px;
+		padding-bottom: 20px;
+		.nameInput {
+		  font-size: 1.5rem;
+		  border: none;
+		  padding: 10px 0 !important;
+		  background: none;
+		  border-radius: 0;
+		  border-bottom: 2px solid #a6adb5;
+		  height: 40px;
+		}
+	}
+
+	.SQLEditor {
+		padding: 5px;
+	}
+
+	.buttons {
+		padding: 5px;
+		display: flex;
+		.run {
+			margin-right: 5px;
+		}
+
+		.save {
+
+		}
+	}
+
+
+
+}

@@ -1,5 +1,4 @@
 import apiService from "./api";
-import { store } from 'react-notifications-component';
 
 class AnomalyService {
     async getAnomalys(){
