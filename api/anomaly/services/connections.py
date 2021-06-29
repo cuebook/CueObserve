@@ -1,21 +1,9 @@
 import logging
-from utils.apiResponse import ApiResponse
 from typing import List
+from utils.apiResponse import ApiResponse
 from dbConnections.dbConnection import BigQueryConnection
-from anomaly.models import Connection, ConnectionParam, ConnectionType, ConnectionParamValue, Anomaly
+from anomaly.models import Connection, ConnectionParam, ConnectionType, ConnectionParamValue
 from anomaly.serializers import ConnectionSerializer, ConnectionDetailSerializer, ConnectionTypeSerializer
-
-class Anomalys:
-	"""
-	"""
-
-	@staticmethod
-	def getAnomalys():
-		res = ApiResponse("Error in getting anomalys")
-		data = [{"name": "First anomaly"}]
-		res.update(True, "Successfully retrieved anomaly", data)
-		return res
-
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)

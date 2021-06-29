@@ -16,3 +16,6 @@ pytest-django==4.3.0
 mixer==7.1.2
 pytest-mock==3.6.1
 redis==3.5.3
+pylint==2.8.3
+pylint-django==2.4.4
+google-cloud-bigquery==2.20.0

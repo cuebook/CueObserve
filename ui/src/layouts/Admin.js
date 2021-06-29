@@ -29,7 +29,9 @@ export default function Admin() {
           <HeaderStats />
           <div className="px-0 md:px-0 mx-auto w-full" style={{minHeight: "calc(100vh - 0px)", padding: "1rem 0rem 0 0rem"}}>
             <Switch>
-              <Route path="/anomalys" exact component={Anomalys} />
+              <Route path="/datasets" exact component={Datasets} />
+              <Route path="/dataset/create" exact component={Dataset} />
+              <Route path="/dataset/:datasetId" exact component={Dataset} />
               <Route path="/connections" exact component={Connections} />
               <Route path="/anomalyDefinitions" exact component={AnomalyDefTable} />
 
