@@ -3,6 +3,7 @@ import style from "./style.module.scss";
 import { useParams, useHistory } from 'react-router-dom';
 import AceEditor from "react-ace";
 import { Resizable } from "re-resizable";
+import { message } from "antd"
 import _ from "lodash";
 
 import { Form, Button, Input,
@@ -13,14 +14,25 @@ import { Form, Button, Input,
   InputNumber,
   TreeSelect,
   Switch,
+  Table
  } from 'antd';
 import datasetService from "services/datasets";
+import queryService from "services/querys";
 import SelectConnection from "components/Connections/SelectConnection";
+
+const { Option } = Select;
 
 export default function Dataset(props) {
   const [datasetName, setDatasetName] = useState("");
   const [datasetSql, setDatasetSql] = useState("");
   const [datasetConnection, setDatasetConnection] = useState(null);
+
+  const [queryData, setQueryData] = useState(null)
+  const [loadingQueryData, setLoadingQueryData] = useState(false)
+  const [datasetColumns, setDatasetColumns] = useState([])
+  const [datasetColumnType, setDatasetColumnType] = useState({})
+  const [datasetGranularity, setDatasetGranlarity] = useState(null)
+
   const [isDataReceived, setIsDataReceived] = useState(false);
   const params = useParams()
   const history = useHistory();
@@ -37,15 +49,44 @@ export default function Dataset(props) {
       setIsDataReceived(true);
       setDatasetName(data.name);
       setDatasetSql(data.sql);
-      setDatasetConnection(data.connection.id)
+      setDatasetConnection(data.connection.id);
+      setDatasetGranlarity(data.granularity);
+
+      const tempColumnTypes = {}
+      data.metrics && data.metrics.forEach(col=>{tempColumnTypes[col]="metric"})
+      data.dimensions && data.dimensions.forEach(col=>{tempColumnTypes[col]="dimension"})
+      tempColumnTypes[data.timestampColumn] = "timestamp"
+
+      setDatasetColumnType(tempColumnTypes)
+      let columns = data.metrics.concat(data.dimensions).concat([data.timestampColumn])
+      columns = columns.sort()
+      setDatasetColumns(columns)
     } 
   }
 
   const saveDataset = async () => {
+    const metrics = Object.keys(datasetColumnType).filter(col=>datasetColumnType[col]=="metric")
+    const dimensions = Object.keys(datasetColumnType).filter(col=>datasetColumnType[col]=="dimension")
+    const timestamps = Object.keys(datasetColumnType).filter(col=>datasetColumnType[col]=="timestamp")
+
+    if (!timestamps.length || timestamps.length > 1){
+      message.error("Please select one timestamp column")
+      return 
+    }
+
+    if (!datasetGranularity){
+      message.error("Please select granularity")
+      return 
+    }
+
     const payload = {
       name: datasetName,
       sql: datasetSql,
-      connectionId: datasetConnection
+      connectionId: datasetConnection,
+      metrics: metrics,
+      dimensions: dimensions,
+      timestamp: timestamps[0],
+      granularity: datasetGranularity,
     }
     if (params.datasetId)
       await datasetService.updateDataset(params.datasetId, payload)
@@ -56,18 +97,79 @@ export default function Dataset(props) {
     }
   }
 
-  const runDataset = async () => {
+
+  const runDatasetQuery = async () => {
+    if (!datasetSql || !datasetConnection){
+      message.error("Please select a connection & enter sql")
+      return 
+    }
     const payload = {
       sql: datasetSql,
       connectionId: datasetConnection
     }
-    // await datasetService.runDataset(payload)
+    setLoadingQueryData(true)
+    const data = await queryService.runQuery(payload)
+    setLoadingQueryData(false)
+    if (data && data.length){
+      setQueryData(data)
+      mergeColumns(Object.keys(data[0]))
+    }
   }
 
+  const mergeColumns = newColumns => {
+    newColumns = newColumns.sort()
+    const tempColumnType = datasetColumnType
+
+    // remove removed columns
+    datasetColumns.filter(col=>!newColumns.includes(col)).forEach(col=>{
+      delete tempColumnType[col]
+    })
+
+    // add new columns
+    newColumns.filter(col=>!datasetColumns.includes(col)).forEach(col=>{
+      tempColumnType[col] = "metric"
+    })
+    setDatasetColumnType(tempColumnType)
+    setDatasetColumns( newColumns )
+  }
+
+  const columns = datasetColumns.map(col=>{return {title: col, dataIndex: col, key: col }});  
+  const queryDataTable = <Table columns={columns} dataSource={queryData} pagination={false} size="small" bordered={true} />
+
+
+  const radioOptions = [{ label: 'Measure', value: 'metric' },
+                        { label: 'Dimension', value: 'dimension' },
+                        { label: 'Timestamp', value: 'timestamp' }]
+
+  const typeSelectorColumns = [
+    {
+      title: "Column Name", 
+      dataIndex: "name", 
+      key: "name", 
+      render: (text, record)=> {
+        return record
+      }
+    }, 
+    {
+      title: "Column Type", 
+      dataIndex: "action", 
+      key: "action",
+      align: "right",
+      render: (text, record) => {
+        return <Radio.Group
+            options={radioOptions}
+            onChange={e=>{setDatasetColumnType({...datasetColumnType, [record]: e.target.value})}}
+            value={datasetColumnType[record]}
+          />
+      }
+    }
+  ]
+  const selectFieldTypeTable = <Table columns={typeSelectorColumns} dataSource={datasetColumns} pagination={false} size="small" />
 
   return (
     <>
-      <div className={style.dataset}>
+      <div className="col-5">
+      <div className={`${style.dataset} col-5`}>
         <div className={style.datasetName}>
           <Input className={style.nameInput} placeholder="Enter Dataset name" onChange={e=>setDatasetName(e.target.value)} value={datasetName}/>
         </div>
@@ -77,19 +179,47 @@ export default function Dataset(props) {
         <div className={style.SQLEditor}>
           <SQLEditor value={datasetSql} setValue={setDatasetSql}/>
         </div>
+        {
+          queryData && queryData.length ? 
+            <div className={style.dataTable}>
+              {queryDataTable}
+            </div> : null
+        }
+        {
+          !datasetColumns.length ? null :
+            <>
+              <div className={style.typeSelectorTable}>
+                <p>Select type for columns: </p>
+                {selectFieldTypeTable}
+              </div>
+              <div className={style.granularity}>
+                <p>Granularity: </p>
+                    <Select style={{ width: 120 }} placeholder="Select granularity" value={datasetGranularity} onChange={setDatasetGranlarity}>
+                      <Option value="hour">Hour</Option>
+                      <Option value="day">Day</Option>
+                      <Option value="week">Week</Option>
+                    </Select>
+              </div>
+            </>
+        }
         <div className={style.buttons}>
           <div className={style.run}>
-            <Button type="primary">Run SQL</Button>
+            <Button type="primary" onClick={runDatasetQuery} loading={loadingQueryData}>Run SQL</Button>
           </div>
           <div className={style.save}>
-            <Button type="primary" onClick={saveDataset}>Save Dataset</Button>
+            <Button type="primary" onClick={saveDataset} disabled={queryData && queryData.length ? false : true }>Save Dataset</Button>
           </div>
         </div>
       </div>   
+      </div>
+
     </>
   );
 
 }
+
+
+
 
 
 export function SQLEditor(props){
@@ -104,7 +234,6 @@ export function SQLEditor(props){
 
 
   const complete = (editor, sqlSuggestionsList) => {
-    console.log(editor, sqlSuggestionsList)
     const completers = sqlSuggestionsList.map(item => ({
       name: item,
       value: item,
