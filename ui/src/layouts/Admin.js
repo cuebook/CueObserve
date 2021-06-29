@@ -9,8 +9,10 @@ import Sidebar from "components/Sidebar/Sidebar.js";
 import HeaderStats from "components/Headers/HeaderStats.js";
 
 // views
-import Anomalys from "views/admin/Anomalys.js";
-import Connections from "views/admin/Connections.js"
+import Datasets from "views/admin/Datasets";
+import Dataset from "views/admin/Dataset";
+import Connections from "views/admin/Connections";
+import AnomalyDefTable from "views/admin/AnomalyDefTable";
 
 // contexts
 import { GlobalContextProvider } from "./GlobalContext";
@@ -29,7 +31,9 @@ export default function Admin() {
             <Switch>
               <Route path="/anomalys" exact component={Anomalys} />
               <Route path="/connections" exact component={Connections} />
-              <Redirect from="/" to="/anomalys" />
+              <Route path="/anomalyDefinitions" exact component={AnomalyDefTable} />
+
+              <Redirect from="/" to="/datasets" />
             </Switch>
           </div>
         </div>
