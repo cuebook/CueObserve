@@ -2,10 +2,12 @@
 import React, { useState, useEffect } from "react";
 import { Table, Button, Popconfirm, Input, message, Tooltip, Drawer } from "antd";
 import style from "./style.module.scss";
+import AddAnomaly from "./AddAnomaly.js"
 // import connectionService from "services/connection.js";
 // import AddConnection from "./AddConnection.js";
 // import ViewConnection from "./ViewConnection.js";
 import { EyeOutlined, DeleteOutlined } from '@ant-design/icons';
+import ErrorBoundary from "antd/lib/alert/ErrorBoundary";
 
 const { Search } = Input;
 const ButtonGroup = Button.Group;
@@ -61,16 +63,17 @@ export default function Connection() {
 
 
     const columns = [
-      {
-        title: "Name",
-        dataIndex: "name",
-        key: "name"
-      },
+      
       {
         title: "Dataset",
         dataIndex: "dataset",
         key: "dataset",
 
+      },
+      {
+        title: "Granularity",
+        dataIndex: "granularity",
+        key: "granularity"
       },
       {
         title: "Anomaly Definition",
@@ -127,13 +130,16 @@ export default function Connection() {
     return (
       <div>
         <div className={`d-flex flex-column justify-content-center text-right mb-2`}>
-            <Button
+            {/* <Button
               key="createTag"
               type="primary"
               // onClick={() => openAddConnectionForm()}
             >
                 New Anomaly Definition
-            </Button>
+            </Button> */}
+            <ErrorBoundary>
+              <AddAnomaly />
+            </ErrorBoundary>
         </div>
         <Table
             rowKey={"id"}
