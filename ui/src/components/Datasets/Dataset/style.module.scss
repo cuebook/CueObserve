@@ -22,8 +22,35 @@
 		padding: 5px;
 	}
 
+	.dataTable {
+		padding: 5px;
+		padding-top: 10px;
+	}
+
+	.typeSelectorTable {
+
+		padding:  5px;
+		padding-left: 25px;
+		width:  50%;
+		p {
+			margin-left: -20px;
+			font-size: 15px ;
+		}
+
+	}
+
+	.granularity {
+		padding: 5px;
+		padding-left: 25px;
+		p {
+			margin-left: -20px;
+			font-size: 15px;
+		}
+	}
+
 	.buttons {
 		padding: 5px;
+		padding-top: 25px;
 		display: flex;
 		.run {
 			margin-right: 5px;

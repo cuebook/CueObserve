@@ -60,3 +60,7 @@ class Dataset(models.Model):
     connection = models.ForeignKey(Connection, on_delete=models.CASCADE, db_index=True)
     name = models.CharField(max_length=500)
     sql = models.TextField(null=True, blank=True)
+    granularity = models.CharField(max_length=50)
+    timestampColumn = models.CharField(max_length=500)
+    metrics = models.TextField(null=True, blank=True)
+    dimensions = models.TextField(null=True, blank=True)

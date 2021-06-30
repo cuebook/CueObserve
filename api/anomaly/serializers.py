@@ -90,7 +90,17 @@ class DatasetSerializer(serializers.ModelSerializer):
     Serializes data related to anomaly tree 
     """
     connection = ConnectionSerializer()
+    dimensions = serializers.SerializerMethodField()
+    metrics = serializers.SerializerMethodField()
+
+    def get_dimensions(self, obj):
+        dimensions = json.loads(obj.dimensions) if obj.metrics else []
+        return dimensions if dimensions else []
+
+    def get_metrics(self, obj):
+        metrics = json.loads(obj.metrics) if obj.metrics else []
+        return metrics if metrics else []
 
     class Meta:
         model = Dataset
-        fields = ['id', 'name', 'sql', 'connection']
+        fields = ['id', 'name', 'sql', 'connection', 'dimensions', 'metrics', 'granularity', 'timestampColumn']
