@@ -19,3 +19,4 @@ redis==3.5.3
 pylint==2.8.3
 pylint-django==2.4.4
 google-cloud-bigquery==2.20.0
+psycopg2==2.9.1

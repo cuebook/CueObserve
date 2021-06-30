@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.http import HttpRequest
 
-from anomaly.services import Datasets, Connections
+from anomaly.services import Datasets, Connections, Querys
 
 
 class DatasetsView(APIView):
@@ -95,4 +95,25 @@ def connectionTypes(request: HttpRequest) -> Response:
     """
     if request.method == "GET":
         res = Connections.getConnectionTypes()
+        return Response(res.json())
+
+
+class QueryView(APIView):
+    """
+    Provides view on creating Dataset
+    """
+
+    def post(self, request):
+        """post request"""
+        data = request.data
+        sql = data["sql"]
+        connectionId = data["connectionId"]
+        connectionRes = Connections.getConnection(connectionId).json()
+        if not connectionRes["success"]:
+            return Response(connectionRes)
+
+        connectionData = connectionRes["data"]
+        res = Querys.runQuery(
+            connectionData["connectionType"], connectionData["params"], sql
+        )
         return Response(res.json())

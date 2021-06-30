@@ -1,3 +1,4 @@
+import json
 from utils.apiResponse import ApiResponse
 from anomaly.models import Dataset
 from anomaly.serializers import DatasetsSerializer, DatasetSerializer
@@ -42,11 +43,19 @@ class Datasets:
         name = data["name"]
         sql = data["sql"]
         connectionId = data["connectionId"]
+        metrics = data["metrics"]
+        dimensions = data["dimensions"]
+        timestamp = data["timestamp"]
+        granularity = data["granularity"]
 
         dataset = Dataset.objects.get(id=datasetId)
         dataset.name = name
         dataset.sql = sql
         dataset.connection_id = connectionId
+        dataset.metrics = json.dumps(metrics)
+        dataset.dimensions = json.dumps(dimensions)
+        dataset.timestampColumn = timestamp
+        dataset.granularity = granularity
         dataset.save()
 
         res.update(True, "Successfully updated dataset")
@@ -75,7 +84,19 @@ class Datasets:
         name = data["name"]
         sql = data["sql"]
         connectionId = data["connectionId"]
-        Dataset.objects.create(name=name, sql=sql, connection_id=connectionId)
+        metrics = data["metrics"]
+        dimensions = data["dimensions"]
+        timestamp = data["timestamp"]
+        granularity = data["granularity"]
+        Dataset.objects.create(
+            name=name,
+            sql=sql,
+            connection_id=connectionId,
+            metrics=json.dumps(metrics),
+            dimensions=json.dumps(dimensions),
+            timestampColumn=timestamp,
+            granularity=granularity,
+        )
 
         res.update(True, "Successfully created dataset")
         return res
