@@ -2,17 +2,29 @@ import logging
 from typing import List
 from utils.apiResponse import ApiResponse
 from dbConnections.dbConnection import BigQueryConnection
-from anomaly.models import Connection, ConnectionParam, ConnectionType, ConnectionParamValue
-from anomaly.serializers import ConnectionSerializer, ConnectionDetailSerializer, ConnectionTypeSerializer
+from anomaly.models import (
+    Connection,
+    ConnectionParam,
+    ConnectionType,
+    ConnectionParamValue,
+)
+from anomaly.serializers import (
+    ConnectionSerializer,
+    ConnectionDetailSerializer,
+    ConnectionTypeSerializer,
+)
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
 
-class Connections:
 
+class Connections:
     @staticmethod
     def getConnections():
-        res = ApiResponse()
+        """
+        Gets all created connections
+        """
+        res = ApiResponse("Error in fetching connections")
         connections = Connection.objects.all()
         serializer = ConnectionSerializer(connections, many=True)
         res.update(True, "Connections retrieved successfully", serializer.data)
@@ -20,7 +32,7 @@ class Connections:
 
     @staticmethod
     def getConnection(connection_id):
-        res = ApiResponse()
+        res = ApiResponse("Error in fetching connection")
         connections = Connection.objects.get(id=connection_id)
         serializer = ConnectionDetailSerializer(connections)
         res.update(True, "Connection retrieved successfully", serializer.data)
@@ -29,22 +41,35 @@ class Connections:
     @staticmethod
     def addConnection(payload):
         connectionResponse = False
-        res = ApiResponse()
+        res = ApiResponse("Error in adding connection")
         connectionType = ConnectionType.objects.get(id=payload["connectionType_id"])
-        file = payload["params"].get("file",{})  #now it's only for BigQuery connection
+
+        # Do this verification using Querys service
+
+        file = payload["params"].get(
+            "file", {}
+        )  # now it's only for BigQuery connection
         if payload["connectionType_id"] == 4:
-            connectionResponse = BigQueryConnection.bigQueryConnection(file)
+            connectionResponse = BigQueryConnection.checkConnection(file)
 
             if connectionResponse:
                 connection = Connection.objects.create(
-                    name=payload["name"], description=payload["description"], connectionType=connectionType, file=file
+                    name=payload["name"],
+                    description=payload["description"],
+                    connectionType=connectionType,
+                    file=file,
                 )
+
                 for param in payload["params"]:
-                    cp = ConnectionParam.objects.get(name=param, connectionType=connectionType)
-                    ConnectionParamValue.objects.create(
-                        connectionParam=cp, value=payload["params"][param], connection=connection
+                    cp = ConnectionParam.objects.get(
+                        name=param, connectionType=connectionType
                     )
-           
+                    ConnectionParamValue.objects.create(
+                        connectionParam=cp,
+                        value=payload["params"][param],
+                        connection=connection,
+                    )
+
                 res.update(True, "Connection added successfully")
             else:
                 logger.error("DB connection failed :")
@@ -52,12 +77,19 @@ class Connections:
 
         else:
             connection = Connection.objects.create(
-                    name=payload["name"], description=payload["description"], connectionType=connectionType, file=file
-                )
+                name=payload["name"],
+                description=payload["description"],
+                connectionType=connectionType,
+                file=file,
+            )
             for param in payload["params"]:
-                cp = ConnectionParam.objects.get(name=param, connectionType=connectionType)
+                cp = ConnectionParam.objects.get(
+                    name=param, connectionType=connectionType
+                )
                 ConnectionParamValue.objects.create(
-                    connectionParam=cp, value=payload["params"][param], connection=connection
+                    connectionParam=cp,
+                    value=payload["params"][param],
+                    connection=connection,
                 )
             res.update(True, "Connection added successfully")
 
@@ -65,9 +97,9 @@ class Connections:
 
     @staticmethod
     def removeConnection(connection_id):
-        res = ApiResponse()
+        res = ApiResponse("Erorr in deleting connection")
         connection = Connection.objects.filter(id=connection_id)
-        if len(connection)>0:
+        if len(connection) > 0:
             Connection.objects.get(id=connection_id).delete()
             res.update(True, "Connection deleted successfully")
         else:
@@ -76,7 +108,7 @@ class Connections:
 
     @staticmethod
     def updateConnection(connection_id, payload):
-        res = ApiResponse()
+        res = ApiResponse("Error in updating connection")
         Connection.objects.filter(id=connection_id).update(
             name=payload.get("name", ""),
             description=payload.get("description", ""),
@@ -98,8 +130,11 @@ class Connections:
 
     @staticmethod
     def getConnectionTypes():
-        res = ApiResponse()
+        """
+        Gets available connection types
+        """
+        res = ApiResponse("Error in fetching connection types")
         connectionTypes = ConnectionType.objects.all()
-        data = serializer = ConnectionTypeSerializer(connectionTypes, many=True).data
+        data = ConnectionTypeSerializer(connectionTypes, many=True).data
         res.update(True, "Successfully retrieved connection types", data)
         return res

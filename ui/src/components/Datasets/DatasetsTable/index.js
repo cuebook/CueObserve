@@ -7,6 +7,8 @@ import { useHistory } from "react-router-dom";
 import {
   Table,
   Button,
+  Popconfirm,
+  Tooltip
 } from "antd";
 import { MoreOutlined, PlayCircleOutlined, UnorderedListOutlined, StopOutlined, FileTextOutlined, DeleteOutlined, CopyOutlined, CloseOutlined, EditOutlined } from '@ant-design/icons';
 import PopconfirmButton from "components/Utils/PopconfirmButton";
@@ -48,9 +50,7 @@ export default function DatasetsTable(props) {
       title: "Datasets",
       dataIndex: "name",
       key: "name",
-      sorter: ()=>{},
-      ellipsis: true,
-
+      sorter: (a, b) => a.name.localeCompare(b.name),
       render: text => {
         return (
           <p>{text}</p>
@@ -61,9 +61,7 @@ export default function DatasetsTable(props) {
       title: "Connection",
       dataIndex: "connection",
       key: "connection",
-      sorter: ()=>{},
-      ellipsis: true,
-
+      sorter: (a, b) => a.connection.name.localeCompare(b.connection.name),
       render: connection => {
         return (
           <p>{connection.name}</p>
@@ -75,27 +73,25 @@ export default function DatasetsTable(props) {
       dataIndex: "action",
       key: "actions",
       className: "text-right",
-      sorter: ()=>{},
-      ellipsis: true,
-
       render: (text, record) => {
         return (
-          <div>
-            <Button
-              icon={<EditOutlined/>}
-              onClick={() => editDataset(record)}
-            >
-              Edit
-            </Button>
-            <PopconfirmButton
-              icon={<DeleteOutlined/>}
-              title="Are you  delete this dataset?"
-              key={record.id}
-              onClick={() => deleteDataset(record)}
-            >
-              Delete
-            </PopconfirmButton>
-          </div>
+          <div className={style.actions}>
+             <Tooltip title={"Delete Dataset"}>
+                 <EditOutlined onClick={()=>editDataset(record)} />
+             </Tooltip>
+
+             <Popconfirm
+                 title={"Are you sure to delete '"+ record.name +"'?"}
+                 onConfirm={() => deleteDataset(record)}
+                 // onCancel={cancel}
+                 okText="Yes"
+                 cancelText="No"
+             >
+                 <Tooltip title={"Delete Dataset"}>
+                     <DeleteOutlined />
+                 </Tooltip>
+             </Popconfirm>
+           </div>
         );
       }
 
@@ -105,7 +101,7 @@ export default function DatasetsTable(props) {
   return (
     <div>
       <div style={{float: "right", paddingBottom: "5px"}}>
-        <Button onClick={createDataset} type="primary">Create Dataset</Button>
+        <Button onClick={createDataset} type="primary">New Dataset</Button>
       </div>
       <Table
         rowKey={"id"}
