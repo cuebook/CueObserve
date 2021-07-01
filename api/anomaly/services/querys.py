@@ -1,6 +1,5 @@
 from utils.apiResponse import ApiResponse
-from anomaly.models import Connection
-from dbConnections.dbConnection import BigQueryConnection
+from access.data import Data
 
 
 class Querys:
@@ -11,10 +10,7 @@ class Querys:
 	@staticmethod
 	def runQuery(connectionType, connectionParams, query, limit=True):
 		res = ApiResponse("Error in getting data")
-		data = None
-		if connectionType == "BigQuery":
-			file = connectionParams['file']
-			data = BigQueryConnection.fetchData(file, query, limit=True)
-
+		dataframe = Data.runQueryOnConnection(connectionType, connectionParams, query, limit)
+		data = dataframe.to_dict("records")
 		res.update(True, "Successfully retrieved data", data)
 		return res
