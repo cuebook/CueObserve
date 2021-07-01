@@ -64,3 +64,11 @@ class Dataset(models.Model):
     timestampColumn = models.CharField(max_length=500)
     metrics = models.TextField(null=True, blank=True)
     dimensions = models.TextField(null=True, blank=True)
+
+class AnomalyDefinition(models.Model):
+    dataset = models.ForeignKey(Dataset, on_delete=models.CASCADE, db_index=True)
+    metric = models.TextField(null=True, blank=True)
+    dimension = models.TextField(null=True, blank=True)
+    highOrLow = models.TextField(null=True, blank=True)
+    top = models.TextField(null=True, blank=True)
+

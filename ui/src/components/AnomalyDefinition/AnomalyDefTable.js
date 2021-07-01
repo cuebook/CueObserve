@@ -3,82 +3,79 @@ import React, { useState, useEffect } from "react";
 import { Table, Button, Popconfirm, Input, message, Tooltip, Drawer } from "antd";
 import style from "./style.module.scss";
 import AddAnomaly from "./AddAnomaly.js"
-// import connectionService from "services/connection.js";
-// import AddConnection from "./AddConnection.js";
-// import ViewConnection from "./ViewConnection.js";
 import { EyeOutlined, DeleteOutlined } from '@ant-design/icons';
 import ErrorBoundary from "antd/lib/alert/ErrorBoundary";
-
+import anomalyService from "services/anomaly.js"
 const { Search } = Input;
 const ButtonGroup = Button.Group;
 
 export default function Connection() {
-  const [connections, setConnections] = useState([]);
-//   const [selectedConnection, setSelectedConnection] = useState('');
-//   const [isAddConnectionDrawerVisible, setIsAddConnectionDrawerVisible] = useState('');
-//   const [isViewConnectionDrawerVisible, setIsViewConnectionDrawerVisible] = useState('');
+  const [data, setData] = useState([]);
 
-//   useEffect(() => {
-//     if (!connections.length) {
-//         fetchConnections();
-//     }
-//   }, []);
+  useEffect(() => {
+    if (!data.length) {
+        fetchData();
+    }
+  }, []);
 
-//   const fetchConnections = async () => {
-//     const response = await connectionService.getConnections();
-//     setConnections(response.data)
-//   }
-
-//   const deleteConnection = async (connection) => {
-//     const response = await connectionService.deleteConnection(connection.id);
-//     if(response.success){
-//         fetchConnections()
-//     }
-//     else{
-//         message.error(response.message)
-//     }
-//   }
-
-//   const viewConnection = async (connection) => {
-//     setSelectedConnection(connection)
-//     setIsViewConnectionDrawerVisible(true)
-//   }
-
-//   const closeAddConnectionDrawer = () => {
-//     setIsAddConnectionDrawerVisible(false)
-//   }
-
-//   const closeViewConnectionDrawer = () => {
-//     setIsViewConnectionDrawerVisible(false)
-//   }
-
-//   const openAddConnectionForm = () => {
-//     setIsAddConnectionDrawerVisible(true)
-//   }
-
-//   const onAddConnectionSuccess = async () => {
-//     closeAddConnectionDrawer();
-//     fetchConnections();
-//   }
+  const fetchData = async () => {
+    const response = await anomalyService.getAnomalys();
+    console.log('response', response.data)
+    setData(response.data)
+  }
 
 
-    const columns = [
+const deleteAnomaly = (anomaly) =>{
+  const response = anomalyService.deleteAnomaly(anomaly.id)
+}
+
+
+
+
+  const columns = [
       
       {
         title: "Dataset",
         dataIndex: "dataset",
         key: "dataset",
+        render: (text, record) => {
+          return (
+            <div>
+              {record.dataset.name}
+            </div>
+          )
+        }
 
       },
       {
         title: "Granularity",
         dataIndex: "granularity",
-        key: "granularity"
+        key: "granularity",
+        render: (text, record) => {
+          return (
+            <div>
+              {record.dataset.granularity}
+            </div>
+          )
+        }
       },
       {
         title: "Anomaly Definition",
         dataIndex: "anomalyDef",
         key: "anomalyDef",
+        render:(text, record) => {
+          return (         
+                <div style={{fontSize:14}}>
+                 <span style={{color: "#ffc71f"}}> {record.anomalyDef.metric}</span>
+                  <span style={{color: "#12b1ff"}}> {record.anomalyDef.dimension}</span>
+                  <span style={{color: "blue"}}> {record.anomalyDef.top > 0 ? record.anomalyDef.top : null}</span>
+                  <span style={{color: "#02c1a3"}}> {record.anomalyDef.highOrLow}</span>
+                  
+                  </div>
+
+              )
+      
+        }
 
       },
       {
@@ -109,11 +106,11 @@ export default function Connection() {
         title: "",
         dataIndex: "",
         key: "",
-        render: (text, connection) => (
+        render: (text, record) => (
          <div className={style.actions}>
             <Popconfirm
-                title={"Are you sure to delete "+ connection.name +"?"}
-                // onConfirm={() => deleteConnection(connection)}
+                title={"Are you sure to delete Anomaly of id "+ record.id +"?"}
+                onConfirm={() => deleteAnomaly(record)}
                 // onCancel={cancel}
                 okText="Yes"
                 cancelText="No"
@@ -130,13 +127,7 @@ export default function Connection() {
     return (
       <div>
         <div className={`d-flex flex-column justify-content-center text-right mb-2`}>
-            {/* <Button
-              key="createTag"
-              type="primary"
-              // onClick={() => openAddConnectionForm()}
-            >
-                New Anomaly Definition
-            </Button> */}
+
             <ErrorBoundary>
               <AddAnomaly />
             </ErrorBoundary>
@@ -145,35 +136,9 @@ export default function Connection() {
             rowKey={"id"}
             scroll={{ x: "100%" }}
             columns={columns}
-            dataSource={connections}
+            dataSource={data}
             pagination={false}
         />
-        {/* <Drawer
-          title={"Add Connection"}
-          width={720}
-          onClose={closeAddConnectionDrawer}
-          visible={isAddConnectionDrawerVisible}
-        >
-          { isAddConnectionDrawerVisible 
-            ? 
-            <AddConnection onAddConnectionSuccess={onAddConnectionSuccess} />
-            :
-            null
-          }
-        </Drawer>
-        <Drawer
-          title={selectedConnection.name}
-          width={720}
-          onClose={closeViewConnectionDrawer}
-          visible={isViewConnectionDrawerVisible}
-        >
-          { isViewConnectionDrawerVisible 
-            ? 
-            <ViewConnection connection={selectedConnection} />
-            :
-            null
-          }
-        </Drawer> */}
-    </div>
+           </div>
     );
   }

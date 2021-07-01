@@ -15,4 +15,8 @@ urlpatterns = [
     path("connectiontypes", views.connectionTypes, name="connectionTypes"),
     # Query
     path("runQuery", views.QueryView.as_view(), name="querys"),
+    # Anomaly
+    path("anomalys", views.AnomalyView.as_view(), name="anomalys"),
+    path("anomalys/<int:anomalyId>",views.AnomalyView.as_view(), name="anomaly"),
+    path("addAnomaly", views.AnomalyView.as_view(), name="addAnomaly")
 ]

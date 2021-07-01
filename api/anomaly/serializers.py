@@ -1,6 +1,6 @@
 import json
 from rest_framework import serializers
-from anomaly.models import Dataset, Connection, ConnectionType
+from anomaly.models import Dataset, Connection, ConnectionType, AnomalyDefinition
 
 
 class ConnectionSerializer(serializers.ModelSerializer):
@@ -104,3 +104,27 @@ class DatasetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Dataset
         fields = ['id', 'name', 'sql', 'connection', 'dimensions', 'metrics', 'granularity', 'timestampColumn']
+
+class AnomalySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AnomalyDefinition
+        fields = ["id", "metric", "dimension", "highOrLow", "top"]
+
+class AnomalyDefinitionSerializer(serializers.ModelSerializer):
+    """
+    Serializes data related to anomlay Definition
+    """
+    dataset = DatasetSerializer()
+    anomalyDef = serializers.SerializerMethodField()
+    def get_anomalyDef(self, obj):
+        params = {}
+        params["id"] = obj.id
+        params["metric"] = obj.metric
+        params["dimension"] = obj.dimension
+        params["highOrLow"] = obj.highOrLow
+        params["top"] = obj.top
+        return params
+    
+    class Meta:
+        model = AnomalyDefinition
+        fields = ["id",  "anomalyDef","dataset"]

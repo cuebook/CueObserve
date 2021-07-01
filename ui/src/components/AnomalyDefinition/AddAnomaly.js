@@ -2,8 +2,9 @@ import React, { useState, useEffect } from "react";
 import style from "./style.module.scss";
 import { components } from "react-select";
 import CreatableSelect from "react-select/creatable";
-// import { connect } from "react-redux";
 import { Modal, Select, Spin, Switch, Button, Radio, notification } from "antd";
+import datasetService from "services/datasets";
+import anomalyService from "services/anomaly.js";
 
 const { Option } = Select;
 
@@ -18,32 +19,18 @@ function generateOptions(autoCueOptions) {
   options = [];
   allOptions = {};
 
-  if (autoCueOptions.queryTypes && autoCueOptions.queryTypes.length) {
-    allOptions.operations = [];
-    autoCueOptions.queryTypes.forEach(q => {
-      if (operationMap[q]) {
-        options.push({
-          value: operationMap[q],
-          label: q,
-          optionType: "Operation",
-          color: "#ff6767"
-        });
-        allOptions.operations.push({
-          value: operationMap[q],
-          label: q,
-          optionType: "Operation",
-          color: "#ff6767"
-        });
-      }
-    });
-  }
-
-  if (autoCueOptions.globalMeasures && autoCueOptions.globalMeasures.length) {
+  if (autoCueOptions.metrics && autoCueOptions.metrics.length) {
     allOptions.metric = [];
-    autoCueOptions.globalMeasures.forEach(q => {
+    autoCueOptions.metrics.forEach(q => {
+      options.push({
+        value: q,
+        label: q,
+        optionType: "Measure",
+        color: "#ffc71f"
+      });
       allOptions.metric.push({
         value: q,
-        label: q.name,
+        label: q,
         optionType: "Measure",
         color: "#ffc71f"
       });
@@ -62,17 +49,6 @@ function generateOptions(autoCueOptions) {
     });
   }
 
-  allOptions.segments = [];
-  if (autoCueOptions.segments && autoCueOptions.segments.length) {
-    autoCueOptions.segments.forEach(q => {
-      allOptions.segments.push({
-        value: q.origin + q.id,
-        label: q.name,
-        optionType: q.origin == "gd" ? "Global Dim Segment" : "Measure Segment",
-        color: "#f241ff"
-      });
-    });
-  }
 
   allOptions.highOrLow = [
     {
@@ -89,23 +65,25 @@ function generateOptions(autoCueOptions) {
     }
   ];
 
-  allOptions.contribution = [
+  allOptions.top = [
     {
-      value: "contribution",
-      label: "On % Contribution",
-      optionType: "Contribution",
-      color: "#02c1a3"
+      value:"top",
+      label:"Top",
+      optionType:"Top",
+      color:"02c1a3"
     }
-  ];
+  ]
 
-  allOptions.cardless = [
+  allOptions.operation = [
     {
-      value: "cardless",
-      label: "Cardless",
-      optionType: "Cardless",
-      color: "#02c1a3"
+      value:10 + "",
+      label: 10 + "",
+      optionType: "Operation",
+      color:"blue"
+
     }
-  ];
+  ]
+
 }
 
 function updateHelpText(selectedOption) {
@@ -127,33 +105,30 @@ function updateHelpText(selectedOption) {
 
 const granularityKeyWords = ["day", "7day"];
 
-function getOperationHelpText(value) {
-  if (granularityKeyWords.indexOf(value) !== -1) {
-    options = allOptions.metric;
-    return " COUNT by STATE Lows Only";
-  }
-}
 
 function getMetricHelpText(value, opts) {
-  if (granularityKeyWords.indexOf(opts[0].value) !== -1) {
     options = [
       ...allOptions.dimension,
-      ...allOptions.segments,
       ...allOptions.highOrLow
     ];
     return " by STATE";
   }
-}
 
 function getDimensionHelpText(value, opts) {
-  if (granularityKeyWords.indexOf(opts[0].value) !== -1) {
     options = [];
-    if (opts[1].value.measureClass == "Physical") {
-      options = allOptions.contribution;
-    }
-    options = [...options, ...allOptions.highOrLow, ...allOptions.cardless];
+    options = [...options, ...allOptions.top];
     return " Highs Only";
   }
+
+function getTopHelpText(value, opts) {
+  options = []
+  options = [...options, ...allOptions.operation]
+}
+
+
+function getOperationHelpText(value, opts) {
+  options = []
+  options = [...options, ...allOptions.highOrLow]
 }
 
 function getHelpText(selectedOption) {
@@ -162,30 +137,23 @@ function getHelpText(selectedOption) {
     let lastOption = selectedOption[length - 1];
     let text = "";
     switch (lastOption.optionType) {
-      case "Operation":
-        text = getOperationHelpText(lastOption.value);
-        break;
       case "Measure":
         text = getMetricHelpText(lastOption.value, selectedOption);
         break;
       case "High Or Low":
-        options = allOptions.cardless;
+        options = [];
         break;
       case "Dimension":
         text = getDimensionHelpText(lastOption.value, selectedOption);
         break;
-      case "Global Dim Segment":
-        text = getDimensionHelpText(lastOption.value, selectedOption);
+      case "Top":
+        text = getTopHelpText(lastOption.value, selectedOption)
         break;
-      case "Measure Segment":
-        text = getDimensionHelpText(lastOption.value, selectedOption);
+      
+      case "Operation":
+        text = getOperationHelpText(lastOption.value, selectedOption)
         break;
-      case "Contribution":
-        options = allOptions.cardless;
-        break;
-      case "Cardless":
-        options = [];
-        break;
+
     }
     return text;
   }
@@ -194,125 +162,89 @@ function getHelpText(selectedOption) {
 
 export default function AddAnomaly(){
   const [allDatasets, setAllDatasets] = useState([]);
-  const [selectedDataset, setSelectedDataset] = useState([]);
+  const [selectedDataset, setSelectedDataset] = useState(null);
+  const [datasetId, setDatasetId] = useState();
   const [connections, setConnections] = useState([]);
   const [selectedOption, setSelectedOption] = useState([]);
   const [addingAnomaly, setAddingAnomaly] = useState([false]);
-  const [datasetId, setDatasetId] = useState([]);
   const [cube_id, setCube_id] = useState([]);
   const [published, setPublished] = useState([]);
   const [isFocused, setIsFocused] = useState([false]);
+  const [autoCueOption, setAutoCueOption] = useState([]);
+
+  useEffect(()=>{
+    if (allDatasets.length == 0){
+      getDatasets();
+    }
+  }, []);
+
+const getDatasets = async () => {
+  const data = await datasetService.getDatasets()
+  setAllDatasets(data)
+}
+const getDataset = async (datasetId) => {
+  const data = await datasetService.getDataset(datasetId)
+  setAutoCueOption(data)
+ generateOptions(data) 
+
+}
 
 
 
-
-
-  // constructor() {
-    // super();
-    // this.state = {
-    //   selectedOption: null,
-    //   addingAnomaly: false,
-    //   published: false,
-    //   cube_id: null
-    // };
-  // }
-
-//   componentDidMount() {
-//     const { dispatch } = this.props;
-//     dispatch({
-//       type: "cubes/LOAD_CUBES"
-//     });
-//     dispatch({
-//       type: "cubes/GLOBAL_CUBE"
-//     });
-//     dispatch({
-//       type: "cubes/GET_ANOMALYS"
-//     });
-//   }
-
-  // componentWillReceiveProps(props) {
-  //   generateOptions(props.query.autoCueOptions);
-  // };
 
  const handleAddAnomaly = () => {
-    const { dispatch } = this.props;
-    const { selectedOption } = this.state;
 
-    if (selectedOption.length < 2) {
+    if (selectedOption.length < 1) {
       notification.warning(
-        "Granularity and GlobalMeasure required to configure anomaly"
+        "Atleast GlobalMeasure required to configure anomaly"
       );
       return;
     }
 
     var payload = {
-      cube_id: cube_id,
-      globalMeasure: selectedOption[1].value,
-      granularity: selectedOption[0].value,
-      published: published,
-      highOrLow: ""
+      datasetId: datasetId,
+      measure: selectedOption[0].value
     };
 
     selectedOption.forEach(item => {
-      if (item.optionType === "Cardless") {
-        payload.cardless = true;
-      }
-      if (item.optionType === "Contribution") {
-        payload.contribution = true;
-      }
       if (item.optionType === "High Or Low") {
         payload.highOrLow = item.value;
       }
       if (item.optionType === "Dimension") {
         payload.dimension = item.value;
       }
-      if (item.optionType === "Global Dim Segment") {
-        payload.globalDimensionSegment = parseInt(item.value.substr(2));
-      }
-      if (item.optionType === "Measure Segment") {
-        payload.measureSegment = parseInt(item.value.substr(2));
+      if (item.optionType === "Operation"){
+        payload.top = item.value
       }
     });
+    getAddAnomaly(payload)
+    setAddingAnomaly(false)
 
-    // dispatch({
-    //   type: "cubes/ADD_ANOMALY",
-    //   payload: payload
-    // });
-
-    // this.setState({
-    //   addingAnomaly: false,
-    //   selectedOption: null
-    // });
-    // dispatch({
-    //   type: "cubes/GET_ANOMALYS"
-    // });
   };
 
- const handleCubeChange = value => {
-    const { dispatch } = this.props;
-    // dispatch({
-    //   type: "query/LOAD_AUTO_CUE_OPTIONS",
-    //   payload: value
-    // });
-    this.setState({ selectedOption: null, cube_id: value });
+  const getAddAnomaly = async (payload) =>{
+    console.log('pyalod', payload)
+  const response = await anomalyService.addAnomaly(payload)
+  }
+
+ const handleDatasetChange = value => {
+    setSelectedOption(null)
+    setDatasetId(value)
+    getDataset(value)
   };
 
   const handleChange = selectedOption => {
-    const { dispatch } = this.props;
-    // dispatch({
-    //   type: "query/SET_STATE",
-    //   payload: { autoCueQuery: selectedOption }
-    // });
-    this.setState({ selectedOption, isFocused: false });
+    setSelectedOption(selectedOption)
+    setIsFocused(false)
     // updateOptions(selectedOption);
     updateHelpText(selectedOption);
     setTimeout(() => {
-      this.setState({ isFocused: true });
+      setIsFocused(true)
     }, 200);
   };
 
   const  singleOption = props => {
-    if (props.label.indexOf("Create ") !== -1) {
+    if (props && props.lable && props.label.indexOf("Create ") !== -1) {
       return (
         <components.Option {...props}>
           <div className={style.optionWrapper}>
@@ -367,22 +299,18 @@ export default function AddAnomaly(){
     setIsFocused(val)
   }
 
-  // render() {
-    // const {
-    //   cubes: { cubes, globalCube }
-    // } = this.props;
-    // var cubeOptions = [];
-    // cubeOptions = cubes.map(cube => (
-    //   <Option value={cube.id} key={cube.id}>
-    //     {cube.name}
-    //   </Option>
-    // ));
+    var datasetOption = [];
+    datasetOption = allDatasets && allDatasets.map(dataset => (
+      <Option value={dataset.id} key={dataset.id}>
+        {dataset.name}
+      </Option>
+    ));
 
     return (
       <div>
         <div style={{ float: "right", paddingBottom: "10px" }}>
           <Button
-            icon="plus"
+            // icon="plus"
             type="primary"
             onClick={() => setAddingAnomaly(true)}
           >
@@ -422,7 +350,7 @@ export default function AddAnomaly(){
                   style={{ width: 200, float: "left" }}
                   placeholder="Select a dataset"
                   optionFilterProp="children"
-                  onChange={handleCubeChange}
+                  onChange={handleDatasetChange}
                 //   notFoundContent={
                 //     this.props.cubes.loading ? <Spin size="small" /> : null
                 //   }
@@ -432,7 +360,7 @@ export default function AddAnomaly(){
                       .indexOf(input.toLowerCase()) >= 0
                   }
                 >
-                  {/* {cubeOptions} */}
+                  {datasetOption}
                 </Select>
               </div>
               <div>
