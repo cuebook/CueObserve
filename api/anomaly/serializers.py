@@ -105,11 +105,6 @@ class DatasetSerializer(serializers.ModelSerializer):
         model = Dataset
         fields = ['id', 'name', 'sql', 'connection', 'dimensions', 'metrics', 'granularity', 'timestampColumn']
 
-class AnomalySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = AnomalyDefinition
-        fields = ["id", "metric", "dimension", "highOrLow", "top"]
-
 class AnomalyDefinitionSerializer(serializers.ModelSerializer):
     """
     Serializes data related to anomlay Definition

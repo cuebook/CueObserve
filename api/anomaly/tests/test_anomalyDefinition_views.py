@@ -4,25 +4,28 @@ from unittest import mock
 from django.test import TestCase
 from django.urls import reverse
 from mixer.backend.django import mixer
+from anomaly.models import AnomalyDefinition
 
 @pytest.mark.django_db(transaction=True)
-def test_anomalys(client, mocker):
+def test_anomalyDefinition(client, mocker):
+    """
+    Test cases for anomalyDefinition
+    """
 
     # Get anomlay when no entry
-    path = reverse('anomalys')
+    path = reverse('anomalyDefs')
     response = client.get(path)
     assert response.status_code == 200
     assert not response.data['data']
-
 
     # Create anomaly
     connection = mixer.blend("anomaly.connection")
     dataset = mixer.blend("anomaly.dataset", granularity='day')
 
-    path = reverse("addAnomaly")
+    path = reverse("addAnomalyDef")
     data = {
         "datasetId": dataset.id,
-        "metric": "Quantity",
+        "measure": "Quantity",
         "dimension": "Category",
         "highOrLow":"",
         "top":"10"
@@ -33,11 +36,17 @@ def test_anomalys(client, mocker):
     assert response.status_code == 200
     assert response.data['success'] 
 
-
     # Get anomalys
-    path = reverse('anomalys')
+    path = reverse('anomalyDefs')
     response = client.get(path)
     assert response.status_code == 200
     assert response.data['data']
+    anomaly = response.data['data'][0]["anomalyDef"]
 
-    dataset = response.data['data'][0]
+    #Delete anomalys
+    path = reverse('anomalyDefs', kwargs={"anomalyId": anomaly["id"]})
+    response = client.delete(path)
+    assert response.status_code == 200
+    assert response.data
+
+

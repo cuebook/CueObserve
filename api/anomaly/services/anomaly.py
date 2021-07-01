@@ -8,7 +8,7 @@ from anomaly.serializers import AnomalyDefinitionSerializer
 class Anomalys:
 
     @staticmethod
-    def getAnomalys():
+    def getAllAnomalyDefinition():
         """
         This method is used to get all anomlayObj
         """
@@ -21,32 +21,29 @@ class Anomalys:
         return response
 
     @staticmethod
-    def addAnomalyObj(metric: str = None, dimension: str = None, highOrLow: str = None, top: int = 0, datasetId: int = 0):
+    def addAnomalyDefinition(metric: str = None, dimension: str = None, highOrLow: str = None, top: int = 0, datasetId: int = 0):
         """
         This method is used to add anomaly to AnomalyDefinition table
         """
         response = ApiResponse("Error in creating AnomalyObject")
-        anomalyObj, created = AnomalyDefinition.objects.get_or_create(
+        anomalyObj = AnomalyDefinition.objects.create(
             dataset_id=datasetId,
             metric=metric,
             dimension=dimension,
             highOrLow=highOrLow,
             top=top
         )
-        if created:
-            response.update(True, "AnomalyObject created ")
-        else:
-            response.update(False, "AnomalyObject allready exists !")
-
+        anomalyObj.save()
+        response.update(True, "AnomalyDefinition created successfully !")
         return response
 
     @staticmethod
-    def deleteAnomalyObj(id):
+    def deleteAnomalyDefinition(anomalyId):
         """
-        Delete anomaly objectsof given id
+        Delete anomaly objects of given id
         """
         response = ApiResponse("Error in creating AnomalyObject")
-        anomalyObj = AnomalyDefinition.objects.get(id=id)
+        anomalyObj = AnomalyDefinition.objects.get(id=anomalyId)
         anomalyObj.delete()
         response.update(True,"Anomaly Object successfully deleted")
         return response

@@ -120,7 +120,6 @@ function getTopHelpText(value, opts) {
   options = [...options, ...allOptions.operation]
 }
 
-
 function getOperationHelpText(value, opts) {
   options = []
   options = [...options, ...allOptions.highOrLow]
@@ -168,7 +167,7 @@ function getHelpText(selectedOption) {
   return "";
 }
 
-export default function AddAnomaly(){
+export default function AddAnomalyDef(){
   const [allDatasets, setAllDatasets] = useState([]);
   const [datasetId, setDatasetId] = useState();
   const [selectedOption, setSelectedOption] = useState([]);

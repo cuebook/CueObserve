@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Table, Button, Popconfirm, Input, message, Tooltip, Drawer } from "antd";
 import style from "./style.module.scss";
-import AddAnomaly from "./AddAnomaly.js"
+import AddAnomalyDef from "./AddAnomalyDef.js"
 import { EyeOutlined, DeleteOutlined } from '@ant-design/icons';
 import ErrorBoundary from "antd/lib/alert/ErrorBoundary";
 import anomalyService from "services/anomaly.js"
@@ -27,9 +27,6 @@ export default function Connection() {
 const deleteAnomaly = (anomaly) =>{
   const response = anomalyService.deleteAnomaly(anomaly.id)
 }
-
-
-
 
   const columns = [
       
@@ -127,7 +124,7 @@ const deleteAnomaly = (anomaly) =>{
         <div className={`d-flex flex-column justify-content-center text-right mb-2`}>
 
             <ErrorBoundary>
-              <AddAnomaly />
+              <AddAnomalyDef />
             </ErrorBoundary>
         </div>
         <Table
