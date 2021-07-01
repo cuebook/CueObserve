@@ -11,7 +11,8 @@ import HeaderStats from "components/Headers/HeaderStats.js";
 // views
 import Datasets from "views/admin/Datasets";
 import Dataset from "views/admin/Dataset";
-import Connections from "views/admin/Connections"
+import Connections from "views/admin/Connections";
+import AnomalyDefTable from "views/admin/AnomalyDefTable";
 
 // contexts
 import { GlobalContextProvider } from "./GlobalContext";
@@ -32,6 +33,8 @@ export default function Admin() {
               <Route path="/dataset/create" exact component={Dataset} />
               <Route path="/dataset/:datasetId" exact component={Dataset} />
               <Route path="/connections" exact component={Connections} />
+              <Route path="/anomalyDefinitions" exact component={AnomalyDefTable} />
+
               <Redirect from="/" to="/datasets" />
             </Switch>
           </div>

@@ -15,6 +15,11 @@ export default function Sidebar(props) {
       "label": "Connections",
       "path": "/connections",
       "icon": "fa-plug"
+    },
+    {
+      "label": "Anomaly Definition",
+      "path": "/anomalyDefinitions",
+      "icon": "fa-exclamation-triangle"
     }
   ]
 
