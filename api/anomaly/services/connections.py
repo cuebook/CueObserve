@@ -1,7 +1,7 @@
 import logging
 from typing import List
 from utils.apiResponse import ApiResponse
-from dbConnections.dbConnection import BigQueryConnection
+from dbConnections import BigQuery
 from anomaly.models import (
     Connection,
     ConnectionParam,
@@ -50,7 +50,7 @@ class Connections:
             "file", {}
         )  # now it's only for BigQuery connection
         if payload["connectionType_id"] == 4:
-            connectionResponse = BigQueryConnection.checkConnection(file)
+            connectionResponse = BigQuery.checkConnection(file)
 
             if connectionResponse:
                 connection = Connection.objects.create(
