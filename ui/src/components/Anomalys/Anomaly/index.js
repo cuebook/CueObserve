@@ -16,13 +16,13 @@ import { Form, Button, Input,
   Switch,
   Table
  } from 'antd';
-import datasetService from "services/datasets";
+import anomalyService from "services/anomalys";
 import queryService from "services/querys";
 import SelectConnection from "components/Connections/SelectConnection";
 
 const { Option } = Select;
 
-export default function Dataset(props) {
+export default function Anomaly(props) {
   const [datasetName, setDatasetName] = useState("");
   const [datasetSql, setDatasetSql] = useState("");
   const [datasetConnection, setDatasetConnection] = useState(null);
@@ -44,7 +44,7 @@ export default function Dataset(props) {
   }, []);
 
   const getDataset = async () => {
-    const data = await datasetService.getDataset(params.datasetId)
+    const data = await anomalyService.getDataset(params.datasetId)
     if (data){
       setIsDataReceived(true);
       setDatasetName(data.name);
@@ -89,9 +89,9 @@ export default function Dataset(props) {
       granularity: datasetGranularity,
     }
     if (params.datasetId)
-      await datasetService.updateDataset(params.datasetId, payload)
+      await anomalyService.updateDataset(params.datasetId, payload)
     else {
-      const response = await datasetService.createDataset(payload)
+      const response = await anomalyService.createDataset(payload)
       if (response)
         history.push("/datasets")
     }
@@ -206,12 +206,9 @@ export default function Dataset(props) {
           <div className={style.run}>
             <Button type="primary" onClick={runDatasetQuery} loading={loadingQueryData}>Run SQL</Button>
           </div>
-          { params.datasetId ? null 
-            :
           <div className={style.save}>
             <Button type="primary" onClick={saveDataset} disabled={queryData && queryData.length ? false : true }>Save Dataset</Button>
           </div>
-          }
         </div>
       </div>   
       </div>

@@ -10,7 +10,7 @@ import {
   Popconfirm,
   Tooltip
 } from "antd";
-import { MoreOutlined, PlayCircleOutlined, UnorderedListOutlined, StopOutlined, FileTextOutlined, DeleteOutlined, CopyOutlined, CloseOutlined, EditOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import PopconfirmButton from "components/Utils/PopconfirmButton";
 
 export default function DatasetsTable(props) {
@@ -76,8 +76,8 @@ export default function DatasetsTable(props) {
       render: (text, record) => {
         return (
           <div className={style.actions}>
-             <Tooltip title={"Delete Dataset"}>
-                 <EditOutlined onClick={()=>editDataset(record)} />
+             <Tooltip title={"View Dataset"}>
+                 <EyeOutlined onClick={()=>editDataset(record)} />
              </Tooltip>
 
              <Popconfirm

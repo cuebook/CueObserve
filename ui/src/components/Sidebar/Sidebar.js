@@ -7,9 +7,14 @@ export default function Sidebar(props) {
   let urlPrefix = ""
   const menuItems = [
     {
+      "label": "Anomalys",
+      "path": "/anomalys",
+      "icon": "fa-exclamation-triangle"
+    },
+    {
       "label": "Datasets",
       "path": "/datasets",
-      "icon": "fa-file"
+      "icon": "fa-table"
     },
     {
       "label": "Connections",

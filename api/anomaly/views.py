@@ -8,6 +8,39 @@ from django.http import HttpRequest
 from anomaly.services import Datasets, Connections, Querys
 
 
+class AnomalysView(APIView):
+    """
+    Provides views on datasets(many)
+    """
+
+    def get(self, request):
+        """get request"""
+        res = Datasets.getDatasets()
+        return Response(res.json())
+
+
+class AnomalyView(APIView):
+    """
+    Provided views on Dataset(single)
+    """
+
+    def get(self, request, datasetId: int):
+        """get request"""
+        res = Datasets.getDataset(datasetId)
+        return Response(res.json())
+
+    def post(self, request, datasetId: int):
+        """post request"""
+        data = request.data
+        res = Datasets.updateDataset(datasetId, data)
+        return Response(res.json())
+
+    def delete(self, request, datasetId: int):
+        """delete request"""
+        res = Datasets.deleteDataset(datasetId)
+        return Response(res.json())
+
+
 class DatasetsView(APIView):
     """
     Provides views on datasets(many)

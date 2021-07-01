@@ -1,0 +1,66 @@
+.dataset {
+
+	.datasetName {
+		padding: 5px;
+		padding-bottom: 20px;
+		.nameInput {
+		  font-size: 1.5rem;
+		  border: none;
+		  padding: 10px 0 !important;
+		  background: none;
+		  border-radius: 0;
+		  border-bottom: 2px solid #a6adb5;
+		  height: 40px;
+		}
+	}
+
+	.selectConnection {
+		padding: 5px;
+	}
+
+	.SQLEditor {
+		padding: 5px;
+	}
+
+	.dataTable {
+		padding: 5px;
+		padding-top: 10px;
+	}
+
+	.typeSelectorTable {
+
+		padding:  5px;
+		padding-left: 25px;
+		width:  50%;
+		p {
+			margin-left: -20px;
+			font-size: 15px ;
+		}
+
+	}
+
+	.granularity {
+		padding: 5px;
+		padding-left: 25px;
+		p {
+			margin-left: -20px;
+			font-size: 15px;
+		}
+	}
+
+	.buttons {
+		padding: 5px;
+		padding-top: 25px;
+		display: flex;
+		.run {
+			margin-right: 5px;
+		}
+
+		.save {
+
+		}
+	}
+
+
+
+}
