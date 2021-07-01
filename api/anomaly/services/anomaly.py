@@ -1,7 +1,7 @@
 import logging
 from typing import List
 from utils.apiResponse import ApiResponse
-from dbConnections.dbConnection import BigQueryConnection
+from dbConnections import BigQuery
 from anomaly.models import AnomalyDefinition, Dataset
 from anomaly.serializers import AnomalyDefinitionSerializer
 
