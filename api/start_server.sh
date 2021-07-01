@@ -6,7 +6,7 @@ fi
 redis-server &
 export DEBUG=false
 python manage.py migrate
-# python manage.py loaddata seeddata/*.json
+python manage.py loaddata seeddata/*.json
 chmod -R 777 db
 chown -R www-data:www-data db
 (gunicorn app.wsgi --user www-data --bind 0.0.0.0:8000 --workers 3) &
