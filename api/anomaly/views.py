@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.http import HttpRequest
 
-from anomaly.services import Datasets, Connections, Querys, Anomalys
+from anomaly.services import Datasets, Connections, Querys, AnomalyDefinitions
 
 
 class DatasetsView(APIView):
@@ -123,7 +123,7 @@ class AnomalyView(APIView):
     Provides view on Anomaly Operation
     """
     def get(self, request):
-        res = Anomalys.getAllAnomalyDefinition()
+        res = AnomalyDefinitions.getAllAnomalyDefinition()
         return Response(res.json())
 
     def post(self, request):
@@ -132,9 +132,9 @@ class AnomalyView(APIView):
         highOrLow = request.data.get("highOrLow", None)
         top = int(request.data.get("top", 0))
         dimension = request.data.get("dimension", None)
-        res = Anomalys.addAnomalyDefinition(metric, dimension, highOrLow, top, datasetId)
+        res = AnomalyDefinitions.addAnomalyDefinition(metric, dimension, highOrLow, top, datasetId)
         return Response(res.json())
 
     def delete(self, request ,anomalyId: int):
-        res = Anomalys.deleteAnomalyDefinition(anomalyId)
+        res = AnomalyDefinitions.deleteAnomalyDefinition(anomalyId)
         return Response(res.json())

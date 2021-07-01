@@ -44,7 +44,7 @@ def test_anomalyDefinition(client, mocker):
     anomaly = response.data['data'][0]["anomalyDef"]
 
     #Delete anomalys
-    path = reverse('anomalyDefs', kwargs={"anomalyId": anomaly["id"]})
+    path = reverse('anomalyDef', kwargs={"anomalyId": anomaly["id"]})
     response = client.delete(path)
     assert response.status_code == 200
     assert response.data

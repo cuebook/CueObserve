@@ -12,7 +12,7 @@ class AnomalyService {
         return response
     }
     async deleteAnomaly(id){
-        const response = await apiService.delete("anomaly/anomalyDefs/" + id)
+        const response = await apiService.delete("anomaly/anomalyDef/" + id)
         return response
     }
 

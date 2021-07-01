@@ -5,7 +5,7 @@ from dbConnections import BigQuery
 from anomaly.models import AnomalyDefinition, Dataset
 from anomaly.serializers import AnomalyDefinitionSerializer
 
-class Anomalys:
+class AnomalyDefinitions:
 
     @staticmethod
     def getAllAnomalyDefinition():
