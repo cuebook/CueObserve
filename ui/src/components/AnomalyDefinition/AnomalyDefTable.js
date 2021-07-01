@@ -20,7 +20,6 @@ export default function Connection() {
 
   const fetchData = async () => {
     const response = await anomalyService.getAnomalys();
-    console.log('response', response.data)
     setData(response.data)
   }
 
@@ -67,10 +66,9 @@ const deleteAnomaly = (anomaly) =>{
           return (         
                 <div style={{fontSize:14}}>
                  <span style={{color: "#ffc71f"}}> {record.anomalyDef.metric}</span>
-                  <span style={{color: "#12b1ff"}}> {record.anomalyDef.dimension}</span>
-                  <span style={{color: "blue"}}> {record.anomalyDef.top > 0 ? record.anomalyDef.top : null}</span>
+                  <span style={{color: "#12b1ff"}}> {record.anomalyDef.dimension ? record.anomalyDef.dimension : null}</span>
+                  <span style={{color: "#ff6767"}}> {record.anomalyDef.top > 0 ? "Top " + record.anomalyDef.top : null}</span>
                   <span style={{color: "#02c1a3"}}> {record.anomalyDef.highOrLow}</span>
-                  
                   </div>
 
               )

@@ -10,10 +10,6 @@ const { Option } = Select;
 
 let options = [];
 let allOptions = {};
-const operationMap = {
-  daily: "day",
-  "7day": "7day"
-};
 
 function generateOptions(autoCueOptions) {
   options = [];
@@ -52,13 +48,13 @@ function generateOptions(autoCueOptions) {
 
   allOptions.highOrLow = [
     {
-      value: "high",
+      value: "High",
       label: "Highs Only",
       optionType: "High Or Low",
       color: "#02c1a3"
     },
     {
-      value: "low",
+      value: "Low",
       label: "Lows Only",
       optionType: "High Or Low",
       color: "#02c1a3"
@@ -67,10 +63,10 @@ function generateOptions(autoCueOptions) {
 
   allOptions.top = [
     {
-      value:"top",
+      value:"Top",
       label:"Top",
       optionType:"Top",
-      color:"02c1a3"
+      color:"#ff6767"
     }
   ]
 
@@ -79,7 +75,7 @@ function generateOptions(autoCueOptions) {
       value:10 + "",
       label: 10 + "",
       optionType: "Operation",
-      color:"blue"
+      color:"#ff6767"
 
     }
   ]
@@ -103,7 +99,6 @@ function updateHelpText(selectedOption) {
   }
 }
 
-const granularityKeyWords = ["day", "7day"];
 
 
 function getMetricHelpText(value, opts) {
@@ -136,6 +131,19 @@ function getHelpText(selectedOption) {
     let length = selectedOption.length;
     let lastOption = selectedOption[length - 1];
     let text = "";
+    if (lastOption.__isNew__) {
+      // when custom input by user
+      // check in options of callback validation functions
+          let newOption = lastOption;
+          newOption.value = lastOption.value;
+          newOption.label = lastOption.value + " ";
+          newOption.optionType = "Operation"
+          newOption.color = "#ff6767"
+          selectedOption.pop();
+          selectedOption.push(newOption);
+          lastOption = newOption
+      }
+
     switch (lastOption.optionType) {
       case "Measure":
         text = getMetricHelpText(lastOption.value, selectedOption);
@@ -162,15 +170,10 @@ function getHelpText(selectedOption) {
 
 export default function AddAnomaly(){
   const [allDatasets, setAllDatasets] = useState([]);
-  const [selectedDataset, setSelectedDataset] = useState(null);
   const [datasetId, setDatasetId] = useState();
-  const [connections, setConnections] = useState([]);
   const [selectedOption, setSelectedOption] = useState([]);
-  const [addingAnomaly, setAddingAnomaly] = useState([false]);
-  const [cube_id, setCube_id] = useState([]);
-  const [published, setPublished] = useState([]);
-  const [isFocused, setIsFocused] = useState([false]);
-  const [autoCueOption, setAutoCueOption] = useState([]);
+  const [addingAnomaly, setAddingAnomaly] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
 
   useEffect(()=>{
     if (allDatasets.length == 0){
@@ -184,13 +187,8 @@ const getDatasets = async () => {
 }
 const getDataset = async (datasetId) => {
   const data = await datasetService.getDataset(datasetId)
-  setAutoCueOption(data)
- generateOptions(data) 
-
+    generateOptions(data) 
 }
-
-
-
 
  const handleAddAnomaly = () => {
 
@@ -223,7 +221,6 @@ const getDataset = async (datasetId) => {
   };
 
   const getAddAnomaly = async (payload) =>{
-    console.log('pyalod', payload)
   const response = await anomalyService.addAnomaly(payload)
   }
 
