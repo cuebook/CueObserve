@@ -12,6 +12,11 @@ export default function Sidebar(props) {
       "icon": "fa-exclamation-triangle"
     },
     {
+      "label": "Anomaly Definition",
+      "path": "/anomalyDefinitions",
+      "icon": "fa-exclamation"
+    },
+    {
       "label": "Datasets",
       "path": "/datasets",
       "icon": "fa-table"
@@ -20,7 +25,7 @@ export default function Sidebar(props) {
       "label": "Connections",
       "path": "/connections",
       "icon": "fa-plug"
-    }
+    },
   ]
 
   let menuElements = []

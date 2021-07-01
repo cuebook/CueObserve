@@ -1,0 +1,83 @@
+
+// @import "assets/styles/mixins.scss";
+
+.selectedOption {
+  // color: black;
+}
+
+.optionWrapper {
+  display: inline-block;
+  width: 100%;
+  height: 22px;
+}
+
+.subText {
+  font-size: 10px;
+  color: gray-4;
+  display: inline-block;
+  margin: 0;
+  position: relative !important;
+  top: -18px;
+  border-radius: 5px;
+  padding: 0px 3px;
+  float: right;
+}
+
+.option {
+  margin: 0;
+}
+
+.filterWrapper {
+  display: inline-block;
+  width: 100%;
+  position: relative;
+}
+
+.filterLabel {
+  width: 100px;
+  color:gray-4;
+  position: absolute;
+  float: left;
+  height: 38px;
+  padding: 7px 12px;
+  border-radius: 0 0 0 5px;
+  z-index: 99;
+
+  i {
+    margin-right: 5px;
+  }
+}
+
+.cuelFilterLabel {
+  width: 100px;
+  background: primary;
+  color: gray-4;
+  float: left;
+  height: 38px;
+  padding: 9px 20px;
+  border-radius: 5px 0 0 0;
+
+  i {
+    margin-right: 5px;
+  }
+}
+
+.filterEditor {
+  float: right !important;
+  width: 70%;
+  margin-bottom: 2px;
+}
+
+.cuelSqlRadio {
+  margin-top: 6px;
+  margin-bottom: 10px;
+  font-size: 12px;
+  position: absolute;
+  right: 0px;
+  top: -14px;
+
+  .cuelSqlRadioElement{
+    height: 24px;
+    line-height: 22px;
+  }
+}
