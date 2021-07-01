@@ -36,6 +36,8 @@ jobs:
         
     - name: Run Pylint
       run: |
+        cd api
+        export DJANGO_SETTINGS_MODULE=app.settings
         URL="https://api.github.com/repos/${GITHUB_REPOSITORY}/pulls/${{ github.event.pull_request.number }}/files"
         echo "************ Getting files for this PR **********"
         git fetch 
@@ -53,7 +55,7 @@ jobs:
           for file in $x; do
             file=$(echo $file | cut -d ':' -f 1)
             echo "Running Pylint on: "$file;
-            python ./api/lint.py --path $file --threshold 8
+            python ./lint.py --path $file --threshold 8
             ret=$?
             if [ $ret -ne 0 ]; then
                 echo " ----------------------------- Pylint failed for file: "$file

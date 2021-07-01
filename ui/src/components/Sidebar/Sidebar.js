@@ -73,7 +73,7 @@ export default function Sidebar(props) {
               className="md:block text-left md:pb-1 text-gray-700 mr-0 inline-block whitespace-no-wrap text-sm uppercase font-bold p-0 px-0"
               to={urlPrefix + "/"}
             >
-              <img src={require("assets/img/cuebook.png")} />
+              <img src={require("assets/img/cueObserve.png")} />
             </Link>
             </>
           }
