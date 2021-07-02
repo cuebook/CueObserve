@@ -5,11 +5,13 @@ import CreatableSelect from "react-select/creatable";
 import { Modal, Select, Spin, Switch, Button, Radio, notification } from "antd";
 import datasetService from "services/datasets";
 import anomalyDefService from "services/anomalyDefinitions.js";
+import  _ from "lodash";
 
 const { Option } = Select;
 
 let options = [];
 let allOptions = {};
+let tempOption = {};
 
 function generateOptions(autoCueOptions) {
   options = [];
@@ -118,11 +120,13 @@ function getDimensionHelpText(value, opts) {
 function getTopHelpText(value, opts) {
   options = []
   options = [...options, ...allOptions.operation]
+  return "Top Values"
 }
 
 function getOperationHelpText(value, opts) {
   options = []
   options = [...options, ...allOptions.highOrLow]
+  return "Number"
 }
 
 function getHelpText(selectedOption) {
@@ -141,30 +145,53 @@ function getHelpText(selectedOption) {
           selectedOption.pop();
           selectedOption.push(newOption);
           lastOption = newOption
+          tempOption = lastOption
       }
 
     switch (lastOption.optionType) {
       case "Measure":
         text = getMetricHelpText(lastOption.value, selectedOption);
+        tempOption = lastOption
         break;
       case "High Or Low":
         options = [];
         break;
       case "Dimension":
+        if (lastOption.optionType === "Dimension" && tempOption.optionType === "Top"){
+         lastOption =  selectedOption.pop()
+         text = getMetricHelpText(lastOption.value, selectedOption);
+         tempOption = lastOption
+        }
+        else {
         text = getDimensionHelpText(lastOption.value, selectedOption);
+        let defaultOption1 = options.pop()  
+        selectedOption.push(defaultOption1)
+        lastOption = defaultOption1
+        text = getTopHelpText(lastOption.value, selectedOption)
+        let defaultOption2 = options.pop()
+        selectedOption.push(defaultOption2)
+        lastOption = defaultOption2
+        text = getOperationHelpText(lastOption.value, selectedOption)
+        }
         break;
       case "Top":
         text = getTopHelpText(lastOption.value, selectedOption)
+        tempOption = lastOption
         break;
-      
       case "Operation":
         text = getOperationHelpText(lastOption.value, selectedOption)
+        tempOption = lastOption
         break;
 
     }
     return text;
   }
-  return "";
+  else{
+      options = []
+      options = [...options, ...allOptions.metric]
+      return options
+  }
+  // return "";
 }
 
 export default function AddAnomalyDef(){
@@ -180,6 +207,7 @@ export default function AddAnomalyDef(){
     }
   }, []);
 
+
 const getDatasets = async () => {
   const data = await datasetService.getDatasets()
   setAllDatasets(data)
@@ -190,11 +218,10 @@ const getDataset = async (datasetId) => {
 }
 
  const handleAddAnomaly = () => {
-
-    if (selectedOption.length < 1) {
-      notification.warning(
-        "Atleast GlobalMeasure required to configure anomaly"
-      );
+    if ( _.isNull(selectedOption )) {
+      notification.warning({
+        message: "At least Measure required to configure anomaly !"
+           });
       return;
     }
 
@@ -203,19 +230,32 @@ const getDataset = async (datasetId) => {
       measure: selectedOption[0].value
     };
 
+    let isDimension = false
+    let topVal = null;
     selectedOption.forEach(item => {
       if (item.optionType === "High Or Low") {
         payload.highOrLow = item.value;
       }
       if (item.optionType === "Dimension") {
         payload.dimension = item.value;
+        isDimension = true
       }
       if (item.optionType === "Operation"){
         payload.top = item.value
+        topVal = item.value
       }
     });
+
+    if(isDimension && _.isNull(topVal)){
+      notification.warning({
+        message: "Please Enter Top Values "
+           });
+      return;
+    }
+
     getAddAnomaly(payload)
     setAddingAnomaly(false)
+    setSelectedOption("")
 
   };
 
