@@ -48,6 +48,17 @@ class AnomalyDefinitions:
         response.update(True,"Anomaly Object successfully deleted")
         return response
 
+    @staticmethod
+    def editAnomalyDefinition(anomalyId: int = 0, highOrLow: str = None):
+        """
+        Update anomaly objects of given anomalyId
+        """
+        response = ApiResponse("Error in updating AnomalyObject")
+        anomalyObj = AnomalyDefinition.objects.get(id=anomalyId)
+        anomalyObj.highOrLow = highOrLow
+        anomalyObj.save()
+        response.update(True, "AnomalyObj updated successfully")
+        return response
 
         
 

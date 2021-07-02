@@ -21,4 +21,5 @@ urlpatterns = [
         "anomalyDef/<int:anomalyId>", views.AnomalyDefView.as_view(), name="anomalyDef"
     ),
     path("addAnomalyDef", views.AnomalyDefView.as_view(), name="addAnomalyDef"),
+    path("editAnomalyDef",  views.AnomalyDefView.as_view(), name="editAnomalyDef")
 ]

@@ -3,7 +3,8 @@ import React, { useState, useEffect } from "react";
 import { Table, Button, Popconfirm, Input, message, Tooltip, Drawer } from "antd";
 import style from "./style.module.scss";
 import AddAnomalyDef from "./AddAnomalyDef.js"
-import { EyeOutlined, DeleteOutlined } from '@ant-design/icons';
+import EditAnomalyDef from "./EditAnomalyDef.js"
+import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import ErrorBoundary from "antd/lib/alert/ErrorBoundary";
 import anomalyDefService from "services/anomalyDefinitions.js"
 const { Search } = Input;
@@ -11,6 +12,8 @@ const ButtonGroup = Button.Group;
 
 export default function Connection() {
   const [data, setData] = useState([]);
+  const [editAnomalyDef, setEditAnomalyDef] = useState([]);
+  const [edit, setEdit] = useState(false);
 
   useEffect(() => {
     if (!data.length) {
@@ -26,6 +29,14 @@ export default function Connection() {
 
 const deleteAnomalyDef = (anomalyDef) =>{
   const response = anomalyDefService.deleteAnomalyDef(anomalyDef.id)
+}
+
+const editAnomlay = (anomalyDef) => {
+  setEdit(true)
+  setEditAnomalyDef(anomalyDef)
+}
+const onEditAnomalyDefSuccess = (val) => {
+  setEdit(val)
 }
 
   const columns = [
@@ -103,6 +114,9 @@ const deleteAnomalyDef = (anomalyDef) =>{
         key: "",
         render: (text, record) => (
          <div className={style.actions}>
+           <Tooltip title={"Edit AnomalyDefinition"}>
+              <EditOutlined onClick={() => editAnomlay(record)} />
+            </Tooltip>
             <Popconfirm
                 title={"Are you sure to delete Anomaly of id "+ record.id +"?"}
                 onConfirm={() => deleteAnomalyDef(record)}
@@ -110,7 +124,7 @@ const deleteAnomalyDef = (anomalyDef) =>{
                 okText="Yes"
                 cancelText="No"
             >
-                <Tooltip title={"Delete Connection"}>
+                <Tooltip title={"Delete AnomalyDefinition"}>
                     <DeleteOutlined />
                 </Tooltip>
             </Popconfirm>
@@ -126,6 +140,9 @@ const deleteAnomalyDef = (anomalyDef) =>{
             <ErrorBoundary>
               <AddAnomalyDef />
             </ErrorBoundary>
+          {edit ? 
+          <EditAnomalyDef onEditAnomalyDefSuccess={onEditAnomalyDefSuccess} editAnomalyDef={editAnomalyDef}/> 
+          : null }
         </div>
         <Table
             rowKey={"id"}

@@ -11,6 +11,10 @@ class AnomalyDefService {
         const response = await apiService.post("anomaly/addAnomalyDef" , payload)
         return response
     }
+    async editAnomalyDef(payload){
+        const response = await apiService.put("anomaly/editAnomalyDef",payload)
+        return response
+    }
     async deleteAnomalyDef(id){
         const response = await apiService.delete("anomaly/anomalyDef/" + id)
         return response
