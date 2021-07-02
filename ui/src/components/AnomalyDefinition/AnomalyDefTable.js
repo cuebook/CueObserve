@@ -5,7 +5,7 @@ import style from "./style.module.scss";
 import AddAnomalyDef from "./AddAnomalyDef.js"
 import { EyeOutlined, DeleteOutlined } from '@ant-design/icons';
 import ErrorBoundary from "antd/lib/alert/ErrorBoundary";
-import anomalyService from "services/anomaly.js"
+import anomalyDefService from "services/anomalyDefinitions.js"
 const { Search } = Input;
 const ButtonGroup = Button.Group;
 
@@ -19,13 +19,13 @@ export default function Connection() {
   }, []);
 
   const fetchData = async () => {
-    const response = await anomalyService.getAnomalys();
+    const response = await anomalyDefService.getAnomalyDefs();
     setData(response.data)
   }
 
 
-const deleteAnomaly = (anomaly) =>{
-  const response = anomalyService.deleteAnomaly(anomaly.id)
+const deleteAnomalyDef = (anomalyDef) =>{
+  const response = anomalyDefService.deleteAnomalyDef(anomalyDef.id)
 }
 
   const columns = [
@@ -105,7 +105,7 @@ const deleteAnomaly = (anomaly) =>{
          <div className={style.actions}>
             <Popconfirm
                 title={"Are you sure to delete Anomaly of id "+ record.id +"?"}
-                onConfirm={() => deleteAnomaly(record)}
+                onConfirm={() => deleteAnomalyDef(record)}
                 // onCancel={cancel}
                 okText="Yes"
                 cancelText="No"
