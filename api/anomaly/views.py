@@ -118,10 +118,12 @@ class QueryView(APIView):
         )
         return Response(res.json())
 
-class AnomalyView(APIView):
+
+class AnomalyDefView(APIView):
     """
     Provides view on Anomaly Operation
     """
+
     def get(self, request):
         res = AnomalyDefinitions.getAllAnomalyDefinition()
         return Response(res.json())
@@ -132,9 +134,11 @@ class AnomalyView(APIView):
         highOrLow = request.data.get("highOrLow", None)
         top = int(request.data.get("top", 0))
         dimension = request.data.get("dimension", None)
-        res = AnomalyDefinitions.addAnomalyDefinition(metric, dimension, highOrLow, top, datasetId)
+        res = AnomalyDefinitions.addAnomalyDefinition(
+            metric, dimension, highOrLow, top, datasetId
+        )
         return Response(res.json())
 
-    def delete(self, request ,anomalyId: int):
+    def delete(self, request, anomalyId: int):
         res = AnomalyDefinitions.deleteAnomalyDefinition(anomalyId)
         return Response(res.json())

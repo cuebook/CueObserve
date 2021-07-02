@@ -16,7 +16,9 @@ urlpatterns = [
     # Query
     path("runQuery", views.QueryView.as_view(), name="querys"),
     # AnomalyDefinition
-    path("anomalyDefs", views.AnomalyView.as_view(), name="anomalyDefs"),
-    path("anomalyDef/<int:anomalyId>",views.AnomalyView.as_view(), name="anomalyDef"),
-    path("addAnomalyDef", views.AnomalyView.as_view(), name="addAnomalyDef")
+    path("anomalyDefs", views.AnomalyDefView.as_view(), name="anomalyDefs"),
+    path(
+        "anomalyDef/<int:anomalyId>", views.AnomalyDefView.as_view(), name="anomalyDef"
+    ),
+    path("addAnomalyDef", views.AnomalyDefView.as_view(), name="addAnomalyDef"),
 ]

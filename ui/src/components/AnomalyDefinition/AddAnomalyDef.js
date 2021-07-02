@@ -4,7 +4,7 @@ import { components } from "react-select";
 import CreatableSelect from "react-select/creatable";
 import { Modal, Select, Spin, Switch, Button, Radio, notification } from "antd";
 import datasetService from "services/datasets";
-import anomalyService from "services/anomaly.js";
+import anomalyDefService from "services/anomalyDefinitions.js";
 
 const { Option } = Select;
 
@@ -220,7 +220,7 @@ const getDataset = async (datasetId) => {
   };
 
   const getAddAnomaly = async (payload) =>{
-  const response = await anomalyService.addAnomaly(payload)
+  const response = await anomalyDefService.addAnomalyDef(payload)
   }
 
  const handleDatasetChange = value => {
