@@ -14,7 +14,7 @@ export default function Sidebar(props) {
     {
       "label": "Anomaly Definition",
       "path": "/anomalyDefinitions",
-      "icon": "fa-exclamation"
+      "icon": "fa-cog"
     },
     {
       "label": "Datasets",

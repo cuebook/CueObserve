@@ -10,7 +10,7 @@ import {
   Popconfirm,
   Tooltip
 } from "antd";
-import { MoreOutlined, PlayCircleOutlined, UnorderedListOutlined, StopOutlined, FileTextOutlined, DeleteOutlined, CopyOutlined, CloseOutlined, EditOutlined } from '@ant-design/icons';
+import { EyeOutlined } from '@ant-design/icons';
 import PopconfirmButton from "components/Utils/PopconfirmButton";
 
 export default function AnomalysTable(props) {
@@ -30,12 +30,16 @@ export default function AnomalysTable(props) {
     }
   }
 
+  const viewAnomaly = async (anomaly) => {
+    history.push('/anomaly/' + anomaly.id)
+  }
+
   const columns = [
     {
-      title: "Datasets",
-      dataIndex: "name",
-      key: "name",
-      sorter: (a, b) => a.name.localeCompare(b.name),
+      title: "Title",
+      dataIndex: "title",
+      key: "title",
+      sorter: (a, b) => a.title.localeCompare(b.title),
       render: text => {
         return (
           <p>{text}</p>
@@ -43,16 +47,31 @@ export default function AnomalysTable(props) {
       }
     },
     {
-      title: "Connection",
-      dataIndex: "connection",
-      key: "connection",
-      sorter: (a, b) => a.connection.name.localeCompare(b.connection.name),
-      render: connection => {
+      title: "Filter",
+      dataIndex: "dimVal",
+      key: "dimVal",
+      sorter: (a, b) => a.dimVal.localeCompare(b.dimVal),
+      render: text => {
         return (
-          <p>{connection.name}</p>
+          <p>{text}</p>
         );
       }
-    } 
+    },
+    {
+      title: "",
+      dataIndex: "action",
+      key: "actions",
+      className: "text-right",
+      render: (text, record) => {
+        return (
+          <div className={style.actions}>
+             <Tooltip title={"View Anomaly"}>
+                 <EyeOutlined onClick={()=>viewAnomaly(record)} />
+             </Tooltip>
+           </div>
+        );
+      }
+    },
   ]
 
   return (

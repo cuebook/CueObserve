@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.http import HttpRequest
 
-from anomaly.services import Datasets, Connections, Querys, AnomalyDefinitions
+from anomaly.services import Datasets, Connections, Querys, AnomalyDefinitions, Anomalys
 
 
 class AnomalysView(APIView):
@@ -15,7 +15,7 @@ class AnomalysView(APIView):
 
     def get(self, request):
         """get request"""
-        res = Datasets.getDatasets()
+        res = Anomalys.getAnomalys()
         return Response(res.json())
 
 
@@ -24,20 +24,9 @@ class AnomalyView(APIView):
     Provided views on Dataset(single)
     """
 
-    def get(self, request, datasetId: int):
+    def get(self, request, anomalyId: int):
         """get request"""
-        res = Datasets.getDataset(datasetId)
-        return Response(res.json())
-
-    def post(self, request, datasetId: int):
-        """post request"""
-        data = request.data
-        res = Datasets.updateDataset(datasetId, data)
-        return Response(res.json())
-
-    def delete(self, request, datasetId: int):
-        """delete request"""
-        res = Datasets.deleteDataset(datasetId)
+        res = Anomalys.getAnomaly(anomalyId)
         return Response(res.json())
 
 
@@ -151,10 +140,12 @@ class QueryView(APIView):
         )
         return Response(res.json())
 
-class AnomalyView(APIView):
+
+class AnomalyDefView(APIView):
     """
     Provides view on Anomaly Operation
     """
+
     def get(self, request):
         res = AnomalyDefinitions.getAllAnomalyDefinition()
         return Response(res.json())
@@ -165,9 +156,11 @@ class AnomalyView(APIView):
         highOrLow = request.data.get("highOrLow", None)
         top = int(request.data.get("top", 0))
         dimension = request.data.get("dimension", None)
-        res = AnomalyDefinitions.addAnomalyDefinition(metric, dimension, highOrLow, top, datasetId)
+        res = AnomalyDefinitions.addAnomalyDefinition(
+            metric, dimension, highOrLow, top, datasetId
+        )
         return Response(res.json())
 
-    def delete(self, request ,anomalyId: int):
+    def delete(self, request, anomalyId: int):
         res = AnomalyDefinitions.deleteAnomalyDefinition(anomalyId)
         return Response(res.json())
