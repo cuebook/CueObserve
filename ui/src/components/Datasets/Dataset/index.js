@@ -2,6 +2,9 @@ import React, { useState, useEffect, useRef } from "react";
 import style from "./style.module.scss";
 import { useParams, useHistory } from 'react-router-dom';
 import AceEditor from "react-ace";
+import "ace-builds/src-noconflict/mode-mysql";
+import "ace-builds/src-noconflict/theme-xcode";
+import "ace-builds/src-noconflict/ext-language_tools";
 import { Resizable } from "re-resizable";
 import { message } from "antd"
 import _ from "lodash";
@@ -23,6 +26,7 @@ import SelectConnection from "components/Connections/SelectConnection";
 const { Option } = Select;
 
 export default function Dataset(props) {
+  const [datasetDetails, setDatasetDetails] = useState({})
   const [datasetName, setDatasetName] = useState("");
   const [datasetSql, setDatasetSql] = useState("");
   const [datasetConnection, setDatasetConnection] = useState(null);
@@ -51,6 +55,7 @@ export default function Dataset(props) {
       setDatasetSql(data.sql);
       setDatasetConnection(data.connection.id);
       setDatasetGranlarity(data.granularity);
+      setDatasetDetails(data);
 
       const tempColumnTypes = {}
       data.metrics && data.metrics.forEach(col=>{tempColumnTypes[col]="metric"})
@@ -206,7 +211,7 @@ export default function Dataset(props) {
           <div className={style.run}>
             <Button type="primary" onClick={runDatasetQuery} loading={loadingQueryData}>Run SQL</Button>
           </div>
-          { params.datasetId ? null 
+          { params.datasetId && datasetDetails.anomalyDefinitionCount ? null 
             :
           <div className={style.save}>
             <Button type="primary" onClick={saveDataset} disabled={queryData && queryData.length ? false : true }>Save Dataset</Button>
@@ -220,9 +225,6 @@ export default function Dataset(props) {
   );
 
 }
-
-
-
 
 
 export function SQLEditor(props){
@@ -315,7 +317,7 @@ export function SQLEditor(props){
         height="100%"
         readOnly={false}
         wrapEnabled={true}
-        showPrintMargin={true}
+        showPrintMargin={false}
         highlightActiveLine={true}
         setOptions={{
           enableBasicAutocompletion: true,

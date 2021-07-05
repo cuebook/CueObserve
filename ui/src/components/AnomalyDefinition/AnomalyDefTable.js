@@ -150,6 +150,7 @@ const onEditAnomalyDefSuccess = (val) => {
             columns={columns}
             dataSource={data}
             pagination={false}
+            size={"small"}
         />
            </div>
     );

@@ -39,6 +39,7 @@ def test_datasets(client, mocker):
     response = client.get(path)
     assert response.status_code == 200
     assert response.data['data']
+    assert set(response.data['data'][0].keys()) == set(['anomalyDefinitionCount', 'connection', 'granularity', 'name', 'id'])
 
     dataset = response.data['data'][0]
 
@@ -50,6 +51,7 @@ def test_datasets(client, mocker):
     assert response.status_code == 200
     assert response.data['data']
     assert response.data['data']['name'] == "something"
+    assert set(response.data['data'].keys()) == set(['id', 'name', 'sql', 'connection', 'dimensions', 'metrics', 'granularity', 'timestampColumn', 'anomalyDefinitionCount'])
 
 
     # Update dataset

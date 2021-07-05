@@ -51,22 +51,32 @@ export default function DatasetsTable(props) {
       dataIndex: "name",
       key: "name",
       sorter: (a, b) => a.name.localeCompare(b.name),
-      render: text => {
-        return (
-          <p>{text}</p>
-        );
-      }
     },
     {
       title: "Connection",
       dataIndex: "connection",
       key: "connection",
       sorter: (a, b) => a.connection.name.localeCompare(b.connection.name),
-      render: connection => {
-        return (
-          <p>{connection.name}</p>
-        );
+    },
+    {
+      title: "Granularity",
+      dataIndex: "granularity",
+      key: "granularity",
+      sorter: (a, b) => a.granularity.name.localeCompare(b.granularity.name),
+      render: granularity => {
+        if (granularity == "day") return "daily"
+        else if (granularity == "hour") return "hourly"
+        else if (granularity == "year") return "yearly"
+        else if (granularity == "month") return "monthly"
+        else if (granularity == "week") return "weekly"
+        else return null
       }
+    },
+    {
+      title: "Anomaly Definitions",
+      dataIndex: "anomalyDefinitionCount",
+      key: "anomalyDefinitionCount",
+      sorter: (a, b) => a.anomalyDefinitionCount - b.anomalyDefinitionCount,
     },
     {
       title: "",
