@@ -7,6 +7,5 @@ def test_limitSql():
 	""" limits sql """
 	sql = "SELECT * from limit 234 limIt  3456  "
 	newSql = limitSql(sql)
-	breakpoint()
 	assert limitSql(sql) == "SELECT * from limit 234 limit 10  "
 	assert sql == "SELECT * from limit 234 limIt  3456  "
