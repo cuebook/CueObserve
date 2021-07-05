@@ -41,7 +41,6 @@ def checkLatestAnomaly(df):
     """
     Looks up latest anomaly in dataframe
     """
-    global anomalyConfig
     anomalies = df[df["anomaly"] == 15]
     if anomalies.shape[0] > 0:
         lastAnomalyRow = anomalies.iloc[-1]
@@ -52,9 +51,7 @@ def checkLatestAnomaly(df):
         per = 0
         if expected > 0:
             per = (
-                int(100 * ((lastAnomalyRow["y"] - expected) / expected))
-                if higher
-                else int(100 * ((expected - lastAnomalyRow["y"]) / expected))
+                int(100 * (abs(lastAnomalyRow["y"] - expected) / expected))
             )
 
         return {
