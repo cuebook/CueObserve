@@ -79,10 +79,17 @@ class DatasetsSerializer(serializers.ModelSerializer):
     Serializes data related to anomaly tree 
     """
     connection = ConnectionSerializer()
+    anomalyDefinitionCount = serializers.SerializerMethodField()
+
+    def get_anomalyDefinitionCount(self, obj):
+        """
+        Gets anomaly definition count
+        """
+        return obj.anomalydefinition_set.count()
 
     class Meta:
         model = Dataset
-        fields = ['id', 'name', 'connection']
+        fields = ['id', 'name', 'connection', 'anomalyDefinitionCount']
 
 
 class DatasetSerializer(serializers.ModelSerializer):
@@ -92,6 +99,13 @@ class DatasetSerializer(serializers.ModelSerializer):
     connection = ConnectionSerializer()
     dimensions = serializers.SerializerMethodField()
     metrics = serializers.SerializerMethodField()
+    anomalyDefinitionCount = serializers.SerializerMethodField()
+
+    def get_anomalyDefinitionCount(self, obj):
+        """
+        Gets anomaly definition count
+        """
+        return obj.anomalydefinition_set.count()
 
     def get_dimensions(self, obj):
         dimensions = json.loads(obj.dimensions) if obj.metrics else []
@@ -103,7 +117,7 @@ class DatasetSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Dataset
-        fields = ['id', 'name', 'sql', 'connection', 'dimensions', 'metrics', 'granularity', 'timestampColumn']
+        fields = ['id', 'name', 'sql', 'connection', 'dimensions', 'metrics', 'granularity', 'timestampColumn', 'anomalyDefinitionCount']
 
 class AnomalyDefinitionSerializer(serializers.ModelSerializer):
     """

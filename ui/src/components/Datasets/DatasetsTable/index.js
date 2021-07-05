@@ -69,6 +69,12 @@ export default function DatasetsTable(props) {
       }
     },
     {
+      title: "Anomaly Definitions",
+      dataIndex: "anomalyDefinitionCount",
+      key: "anomalyDefinitionCount",
+      sorter: (a, b) => a.anomalyDefinitionCount - b.anomalyDefinitionCount,
+    },
+    {
       title: "",
       dataIndex: "action",
       key: "actions",
