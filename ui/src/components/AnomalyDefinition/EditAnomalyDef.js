@@ -13,74 +13,74 @@ let options = [];
 let allOptions = {};
 let tempOption = {};
 
-function generateOptions(autoCueOptions) {
-  options = [];
+
+function getSelectedOptions(anomalyDef){
+    let temp = []
+    if(anomalyDef.metric){
+        temp.push({
+            value: anomalyDef.metric,
+            label: anomalyDef.metric,
+            optionType: "Measure",
+            color: "#ffc71f",
+            isFixed: true
+          });
+    }
+    if(anomalyDef.dimension){
+        temp.push({
+            value: anomalyDef.dimension,
+            label: anomalyDef.dimension,
+            optionType: "dimension",
+            color: "#12b1ff",
+            isFixed: true
+          });
+          temp.push({
+            value: "Top",
+            label: "Top",
+            optionType: "Top",
+            color: "#ff6767",
+            isFixed: true
+          });
+          temp.push({
+            value: anomalyDef.top,
+            label: anomalyDef.top,
+            optionType: "Operation",
+            color: "#ff6767",
+            isFixed: true
+          });
+          
+    }
+    if(anomalyDef.highOrLow){
+        temp.push({
+            value: anomalyDef.highOrLow,
+            label: anomalyDef.highOrLow,
+            optionType: "High Or Low",
+            color: "#02c1a3",
+            isFixed: false
+          });
+    }
+    return temp
+}
+
+
+function generateOptions() {
   allOptions = {};
-
-  if (autoCueOptions.metrics && autoCueOptions.metrics.length) {
-    allOptions.metric = [];
-    autoCueOptions.metrics.forEach(q => {
-      options.push({
-        value: q,
-        label: q,
-        optionType: "Measure",
-        color: "#ffc71f"
-      });
-      allOptions.metric.push({
-        value: q,
-        label: q,
-        optionType: "Measure",
-        color: "#ffc71f"
-      });
-    });
-  }
-
-  allOptions.dimension = [];
-  if (autoCueOptions.dimensions && autoCueOptions.dimensions.length) {
-    autoCueOptions.dimensions.forEach(q => {
-      allOptions.dimension.push({
-        value: q,
-        label: q,
-        optionType: "Dimension",
-        color: "#12b1ff"
-      });
-    });
-  }
-
-
   allOptions.highOrLow = [
     {
       value: "High",
-      label: "Highs Only",
+      label: "High",
       optionType: "High Or Low",
-      color: "#02c1a3"
+      color: "#02c1a3",
+      isFixed: false
     },
     {
       value: "Low",
-      label: "Lows Only",
+      label: "Low",
       optionType: "High Or Low",
-      color: "#02c1a3"
+      color: "#02c1a3",
+      isFixed: false
     }
   ];
-
-  allOptions.top = [
-    {
-      value:"Top",
-      label:"Top",
-      optionType:"Top",
-      color:"#ff6767"
-    }
-  ]
-
-  allOptions.operation = [
-    {
-      value:10 + "",
-      label: 10 + "",
-      optionType: "Operation",
-      color:"#ff6767"
-
-    }
-  ]
+  options = [...allOptions.highOrLow]
 
 }
 
@@ -101,31 +101,23 @@ function updateHelpText(selectedOption) {
   }
 }
 
-
-
 function getMetricHelpText(value, opts) {
+    // options = []
     options = [
-      ...allOptions.dimension,
       ...allOptions.highOrLow
     ];
     return " by STATE";
   }
 
-function getDimensionHelpText(value, opts) {
-    options = [];
-    options = [...options, ...allOptions.top];
-    return " Highs Only";
-  }
-
 function getTopHelpText(value, opts) {
-  options = []
-  options = [...options, ...allOptions.operation]
+//   options = []
+  options = [...allOptions.highOrLow]
   return "Top Values"
 }
 
 function getOperationHelpText(value, opts) {
-  options = []
-  options = [...options, ...allOptions.highOrLow]
+//   options = []
+  options = [...allOptions.highOrLow]
   return "Number"
 }
 
@@ -134,20 +126,6 @@ function getHelpText(selectedOption) {
     let length = selectedOption.length;
     let lastOption = selectedOption[length - 1];
     let text = "";
-    if (lastOption.__isNew__) {
-      // when custom input by user
-      // check in options of callback validation functions
-          let newOption = lastOption;
-          newOption.value = lastOption.value;
-          newOption.label = lastOption.value + " ";
-          newOption.optionType = "Operation"
-          newOption.color = "#ff6767"
-          selectedOption.pop();
-          selectedOption.push(newOption);
-          lastOption = newOption
-          tempOption = lastOption
-      }
-
     switch (lastOption.optionType) {
       case "Measure":
         text = getMetricHelpText(lastOption.value, selectedOption);
@@ -155,24 +133,6 @@ function getHelpText(selectedOption) {
         break;
       case "High Or Low":
         options = [];
-        break;
-      case "Dimension":
-        if (lastOption.optionType === "Dimension" && tempOption.optionType === "Top"){
-         lastOption =  selectedOption.pop()
-         text = getMetricHelpText(lastOption.value, selectedOption);
-         tempOption = lastOption
-        }
-        else {
-        text = getDimensionHelpText(lastOption.value, selectedOption);
-        let defaultOption1 = options.pop()  
-        selectedOption.push(defaultOption1)
-        lastOption = defaultOption1
-        text = getTopHelpText(lastOption.value, selectedOption)
-        let defaultOption2 = options.pop()
-        selectedOption.push(defaultOption2)
-        lastOption = defaultOption2
-        text = getOperationHelpText(lastOption.value, selectedOption)
-        }
         break;
       case "Top":
         text = getTopHelpText(lastOption.value, selectedOption)
@@ -194,84 +154,72 @@ function getHelpText(selectedOption) {
   // return "";
 }
 
-export default function AddAnomalyDef(){
+export default function EditAnomalyDef(props){
   const [allDatasets, setAllDatasets] = useState([]);
-  const [datasetId, setDatasetId] = useState();
   const [selectedOption, setSelectedOption] = useState([]);
-  const [addingAnomaly, setAddingAnomaly] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
+  const [initialDataset, setInitialDataset] = useState([])
+  const [anomalyDefId, setAnomalyDefId] = useState(0)
 
   useEffect(()=>{
-    if (allDatasets.length == 0){
-      getDatasets();
+    
+
+    if(props)
+    {
+        let anomalyDef = props.editAnomalyDef["anomalyDef"]
+        let dataset = props.editAnomalyDef["dataset"]
+        setInitialDataset(dataset["name"])
+        let selected = getSelectedOptions(anomalyDef)
+        setSelectedOption(selected)
+        setAnomalyDefId(anomalyDef["id"])
+        generateOptions()
     }
+
   }, []);
 
-
-const getDatasets = async () => {
-  const data = await datasetService.getDatasets()
-  setAllDatasets(data)
-}
-const getDataset = async (datasetId) => {
-  const data = await datasetService.getDataset(datasetId)
-    generateOptions(data) 
-}
- const handleAddAnomaly = () => {
-    if ( _.isNull(selectedOption ) ||  selectedOption.length < 1) {
-      notification.warning({
-        message: "At least Measure required to configure anomaly !"
-           });
-      return;
-    }
+ const handelEditAnomaly = () => {
 
     var payload = {
-      datasetId: datasetId,
+      anomalyDefId: anomalyDefId,
       measure: selectedOption[0].value
     };
 
-    let isDimension = false
-    let topVal = null;
     selectedOption.forEach(item => {
       if (item.optionType === "High Or Low") {
         payload.highOrLow = item.value;
       }
       if (item.optionType === "Dimension") {
         payload.dimension = item.value;
-        isDimension = true
       }
       if (item.optionType === "Operation"){
         payload.top = item.value
-        topVal = item.value
       }
     });
 
-    if(isDimension && _.isNull(topVal)){
-      notification.warning({
-        message: "Please Enter Top Values "
-           });
-      return;
-    }
-
-    getAddAnomaly(payload)
-    setAddingAnomaly(false)
+    getEditAnomaly(payload)
+    props.onEditAnomalyDefSuccess(false)
     setSelectedOption([])
 
   };
 
-  const getAddAnomaly = async (payload) =>{
-  const response = await anomalyDefService.addAnomalyDef(payload)
+  const getEditAnomaly = async (payload) =>{
+  const response = await anomalyDefService.editAnomalyDef(payload)
   }
 
  const handleDatasetChange = value => {
     setSelectedOption([])
-    setDatasetId(value)
-    getDataset(value)
   };
-
-  const handleChange = selectedOption => {
+  const handleChange = (selectedOption,{action, removedValue}) => {
+    switch(action){
+        case "pop-value":
+            if(removedValue.isFixed){
+                return 
+            }
+    }
     setSelectedOption(selectedOption)
     setIsFocused(false)
     // updateOptions(selectedOption);
+    // generateOptions()
     updateHelpText(selectedOption);
     setTimeout(() => {
       setIsFocused(true)
@@ -324,9 +272,8 @@ const getDataset = async (datasetId) => {
       </components.MultiValueContainer>
     );
   };
-
   const handleOnCancel = () =>{
-    setAddingAnomaly(false)
+      props.onEditAnomalyDefSuccess(false)
     setSelectedOption([])
   }
 
@@ -344,33 +291,25 @@ const getDataset = async (datasetId) => {
     return (
       <div>
         <div style={{ float: "right", paddingBottom: "10px" }}>
-          <Button
-            // icon="plus"
-            type="primary"
-            onClick={() => setAddingAnomaly(true)}
-          >
-            New Anomaly Definition
-          </Button>
         </div>
-        {addingAnomaly ? (
           <Modal
-            title="Add Anomaly"
+            title="Edit Anomlay"
             width="50%"
             centered
             visible={true}
-            key="addAnomalyModal"
-            onOk={() =>handleAddAnomaly()}
+            key="editAnomalyModal"
+            onOk={() =>handelEditAnomaly()}
             onCancel={handleOnCancel}
             footer={[
               <Button
                 key="back"
                 type="primary"
-                onClick={() => handleAddAnomaly()}
+                onClick={() => handelEditAnomaly()}
               >
                 Save
               </Button>,
               <Button
-                key="addingAnomalyButton"
+                key="editAnomalyButton"
                 onClick={handleOnCancel}
               >
                 Cancel
@@ -385,6 +324,8 @@ const getDataset = async (datasetId) => {
                   style={{ width: 200, float: "left" }}
                   placeholder="Select a dataset"
                   optionFilterProp="children"
+                  value={initialDataset}
+                  disabled={true}
                   onChange={handleDatasetChange}
                 //   notFoundContent={
                 //     this.props.cubes.loading ? <Spin size="small" /> : null
@@ -415,6 +356,9 @@ const getDataset = async (datasetId) => {
                 onFocus={()=>handleIsFocused(true)}
                 onBlur={() => handleIsFocused(false)}
                 menuIsOpen={isFocused}
+                isClearable={false}
+                
+                disabled={true}
                 components={{
                   Option: singleOption,
                   MultiValue: multiValue,
@@ -427,7 +371,6 @@ const getDataset = async (datasetId) => {
             </div>
             
           </Modal>
-        ) : null}
       </div>
     );
   }
