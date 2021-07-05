@@ -12,7 +12,7 @@ class Anomalys:
     @staticmethod
     def getAnomalys():
         """
-        Gets anoamlys
+        Gets anomalys
         """
         res = ApiResponse("Error in getting datasets")
         # datasets = Dataset.objects.all()
@@ -36,21 +36,12 @@ class Anomalys:
     @staticmethod
     def getAnomaly(anomalyId: int):
         """
-        Gets anoamlys
+        Gets anomaly
+        :param anomalyId: id of anomaly to fetch
         """
         res = ApiResponse("Error in getting datasets")
-        # datasets = Dataset.objects.all()
-        # data = DatasetsSerializer(datasets, many=True).data
-        data = {
-            "id": 5,
-            "title": "Card title",
-            "text": "Card text",
-            "dimVal": "Delhi",
-            "filterContribution": 34,
-            "data": {
-                "chartData": [],
-            },
-            "lastAnomalyTimeISO": "20190403",
-        }
+
+        data = None
+
         res.update(True, "Successfully retrieved datasets", data)
         return res

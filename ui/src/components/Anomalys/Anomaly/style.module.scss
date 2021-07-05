@@ -1,66 +1,30 @@
-.dataset {
 
-	.datasetName {
-		padding: 5px;
-		padding-bottom: 20px;
-		.nameInput {
-		  font-size: 1.5rem;
-		  border: none;
-		  padding: 10px 0 !important;
-		  background: none;
-		  border-radius: 0;
-		  border-bottom: 2px solid #a6adb5;
-		  height: 40px;
-		}
-	}
+.chartPanel {
+  background: white;
+  border-color: #dee0e3;
+  border-radius: 6px;
+  padding: 20px;
+}
 
-	.selectConnection {
-		padding: 5px;
-	}
+.chartDiv {
+  padding-top: 25px ;
+}
 
-	.SQLEditor {
-		padding: 5px;
-	}
+.anomalyTitle {
+  /*width: calc(100% - 140px);*/
+  display: inline-block;
+  font-size: 20px;
+  overflow: wrap;
+}
 
-	.dataTable {
-		padding: 5px;
-		padding-top: 10px;
-	}
+.anomalyText {
+  overflow: wrap;
+  /*width: calc(100% - 140px);*/
+  display: inline-block;
+  /*top: -15px;*/
+  /*padding: 0 25px 0 25px;*/
+  font-size: 14px;
+  /*width: 100%;*/
 
-	.typeSelectorTable {
-
-		padding:  5px;
-		padding-left: 25px;
-		width:  50%;
-		p {
-			margin-left: -20px;
-			font-size: 15px ;
-		}
-
-	}
-
-	.granularity {
-		padding: 5px;
-		padding-left: 25px;
-		p {
-			margin-left: -20px;
-			font-size: 15px;
-		}
-	}
-
-	.buttons {
-		padding: 5px;
-		padding-top: 25px;
-		display: flex;
-		.run {
-			margin-right: 5px;
-		}
-
-		.save {
-
-		}
-	}
-
-
-
+  color: #586069 ;
 }
