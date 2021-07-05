@@ -124,6 +124,7 @@ export default function Connection() {
             columns={columns}
             dataSource={connections}
             pagination={false}
+            size={"small"}
         />
 
         <Drawer

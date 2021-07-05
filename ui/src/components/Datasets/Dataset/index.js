@@ -2,6 +2,9 @@ import React, { useState, useEffect, useRef } from "react";
 import style from "./style.module.scss";
 import { useParams, useHistory } from 'react-router-dom';
 import AceEditor from "react-ace";
+import "ace-builds/src-noconflict/mode-mysql";
+import "ace-builds/src-noconflict/theme-xcode";
+import "ace-builds/src-noconflict/ext-language_tools";
 import { Resizable } from "re-resizable";
 import { message } from "antd"
 import _ from "lodash";
@@ -315,7 +318,7 @@ export function SQLEditor(props){
         height="100%"
         readOnly={false}
         wrapEnabled={true}
-        showPrintMargin={true}
+        showPrintMargin={false}
         highlightActiveLine={true}
         setOptions={{
           enableBasicAutocompletion: true,
