@@ -35,13 +35,22 @@ def test_anomalyDefinition(client, mocker):
 
     assert response.status_code == 200
     assert response.data['success'] 
-
     # Get anomalys
     path = reverse('anomalyDefs')
     response = client.get(path)
     assert response.status_code == 200
     assert response.data['data']
     anomaly = response.data['data'][0]["anomalyDef"]
+
+    #Update anomalys
+    path = reverse('editAnomalyDef')
+    data = {
+        "anomalyDefId":anomaly["id"],
+        "highOrLow":"Low"
+    }
+    response = client.put(path, data=data, content_type="application/json")
+    assert response.status_code == 200
+    assert response.data
 
     #Delete anomalys
     path = reverse('anomalyDef', kwargs={"anomalyId": anomaly["id"]})

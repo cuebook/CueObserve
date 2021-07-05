@@ -142,3 +142,9 @@ class AnomalyDefView(APIView):
     def delete(self, request, anomalyId: int):
         res = AnomalyDefinitions.deleteAnomalyDefinition(anomalyId)
         return Response(res.json())
+
+    def put(self, request):
+        anomalyDefId = request.data.get("anomalyDefId", 0)
+        highOrLow = request.data.get("highOrLow", None)
+        res = AnomalyDefinitions.editAnomalyDefinition(anomalyDefId, highOrLow)
+        return Response(res.json())
