@@ -7,6 +7,7 @@ def aggregateDf(df, timestampCol):
     df.dropna(inplace=True)
     df = df.groupby(timestampCol).sum()
     df.reset_index(inplace=True)
+    df.columns = ["ds" if col == timestampCol else "y" for col in df.columns]
     return df
 
 def prepareAnomalyDataframes(datasetDf, timestampCol, metricCol, dimensionCol=None, topN=10):
@@ -15,6 +16,7 @@ def prepareAnomalyDataframes(datasetDf, timestampCol, metricCol, dimensionCol=No
     """
     datasetDf[metricCol] = pd.to_numeric(datasetDf[metricCol])
     dataframes = []
+    dimVals= []
     if dimensionCol:
         datasetDf = datasetDf[[timestampCol, dimensionCol, metricCol]]
         topValsDf = datasetDf[[dimensionCol, metricCol]].groupby(dimensionCol).sum().sort_values(metricCol, ascending=False)
@@ -24,8 +26,9 @@ def prepareAnomalyDataframes(datasetDf, timestampCol, metricCol, dimensionCol=No
             dataframes.append(aggregateDf(tempDf, timestampCol))
     else:
         tempDf = datasetDf[[timestampCol, metricCol]]
+        dimVals = [None]
         dataframes.append(aggregateDf(tempDf, timestampCol))
     
-    return dataframes
+    return dimVals, dataframes
 
 

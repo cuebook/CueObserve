@@ -70,5 +70,19 @@ class AnomalyDefinition(models.Model):
     metric = models.TextField(null=True, blank=True)
     dimension = models.TextField(null=True, blank=True)
     highOrLow = models.TextField(null=True, blank=True)
-    top = models.TextField(null=True, blank=True)
+    top = models.IntegerField(default=10)
 
+class Anomaly(models.Model):
+    anomalyDefinition = models.ForeignKey(AnomalyDefinition, on_delete=models.CASCADE, db_index=True)
+    dimensionVal = models.TextField(null=True, blank=True)
+    published = models.BooleanField(default=False)
+    data = models.JSONField(default=dict)
+
+class AnomalyCardTemplate(models.Model):
+    templateName = models.CharField(blank=True, null=True, db_index=True, max_length=500)
+    title = models.TextField(blank=True, null=True)
+    bodyText = models.TextField(blank=True, null=True)
+    supportedVariables = models.CharField(max_length=1000, blank=True, null=True)
+
+    def __str__(self):
+        return self.templateName

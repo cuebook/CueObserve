@@ -161,12 +161,14 @@ def test_datasets(client, mocker):
     
     datasetDf = pd.DataFrame(fakedata)
     
-    explodedDfs = prepareAnomalyDataframes(datasetDf, timestampCol="CREATEDTS", metricCol="ReceivedQty")
-    assert (explodedDfs[0].columns == ['CREATEDTS', 'ReceivedQty']).all()
-    assert explodedDfs[0].iloc[0]["ReceivedQty"] == 18
+    dimVals, explodedDfs = prepareAnomalyDataframes(datasetDf, timestampCol="CREATEDTS", metricCol="ReceivedQty")
+    assert (explodedDfs[0].columns == ['ds', 'y']).all()
+    assert explodedDfs[0].iloc[0]["y"] == 18
+    assert dimVals == [None]
 
 
-    explodedDfs = prepareAnomalyDataframes(datasetDf, timestampCol="CREATEDTS", metricCol="ReceivedQty", dimensionCol="DeliveryCity")
-    assert (explodedDfs[1].columns == ['CREATEDTS', 'ReceivedQty']).all()
-    assert explodedDfs[1].iloc[0]["ReceivedQty"] == 7
+    dimVals, explodedDfs = prepareAnomalyDataframes(datasetDf, timestampCol="CREATEDTS", metricCol="ReceivedQty", dimensionCol="DeliveryCity")
+    assert (explodedDfs[1].columns == ['ds', 'y']).all()
+    assert explodedDfs[1].iloc[0]["y"] == 7
+    assert "Lucknow" in dimVals
 
