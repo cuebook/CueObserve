@@ -1,16 +1,23 @@
 import json
 import logging
-from django.db import connection
 from google.cloud import bigquery
 from google.oauth2 import service_account
+
+from dbConnections.utils import limitSql
 
 logger = logging.getLogger(__name__)
 
 
 class BigQuery:
-    def checkConnection(file):
+    """
+    Class to support functionalities on bigquery connection
+    """
+
+    @staticmethod
+    def checkConnection(file: str):
         """
         Connection for bigQuery database
+        :param file: credential file from bigquery to connection
         """
         res = True
         try:
@@ -27,12 +34,19 @@ class BigQuery:
 
         return res
 
-    def fetchDataframe(file, sql, limit=False):
+    @staticmethod
+    def fetchDataframe(file: str, sql: str, limit: bool = False):
         """
         Fetches data using given config file and sql
+        :param file: connection file
+        :param sql: string sql query
+        :param limit: limit data
+        :returns: dataframe
         """
         dataframe = None
         try:
+            if limit:
+                sql = limitSql(sql)
             file = json.loads(file)
             service_account_info = file
             credentials = service_account.Credentials.from_service_account_info(
@@ -42,8 +56,6 @@ class BigQuery:
             client = bigquery.Client(credentials=credentials, project=project_id)
             dataJob = client.query(sql)
             dataframe = dataJob.to_dataframe()
-            if limit:
-                dataframe = dataframe[:10]
         except Exception as ex:
             logger.error("Can't connect to db with this credentials %s", str(ex))
 
