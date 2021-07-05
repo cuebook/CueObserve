@@ -89,7 +89,7 @@ class DatasetsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Dataset
-        fields = ['id', 'name', 'connection', 'anomalyDefinitionCount']
+        fields = ['id', 'name', 'granularity', 'connection', 'anomalyDefinitionCount']
 
 
 class DatasetSerializer(serializers.ModelSerializer):
