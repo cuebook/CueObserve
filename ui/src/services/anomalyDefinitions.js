@@ -20,8 +20,6 @@ class AnomalyDefService {
         return response
     }
 
-
-
 }
 let anomalyDefService = new AnomalyDefService();
 export default anomalyDefService;

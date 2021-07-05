@@ -206,9 +206,12 @@ export default function Dataset(props) {
           <div className={style.run}>
             <Button type="primary" onClick={runDatasetQuery} loading={loadingQueryData}>Run SQL</Button>
           </div>
+          { params.datasetId ? null 
+            :
           <div className={style.save}>
             <Button type="primary" onClick={saveDataset} disabled={queryData && queryData.length ? false : true }>Save Dataset</Button>
           </div>
+          }
         </div>
       </div>   
       </div>

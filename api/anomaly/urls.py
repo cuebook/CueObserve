@@ -5,7 +5,10 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    # ============ datasets ==================
+    # Anomalys
+    path("anomalys", views.AnomalysView.as_view(), name="anomalys"),
+    path("anomaly/<int:anomalyId>", views.AnomalyView.as_view(), name="anomaly"),
+    # Datasets
     path("datasets", views.DatasetsView.as_view(), name="datasets"),
     path("dataset/<int:datasetId>", views.DatasetView.as_view(), name="dataset"),
     path("dataset/create", views.CreateDatasetView.as_view(), name="createDataset"),
