@@ -32,6 +32,9 @@ class Connections:
 
     @staticmethod
     def getConnection(connection_id):
+        """
+        Gets connection details of given connection_id
+        """
         res = ApiResponse("Error in fetching connection")
         connections = Connection.objects.get(id=connection_id)
         serializer = ConnectionDetailSerializer(connections)
@@ -40,6 +43,10 @@ class Connections:
 
     @staticmethod
     def addConnection(payload):
+        """
+        Add connection or build new connection
+        :param payload: Contains name, connectionType_id, params, description
+        """
         connectionResponse = False
         res = ApiResponse("Error in adding connection")
         connectionType = ConnectionType.objects.get(id=payload["connectionType_id"])
@@ -97,17 +104,24 @@ class Connections:
 
     @staticmethod
     def removeConnection(connection_id):
+        """
+        Remove connection of given connection_id
+        """
         res = ApiResponse("Erorr in deleting connection")
         connection = Connection.objects.filter(id=connection_id)
         if len(connection) > 0:
             Connection.objects.get(id=connection_id).delete()
             res.update(True, "Connection deleted successfully")
         else:
-            res.update(False, "Cannot delete connection because of dependent notebook")
+            res.update(False, "Cannot delete connection because it is linked with datasets")
         return res
 
     @staticmethod
     def updateConnection(connection_id, payload):
+        """
+        Update connection of giben connection_id
+
+        """
         res = ApiResponse("Error in updating connection")
         Connection.objects.filter(id=connection_id).update(
             name=payload.get("name", ""),

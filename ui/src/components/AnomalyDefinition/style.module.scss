@@ -81,3 +81,14 @@
     line-height: 22px;
   }
 }
+.actions{
+  text-align: right;
+  font-size: 18px;
+  &>span{
+      margin-right: 8px;
+      cursor: pointer;
+      &:hover{
+          color: skyblue;
+      }
+  }
+}
