@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Table, Button, Popconfirm, Input, message, Tooltip, Drawer, Modal } from "antd";
+import { Table, Button, Popconfirm, Input, message, Tooltip, Drawer, Modal , notification} from "antd";
 import style from "./style.module.scss";
 import connectionService from "services/connection.js";
 import AddConnection from "./AddConnection.js";
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import ViewConnection from "./ViewConnection.js";
+import { EyeOutlined, DeleteOutlined } from '@ant-design/icons';
 
 const { Search } = Input;
 const ButtonGroup = Button.Group;
@@ -26,6 +27,12 @@ export default function Connection() {
   }
 
   const deleteConnection = async (connection) => {
+    if (connection.datasetCount > 0){
+      notification.info({
+            message: "Connection linked with datasets can't be deleted "
+      });
+           return ;
+    }
     const response = await connectionService.deleteConnection(connection.id);
     if(response.success){
         fetchConnections()
@@ -35,17 +42,17 @@ export default function Connection() {
     }
   }
 
-  const EditConnection = async (connection) => {
+  const viewConnection = async (connection) => {
     setSelectedConnection(connection)
     setIsViewConnectionDrawerVisible(true)
   }
 
-  const closeAddConnectionDrawer = () => {
-    setIsAddConnectionDrawerVisible(false)
-  }
-
   const closeViewConnectionDrawer = () => {
     setIsViewConnectionDrawerVisible(false)
+  }
+
+  const closeAddConnectionDrawer = () => {
+    setIsAddConnectionDrawerVisible(false)
   }
 
   const openAddConnectionForm = () => {
@@ -60,7 +67,7 @@ export default function Connection() {
 
     const columns = [
       {
-        title: "Name",
+        title: "Connection Name",
         dataIndex: "name",
         key: "name",
         sorter: (a, b) => a.name.localeCompare(b.name)
@@ -81,20 +88,23 @@ export default function Connection() {
 
       },
       {
-        title: "Dataset",
-        dataIndex: "dataset",
-        key: "dataset"
-      
+        title: "Datasets",
+        dataIndex: "datasetCount",
+        key: "dataset",
+        width: "10%",
+        align: "right",
+        sorter:(a, b) => a.datasetCount - b.datasetCount,
       },
       {
         title: "",
         dataIndex: "",
         key: "",
+        width: "20%",
         render: (text, connection) => (
          <div className={style.actions}>
-            {/* <Tooltip title={"Edit Connection"}>
-              <EditOutlined onClick={() => EditConnection(connection)} />
-            </Tooltip> */}
+            <Tooltip title={"View Connection"}>
+              <EyeOutlined onClick={() => viewConnection(connection)} />
+            </Tooltip>
             <Popconfirm
                 title={"Are you sure to delete "+ connection.name +"?"}
                 onConfirm={() => deleteConnection(connection)}
@@ -119,7 +129,7 @@ export default function Connection() {
                 type="primary"
                 onClick={() => openAddConnectionForm()}
             >
-                New Connection
+                Add Connection
             </Button>
         </div>
         <Table
@@ -147,6 +157,19 @@ export default function Connection() {
                 :
                 null
               }
+        </Drawer>
+        <Drawer
+          title={selectedConnection.name}
+          width={720}
+          onClose={closeViewConnectionDrawer}
+          visible={isViewConnectionDrawerVisible}
+        >
+          { isViewConnectionDrawerVisible 
+            ? 
+            <ViewConnection connection={selectedConnection} />
+            :
+            null
+          }
         </Drawer>
 
     </div>
