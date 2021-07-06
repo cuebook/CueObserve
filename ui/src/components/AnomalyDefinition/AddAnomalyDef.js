@@ -343,13 +343,13 @@ const getDataset = async (datasetId) => {
 
     return (
       <div>
-        <div style={{ float: "right", paddingBottom: "10px" }}>
+        <div className={`d-flex flex-column justify-content-center text-right mb-2`}>
           <Button
             // icon="plus"
             type="primary"
             onClick={() => setAddingAnomaly(true)}
           >
-            New Anomaly Definition
+            Add Anomaly Definition
           </Button>
         </div>
         {addingAnomaly ? (

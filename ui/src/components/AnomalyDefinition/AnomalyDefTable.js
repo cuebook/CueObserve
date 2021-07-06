@@ -44,7 +44,9 @@ const onEditAnomalyDefSuccess = (val) => {
       {
         title: "Dataset",
         dataIndex: "dataset",
-        key: "dataset",
+        key: "datasetName",
+        sorter:(a, b) =>   a.dataset.name.localeCompare(b.dataset.name),
+
         render: (text, record) => {
           return (
             <div>
@@ -58,6 +60,7 @@ const onEditAnomalyDefSuccess = (val) => {
         title: "Granularity",
         dataIndex: "granularity",
         key: "granularity",
+        sorter:(a, b) => a && a.dataset.granularity &&  a.dataset.granularity.localeCompare(b.dataset.granularity),
         render: (text, record) => {
           return (
             <div>
@@ -70,6 +73,7 @@ const onEditAnomalyDefSuccess = (val) => {
         title: "Anomaly Definition",
         dataIndex: "anomalyDef",
         key: "anomalyDef",
+        sorter:(a, b) => parseInt(a.anomalyDef.top) - parseInt(b.anomalyDef.top),
         render:(text, record) => {
           return (         
                 <div style={{fontSize:14}}>
@@ -103,7 +107,7 @@ const onEditAnomalyDefSuccess = (val) => {
 
       },
       {
-        title: "Last Run Anomaly",
+        title: "Last Run Anomalies",
         dataIndex: "lastRunAnomaly",
         key: "lastRunAnomaly",
 
@@ -149,8 +153,12 @@ const onEditAnomalyDefSuccess = (val) => {
             scroll={{ x: "100%" }}
             columns={columns}
             dataSource={data}
-            pagination={false}
             size={"small"}
+            pagination={{
+              pageSize:20,
+              total:  data ? data.length : 20
+            }}
+            
         />
            </div>
     );

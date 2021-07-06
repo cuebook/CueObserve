@@ -62,12 +62,15 @@ export default function Connection() {
       {
         title: "Name",
         dataIndex: "name",
-        key: "name"
+        key: "name",
+        sorter: (a, b) => a.name.localeCompare(b.name)
+
       },
       {
         title: "Connection Type",
         dataIndex: "connectionType",
         key: "connectionType",
+        sorter: (a, b) => a.connectionType.localeCompare(b.connectionType),
         render: (connectionType) => (
             <>
             <div className={style.connectionLogoTable} style={{backgroundImage: `url(${require("assets/img/" + connectionType + ".svg")})`}}>
@@ -81,6 +84,7 @@ export default function Connection() {
         title: "Dataset",
         dataIndex: "dataset",
         key: "dataset"
+      
       },
       {
         title: "",
@@ -123,8 +127,11 @@ export default function Connection() {
             scroll={{ x: "100%" }}
             columns={columns}
             dataSource={connections}
-            pagination={false}
             size={"small"}
+            pagination={{
+              pageSize:20,
+              total:  connections ? connections.length : 20
+            }}
         />
 
         <Drawer
