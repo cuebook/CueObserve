@@ -9,11 +9,16 @@ import ErrorBoundary from "antd/lib/alert/ErrorBoundary";
 import anomalyDefService from "services/anomalyDefinitions.js"
 const { Search } = Input;
 const ButtonGroup = Button.Group;
-
+const granularity = {
+  "day" : "Day",
+  "hour" : "Hour",
+  "week" : "Week"
+ }
 export default function Connection() {
   const [data, setData] = useState([]);
   const [editAnomalyDef, setEditAnomalyDef] = useState([]);
   const [edit, setEdit] = useState(false);
+  const [addAnomalyDef, setAddAnomalyDef] = useState(false);
 
   useEffect(() => {
     if (!data.length) {
@@ -64,7 +69,7 @@ const onEditAnomalyDefSuccess = (val) => {
         render: (text, record) => {
           return (
             <div>
-              {record.dataset.granularity}
+              {granularity[record.dataset.granularity]}
             </div>
           )
         }

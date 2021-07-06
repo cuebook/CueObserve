@@ -60,7 +60,7 @@ export default function Connection() {
 
     const columns = [
       {
-        title: "Name",
+        title: "Connection Name",
         dataIndex: "name",
         key: "name",
         sorter: (a, b) => a.name.localeCompare(b.name)
@@ -81,20 +81,24 @@ export default function Connection() {
 
       },
       {
-        title: "Dataset",
-        dataIndex: "dataset",
-        key: "dataset"
-      
+        title: "Datasets",
+        dataIndex: "datasetCount",
+        key: "dataset",
+        width: "10%",
+        align: "right",
+        sorter:(a, b) => a.datasetCount - b.datasetCount,
       },
       {
         title: "",
         dataIndex: "",
         key: "",
+        width: "20%",
         render: (text, connection) => (
          <div className={style.actions}>
             {/* <Tooltip title={"Edit Connection"}>
               <EditOutlined onClick={() => EditConnection(connection)} />
             </Tooltip> */}
+            {connection.datasetCount == 0 ? 
             <Popconfirm
                 title={"Are you sure to delete "+ connection.name +"?"}
                 onConfirm={() => deleteConnection(connection)}
@@ -106,6 +110,7 @@ export default function Connection() {
                     <DeleteOutlined />
                 </Tooltip>
             </Popconfirm>
+            : null }
           </div>
         )
       }
@@ -119,7 +124,7 @@ export default function Connection() {
                 type="primary"
                 onClick={() => openAddConnectionForm()}
             >
-                New Connection
+                Add Connection
             </Button>
         </div>
         <Table
