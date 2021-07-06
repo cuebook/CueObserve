@@ -11,6 +11,7 @@ export default function ViewConnection(props) {
   const [selectedConnection, setSelectedConnection] = useState({});
   const [initialFormValues, setInitialFormValues] = useState({});
   const [form] = Form.useForm();
+  const{TextArea} = Input;
 
   useEffect(() => {
     if (!connectionTypes.length) {
@@ -48,6 +49,21 @@ export default function ViewConnection(props) {
                   className={style.formItem}
                   key={item.id}
                 >
+                  { item.properties.type === 'json' ?
+                  
+                  <Form.Item 
+                    key={item.name} 
+                    label={item.label} 
+                    rules={item.properties.rules}
+                    name={item.name}
+                  >
+                      <TextArea
+                        type={item.isEncrypted ? "password" : "text"}
+                        className={style.inputArea}
+                        disabled
+                      />
+                  </Form.Item>
+                : (
                   <Form.Item 
                     key={item.name} 
                     label={item.label} 
@@ -60,6 +76,7 @@ export default function ViewConnection(props) {
                         disabled
                       />
                   </Form.Item>
+                )}
                 </div>
             )
           }
