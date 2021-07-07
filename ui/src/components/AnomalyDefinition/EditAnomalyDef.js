@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import style from "./style.module.scss";
 import { components } from "react-select";
 import CreatableSelect from "react-select/creatable";
-import { Modal, Select, Spin, Switch, Button, Radio, notification } from "antd";
+import { Modal, Select, Spin, Switch, Button, Radio, notification, Drawer } from "antd";
 import datasetService from "services/datasets";
 import anomalyDefService from "services/anomalyDefinitions.js";
 import  _ from "lodash";
@@ -43,7 +43,7 @@ function getSelectedOptions(anomalyDef){
           temp.push({
             value: anomalyDef.top,
             label: anomalyDef.top,
-            optionType: "Operation",
+            optionType: "Dimension Values",
             color: "#ff6767",
             isFixed: true
           });
@@ -138,7 +138,7 @@ function getHelpText(selectedOption) {
         text = getTopHelpText(lastOption.value, selectedOption)
         tempOption = lastOption
         break;
-      case "Operation":
+      case "Dimension Values":
         text = getOperationHelpText(lastOption.value, selectedOption)
         tempOption = lastOption
         break;
@@ -191,7 +191,7 @@ export default function EditAnomalyDef(props){
       if (item.optionType === "Dimension") {
         payload.dimension = item.value;
       }
-      if (item.optionType === "Operation"){
+      if (item.optionType === "Dimension Values"){
         payload.top = item.value
       }
     });
@@ -227,7 +227,7 @@ export default function EditAnomalyDef(props){
   };
 
   const  singleOption = props => {
-    if (props && props.lable && props.label.indexOf("Create ") !== -1) {
+    if (props && props.label && props.label.indexOf("Create ") !== -1) {
       return (
         <components.Option {...props}>
           <div className={style.optionWrapper}>
@@ -290,38 +290,40 @@ export default function EditAnomalyDef(props){
 
     return (
       <div>
-        <div style={{ float: "right", paddingBottom: "10px" }}>
-        </div>
-          <Modal
-            title="Edit Anomlay"
+          <Drawer
+            title="Edit Anomlay Definition"
             width="50%"
             centered
             visible={true}
             key="editAnomalyModal"
-            onOk={() =>handelEditAnomaly()}
-            onCancel={handleOnCancel}
-            footer={[
+            centered="true"
+            onClose={handleOnCancel}
+            footer={
+              <div style={{textAlign:"right"}}>
+              
               <Button
                 key="back"
-                type="primary"
-                onClick={() => handelEditAnomaly()}
-              >
-                Save
-              </Button>,
-              <Button
-                key="editAnomalyButton"
                 onClick={handleOnCancel}
+                style={{marginRight: 8}}
               >
                 Cancel
               </Button>
-            ]}
+              <Button
+                key="save"
+                type="primary"
+                onClick={() => handelEditAnomaly()}
+              >
+                Save Anomaly Definition 
+              </Button>
+              </div>
+            }
           >
-            <div className="pb-4 ">
-              <div className="pl-4">
+            <div>
+              <div className="pb-6">
                 <Select
-                  className="pb-2 mx-2 "
+                  className={`${style.selectEditor}`}
                   showSearch
-                  style={{ width: 200, float: "left" }}
+                  // style={{ width: 200, float: "left" }}
                   placeholder="Select a dataset"
                   optionFilterProp="children"
                   value={initialDataset}
@@ -365,12 +367,12 @@ export default function EditAnomalyDef(props){
                   MultiValueContainer: multiValueContainer
                 }}
                 options={options}
-                placeholder={`DAILY COUNT by STATE `}
+                placeholder={`Measure [Dimension Top N] [High/Low] `}
               />
             </div>
             </div>
             
-          </Modal>
+          </Drawer>
       </div>
     );
   }

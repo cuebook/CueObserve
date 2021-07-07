@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import style from "./style.module.scss";
 import { components } from "react-select";
 import CreatableSelect from "react-select/creatable";
-import { Modal, Select, Spin, Switch, Button, Radio, notification } from "antd";
+import { Modal, Select, Spin, Switch, Button, Radio, notification, Drawer } from "antd";
 import datasetService from "services/datasets";
 import anomalyDefService from "services/anomalyDefinitions.js";
 import  _ from "lodash";
@@ -24,13 +24,13 @@ function generateOptions(autoCueOptions) {
         value: q,
         label: q,
         optionType: "Measure",
-        color: "#ffc71f"
+        color: "#4B0082"
       });
       allOptions.metric.push({
         value: q,
         label: q,
         optionType: "Measure",
-        color: "#ffc71f"
+        color: "#4B0082"
       });
     });
   }
@@ -51,13 +51,13 @@ function generateOptions(autoCueOptions) {
   allOptions.highOrLow = [
     {
       value: "High",
-      label: "Highs Only",
+      label: "High",
       optionType: "High Or Low",
       color: "#02c1a3"
     },
     {
       value: "Low",
-      label: "Lows Only",
+      label: "Low",
       optionType: "High Or Low",
       color: "#02c1a3"
     }
@@ -72,11 +72,32 @@ function generateOptions(autoCueOptions) {
     }
   ]
 
-  allOptions.operation = [
+  allOptions.dimVal = [
     {
       value:10 + "",
       label: 10 + "",
-      optionType: "Operation",
+      optionType: "Dimension Values",
+      color:"#ff6767"
+
+    },
+    {
+      value:20 + "",
+      label: 20 + "",
+      optionType: "Dimension Values",
+      color:"#ff6767"
+
+    },
+    {
+      value:30 + "",
+      label: 30 + "",
+      optionType: "Dimension Values",
+      color:"#ff6767"
+
+    },
+    {
+      value:40 + "",
+      label: 40 + "",
+      optionType: "Dimension Values",
       color:"#ff6767"
 
     }
@@ -104,29 +125,33 @@ function updateHelpText(selectedOption) {
 
 
 function getMetricHelpText(value, opts) {
+  if(opts){
     options = [
       ...allOptions.dimension,
       ...allOptions.highOrLow
     ];
-    return " by STATE";
+    return "";
+  }
   }
 
 function getDimensionHelpText(value, opts) {
+  if(opts){
     options = [];
     options = [...options, ...allOptions.top];
-    return " Highs Only";
+    return "Measure";
   }
+}
 
 function getTopHelpText(value, opts) {
   options = []
-  options = [...options, ...allOptions.operation]
-  return "Top Values"
+  options = [...options, ...allOptions.dimVal]
+  return "by State"
 }
 
-function getOperationHelpText(value, opts) {
+function getDimValHelpText(value, opts) {
   options = []
   options = [...options, ...allOptions.highOrLow]
-  return "Number"
+  return ""
 }
 
 function getHelpText(selectedOption) {
@@ -140,7 +165,7 @@ function getHelpText(selectedOption) {
           let newOption = lastOption;
           newOption.value = lastOption.value;
           newOption.label = lastOption.value + " ";
-          newOption.optionType = "Operation"
+          newOption.optionType = "Dimension Values"
           newOption.color = "#ff6767"
           selectedOption.pop();
           selectedOption.push(newOption);
@@ -168,18 +193,18 @@ function getHelpText(selectedOption) {
         selectedOption.push(defaultOption1)
         lastOption = defaultOption1
         text = getTopHelpText(lastOption.value, selectedOption)
-        let defaultOption2 = options.pop()
+        let defaultOption2 = options.shift()
         selectedOption.push(defaultOption2)
         lastOption = defaultOption2
-        text = getOperationHelpText(lastOption.value, selectedOption)
+        text = getDimValHelpText(lastOption.value, selectedOption)
         }
         break;
       case "Top":
         text = getTopHelpText(lastOption.value, selectedOption)
         tempOption = lastOption
         break;
-      case "Operation":
-        text = getOperationHelpText(lastOption.value, selectedOption)
+      case "Dimension Values":
+        text = getDimValHelpText(lastOption.value, selectedOption)
         tempOption = lastOption
         break;
 
@@ -194,7 +219,7 @@ function getHelpText(selectedOption) {
   // return "";
 }
 
-export default function AddAnomalyDef(){
+export default function AddAnomalyDef(props){
   const [allDatasets, setAllDatasets] = useState([]);
   const [datasetId, setDatasetId] = useState();
   const [selectedOption, setSelectedOption] = useState([]);
@@ -239,7 +264,7 @@ const getDataset = async (datasetId) => {
         payload.dimension = item.value;
         isDimension = true
       }
-      if (item.optionType === "Operation"){
+      if (item.optionType === "Dimension Values"){
         payload.top = item.value
         topVal = item.value
       }
@@ -254,6 +279,7 @@ const getDataset = async (datasetId) => {
 
     getAddAnomaly(payload)
     setAddingAnomaly(false)
+    props.onAddAnomalyDefSuccess(false)
     setSelectedOption([])
 
   };
@@ -279,7 +305,7 @@ const getDataset = async (datasetId) => {
   };
 
   const  singleOption = props => {
-    if (props && props.lable && props.label.indexOf("Create ") !== -1) {
+    if (props && props.label && props.label.indexOf("Create ") !== -1) {
       return (
         <components.Option {...props}>
           <div className={style.optionWrapper}>
@@ -326,6 +352,7 @@ const getDataset = async (datasetId) => {
   };
 
   const handleOnCancel = () =>{
+    props.onAddAnomalyDefSuccess(false)
     setAddingAnomaly(false)
     setSelectedOption([])
   }
@@ -343,46 +370,39 @@ const getDataset = async (datasetId) => {
 
     return (
       <div>
-        <div className={`d-flex flex-column justify-content-center text-right mb-2`}>
-          <Button
-            // icon="plus"
-            type="primary"
-            onClick={() => setAddingAnomaly(true)}
-          >
-            Add Anomaly Definition
-          </Button>
-        </div>
-        {addingAnomaly ? (
-          <Modal
-            title="Add Anomaly"
+          <Drawer
+            title="Add Anomaly Definition"
             width="50%"
             centered
             visible={true}
             key="addAnomalyModal"
-            onOk={() =>handleAddAnomaly()}
-            onCancel={handleOnCancel}
-            footer={[
-              <Button
-                key="back"
-                type="primary"
-                onClick={() => handleAddAnomaly()}
-              >
-                Save
-              </Button>,
+            centered="true"
+            onClose={handleOnCancel}
+            footer={
+              <div style={{textAlign: "right"}}>
               <Button
                 key="addingAnomalyButton"
                 onClick={handleOnCancel}
+                style={{marginRight: 8}}
               >
                 Cancel
               </Button>
-            ]}
+
+              <Button
+              key="back"
+              type="primary"
+              onClick={() => handleAddAnomaly()}
+              >
+              Save Anomaly Definition
+              </Button>
+              </div>
+            }
           >
-            <div className="pb-4 ">
-              <div className="pl-4">
+            <div>
+              <div className="mb-6">
                 <Select
-                  className="pb-2 mx-2 "
+                className={`${style.selectEditor}`}
                   showSearch
-                  style={{ width: 200, float: "left" }}
                   placeholder="Select a dataset"
                   optionFilterProp="children"
                   onChange={handleDatasetChange}
@@ -398,8 +418,6 @@ const getDataset = async (datasetId) => {
                   {datasetOption}
                 </Select>
               </div>
-              <div>
-
               <CreatableSelect
                 styles={{
                   indicatorSeparator: () => {}, // removes the "stick"
@@ -421,13 +439,20 @@ const getDataset = async (datasetId) => {
                   MultiValueContainer: multiValueContainer
                 }}
                 options={options}
-                placeholder={`DAILY COUNT by STATE `}
+                placeholder="Measure [Dimension Top N] [High/Low] "
               />
-            </div>
-            </div>
+            {/* <div style={{float:"left"}}>
+            <Button
+              key="back"
+              type="primary"
+              onClick={() => handleAddAnomaly()}
+              >
+              Save Anomaly Definition
+              </Button>
+              </div> */}
+          </div>
             
-          </Modal>
-        ) : null}
+          </Drawer>
       </div>
     );
   }

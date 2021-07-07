@@ -33,7 +33,6 @@ class AnomalyDefinitions:
             highOrLow=highOrLow,
             top=top
         )
-        anomalyObj.save()
         response.update(True, "AnomalyDefinition created successfully !")
         return response
 

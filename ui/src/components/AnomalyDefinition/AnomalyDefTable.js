@@ -7,6 +7,7 @@ import EditAnomalyDef from "./EditAnomalyDef.js"
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import ErrorBoundary from "antd/lib/alert/ErrorBoundary";
 import anomalyDefService from "services/anomalyDefinitions.js"
+
 const { Search } = Input;
 const ButtonGroup = Button.Group;
 const granularity = {
@@ -15,35 +16,62 @@ const granularity = {
   "week" : "Week"
  }
 export default function Connection() {
-  const [data, setData] = useState([]);
+  const [data, setData] = useState();
   const [editAnomalyDef, setEditAnomalyDef] = useState([]);
-  const [edit, setEdit] = useState(false);
+  const [editAnomalyDefinition, setEditAnomalyDefinition] = useState(false);
   const [addAnomalyDef, setAddAnomalyDef] = useState(false);
+  const [isAddAnomalyDefDrawerVisible, setIsAddAnomalyDefDrawerVisible] = useState(false);
+  const [isEditAnomalyDefDrawerVisible, setIsEditAnomalyDefDrawerVisible] = useState(false);
 
   useEffect(() => {
-    if (!data.length) {
+    if (!data) {
         fetchData();
     }
   }, []);
 
   const fetchData = async () => {
     const response = await anomalyDefService.getAnomalyDefs();
-    setData(response.data)
+    if(response){
+      setData(response.data)
+    }
   }
 
 
 const deleteAnomalyDef = (anomalyDef) =>{
   const response = anomalyDefService.deleteAnomalyDef(anomalyDef.id)
+  fetchData()
 }
 
+const closeAddAnomalyDefDrawer = () => {
+  setIsAddAnomalyDefDrawerVisible(false)
+}
+
+const closeViewConnectionDrawer = () =>{
+  setIsEditAnomalyDefDrawerVisible(false)
+}
+
+const addingAnomaly = (val) => {
+  setAddAnomalyDef(val)
+}
+
+
 const editAnomlay = (anomalyDef) => {
-  setEdit(true)
+  setEditAnomalyDefinition(true)
+
+
   setEditAnomalyDef(anomalyDef)
 }
 const onEditAnomalyDefSuccess = (val) => {
-  setEdit(val)
+  setEditAnomalyDefinition(val)
+  setIsEditAnomalyDefDrawerVisible(val)
+  fetchData()
 }
 
+const onAddAnomalyDefSuccess = (val) =>{
+  setAddAnomalyDef(val)
+  setIsAddAnomalyDefDrawerVisible(val)
+  fetchData()
+}
   const columns = [
       
       {
@@ -82,7 +110,7 @@ const onEditAnomalyDefSuccess = (val) => {
         render:(text, record) => {
           return (         
                 <div style={{fontSize:14}}>
-                 <span style={{color: "#ffc71f"}}> {record.anomalyDef.metric}</span>
+                 <span style={{color: "#4B0082"}}> {record.anomalyDef.metric}</span>
                   <span style={{color: "#12b1ff"}}> {record.anomalyDef.dimension ? record.anomalyDef.dimension : null}</span>
                   <span style={{color: "#ff6767"}}> {record.anomalyDef.top > 0 ? "Top " + record.anomalyDef.top : null}</span>
                   <span style={{color: "#02c1a3"}}> {record.anomalyDef.highOrLow}</span>
@@ -123,7 +151,7 @@ const onEditAnomalyDefSuccess = (val) => {
         key: "",
         render: (text, record) => (
          <div className={style.actions}>
-           <Tooltip title={"Edit AnomalyDefinition"}>
+           <Tooltip title={"Edit Anomaly Definition"}>
               <EditOutlined onClick={() => editAnomlay(record)} />
             </Tooltip>
             <Popconfirm
@@ -133,7 +161,7 @@ const onEditAnomalyDefSuccess = (val) => {
                 okText="Yes"
                 cancelText="No"
             >
-                <Tooltip title={"Delete AnomalyDefinition"}>
+                <Tooltip title={"Delete Anomaly Definition"}>
                     <DeleteOutlined />
                 </Tooltip>
             </Popconfirm>
@@ -141,17 +169,16 @@ const onEditAnomalyDefSuccess = (val) => {
         )
       }
     ];
-
     return (
       <div>
         <div className={`d-flex flex-column justify-content-center text-right mb-2`}>
-
-            <ErrorBoundary>
-              <AddAnomalyDef />
-            </ErrorBoundary>
-          {edit ? 
-          <EditAnomalyDef onEditAnomalyDefSuccess={onEditAnomalyDefSuccess} editAnomalyDef={editAnomalyDef}/> 
-          : null }
+        <Button
+            type="primary"
+            onClick={() => addingAnomaly(true)}
+          >
+            Add Anomaly Definition
+          </Button>
+          
         </div>
         <Table
             rowKey={"id"}
@@ -165,6 +192,13 @@ const onEditAnomalyDefSuccess = (val) => {
             }}
             
         />
+        {addAnomalyDef ? 
+        <AddAnomalyDef onAddAnomalyDefSuccess={onAddAnomalyDefSuccess}  />
+        : null
+      }
+        {editAnomalyDefinition ? 
+          <EditAnomalyDef onEditAnomalyDefSuccess={onEditAnomalyDefSuccess} editAnomalyDef={editAnomalyDef}/> 
+          : null }
            </div>
     );
   }
