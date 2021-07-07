@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import style from "./style.module.scss";
 import { components } from "react-select";
 import CreatableSelect from "react-select/creatable";
-import { Modal, Select, Spin, Switch, Button, Radio, notification } from "antd";
+import { Modal, Select, Spin, Switch, Button, Radio, notification, Drawer } from "antd";
 import datasetService from "services/datasets";
 import anomalyDefService from "services/anomalyDefinitions.js";
 import  _ from "lodash";
@@ -43,7 +43,7 @@ function getSelectedOptions(anomalyDef){
           temp.push({
             value: anomalyDef.top,
             label: anomalyDef.top,
-            optionType: "Operation",
+            optionType: "Dimension Values",
             color: "#ff6767",
             isFixed: true
           });
@@ -106,19 +106,19 @@ function getMetricHelpText(value, opts) {
     options = [
       ...allOptions.highOrLow
     ];
-    return " by STATE";
+    return "";
   }
 
 function getTopHelpText(value, opts) {
 //   options = []
   options = [...allOptions.highOrLow]
-  return "Top Values"
+  return ""
 }
 
 function getOperationHelpText(value, opts) {
 //   options = []
   options = [...allOptions.highOrLow]
-  return "Number"
+  return ""
 }
 
 function getHelpText(selectedOption) {
@@ -138,7 +138,7 @@ function getHelpText(selectedOption) {
         text = getTopHelpText(lastOption.value, selectedOption)
         tempOption = lastOption
         break;
-      case "Operation":
+      case "Dimension Values":
         text = getOperationHelpText(lastOption.value, selectedOption)
         tempOption = lastOption
         break;
@@ -191,20 +191,23 @@ export default function EditAnomalyDef(props){
       if (item.optionType === "Dimension") {
         payload.dimension = item.value;
       }
-      if (item.optionType === "Operation"){
+      if (item.optionType === "Dimension Values"){
         payload.top = item.value
       }
     });
 
     getEditAnomaly(payload)
-    props.onEditAnomalyDefSuccess(false)
-    setSelectedOption([])
 
   };
 
   const getEditAnomaly = async (payload) =>{
   const response = await anomalyDefService.editAnomalyDef(payload)
+  if(response.success){
+    props.onEditAnomalyDefSuccess(true)
   }
+  setSelectedOption([])
+  }
+  
 
  const handleDatasetChange = value => {
     setSelectedOption([])
@@ -227,7 +230,7 @@ export default function EditAnomalyDef(props){
   };
 
   const  singleOption = props => {
-    if (props && props.lable && props.label.indexOf("Create ") !== -1) {
+    if (props && props.label && props.label.indexOf("Create ") !== -1) {
       return (
         <components.Option {...props}>
           <div className={style.optionWrapper}>
@@ -274,7 +277,7 @@ export default function EditAnomalyDef(props){
   };
   const handleOnCancel = () =>{
       props.onEditAnomalyDefSuccess(false)
-    setSelectedOption([])
+      setSelectedOption([])
   }
 
   const handleIsFocused = (val) => {
@@ -290,38 +293,21 @@ export default function EditAnomalyDef(props){
 
     return (
       <div>
-        <div style={{ float: "right", paddingBottom: "10px" }}>
-        </div>
-          <Modal
-            title="Edit Anomlay"
-            width="50%"
+          <Drawer
+            title="Edit Anomaly Definition"
+            width="30%"
             centered
             visible={true}
             key="editAnomalyModal"
-            onOk={() =>handelEditAnomaly()}
-            onCancel={handleOnCancel}
-            footer={[
-              <Button
-                key="back"
-                type="primary"
-                onClick={() => handelEditAnomaly()}
-              >
-                Save
-              </Button>,
-              <Button
-                key="editAnomalyButton"
-                onClick={handleOnCancel}
-              >
-                Cancel
-              </Button>
-            ]}
+            centered="true"
+            onClose={handleOnCancel}
           >
-            <div className="pb-4 ">
-              <div className="pl-4">
+            <div>
+              <div className="mb-6">
                 <Select
-                  className="pb-2 mx-2 "
+                  className={`${style.selectEditor}`}
                   showSearch
-                  style={{ width: 200, float: "left" }}
+                  // style={{ width: 200, float: "left" }}
                   placeholder="Select a dataset"
                   optionFilterProp="children"
                   value={initialDataset}
@@ -339,8 +325,7 @@ export default function EditAnomalyDef(props){
                   {datasetOption}
                 </Select>
               </div>
-              <div>
-
+              <div className="mb-6">
               <CreatableSelect
                 styles={{
                   indicatorSeparator: () => {}, // removes the "stick"
@@ -365,12 +350,22 @@ export default function EditAnomalyDef(props){
                   MultiValueContainer: multiValueContainer
                 }}
                 options={options}
-                placeholder={`DAILY COUNT by STATE `}
+                placeholder={`Measure [Dimension Top N] [High/Low] `}
               />
+
             </div>
+            <div className="mb-6">
+            <Button
+                key="save"
+                type="primary"
+                onClick={() => handelEditAnomaly()}
+              >
+                Save Anomaly Definition 
+              </Button>
+              </div>
             </div>
             
-          </Modal>
+          </Drawer>
       </div>
     );
   }

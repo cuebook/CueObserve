@@ -1,8 +1,7 @@
 
-// @import "assets/styles/mixins.scss";
 
 .selectedOption {
-  // color: black;
+  background-color: white;
 }
 
 .optionWrapper {
@@ -13,14 +12,14 @@
 
 .subText {
   font-size: 10px;
-  color: gray-4;
+  color: gray;
   display: inline-block;
   margin: 0;
   position: relative !important;
   top: -18px;
   border-radius: 5px;
   padding: 0px 3px;
-  float: right;
+  float: right ;
 }
 
 .option {
@@ -35,7 +34,7 @@
 
 .filterLabel {
   width: 100px;
-  color:gray-4;
+  color:gray;
   position: absolute;
   float: left;
   height: 38px;
@@ -50,8 +49,8 @@
 
 .cuelFilterLabel {
   width: 100px;
-  background: primary;
-  color: gray-4;
+  background: "primary";
+  color: gray;
   float: left;
   height: 38px;
   padding: 9px 20px;
@@ -63,9 +62,10 @@
 }
 
 .filterEditor {
-  float: right !important;
-  width: 70%;
+  width: 80%;
   margin-bottom: 2px;
+  display: block;
+
 }
 
 .cuelSqlRadio {
@@ -91,4 +91,9 @@
           color: skyblue;
       }
   }
+}
+
+.selectEditor{
+  width: 80%;
+  margin-bottom: 2px;
 }
