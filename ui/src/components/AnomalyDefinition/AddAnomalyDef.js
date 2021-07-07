@@ -278,14 +278,14 @@ const getDataset = async (datasetId) => {
     }
 
     getAddAnomaly(payload)
-    setAddingAnomaly(false)
-    props.onAddAnomalyDefSuccess(false)
-    setSelectedOption([])
-
   };
 
   const getAddAnomaly = async (payload) =>{
-  const response = await anomalyDefService.addAnomalyDef(payload)
+    const response = await anomalyDefService.addAnomalyDef(payload)
+    // check success in response and add show error message if failed
+    setAddingAnomaly(false)
+    props.onAddAnomalyDefSuccess(false)
+    setSelectedOption([])
   }
 
  const handleDatasetChange = value => {
