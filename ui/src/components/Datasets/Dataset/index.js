@@ -8,6 +8,7 @@ import "ace-builds/src-noconflict/ext-language_tools";
 import { Resizable } from "re-resizable";
 import { message } from "antd"
 import _ from "lodash";
+import { calculateColumnsWidth } from "components/Utils/columnWidthHelper";
 
 import { Form, Button, Input,
   Radio,
@@ -36,6 +37,7 @@ export default function Dataset(props) {
   const [datasetColumns, setDatasetColumns] = useState([])
   const [datasetColumnType, setDatasetColumnType] = useState({})
   const [datasetGranularity, setDatasetGranlarity] = useState(null)
+  const [viewOnlyMode, setViewOnlyMode] = useState(false)
 
   const [isDataReceived, setIsDataReceived] = useState(false);
   const params = useParams()
@@ -57,6 +59,8 @@ export default function Dataset(props) {
       setDatasetGranlarity(data.granularity);
       setDatasetDetails(data);
 
+      if (params.datasetId && data.anomalyDefinitionCount) setViewOnlyMode(true);
+
       const tempColumnTypes = {}
       data.metrics && data.metrics.forEach(col=>{tempColumnTypes[col]="metric"})
       data.dimensions && data.dimensions.forEach(col=>{tempColumnTypes[col]="dimension"})
@@ -64,8 +68,8 @@ export default function Dataset(props) {
 
       setDatasetColumnType(tempColumnTypes)
       let columns = data.metrics.concat(data.dimensions).concat([data.timestampColumn])
-      columns = columns.sort()
       setDatasetColumns(columns)
+      console.log(columns)
     } 
   }
 
@@ -73,6 +77,16 @@ export default function Dataset(props) {
     const metrics = Object.keys(datasetColumnType).filter(col=>datasetColumnType[col]=="metric")
     const dimensions = Object.keys(datasetColumnType).filter(col=>datasetColumnType[col]=="dimension")
     const timestamps = Object.keys(datasetColumnType).filter(col=>datasetColumnType[col]=="timestamp")
+
+    if (!datasetName) {
+      message.error("Please enter name")
+      return 
+    }
+
+    if (!datasetConnection) {
+      message.error("Please select connection")
+      return 
+    }
 
     if (!timestamps.length || timestamps.length > 1){
       message.error("Please select one timestamp column")
@@ -117,12 +131,12 @@ export default function Dataset(props) {
     setLoadingQueryData(false)
     if (data && data.length){
       setQueryData(data)
-      mergeColumns(Object.keys(data[0]))
+      mergeColumns(data[0])
     }
   }
 
-  const mergeColumns = newColumns => {
-    newColumns = newColumns.sort()
+  const mergeColumns = columnValue => {
+    const newColumns = Object.keys(columnValue)
     const tempColumnType = datasetColumnType
 
     // remove removed columns
@@ -130,17 +144,19 @@ export default function Dataset(props) {
       delete tempColumnType[col]
     })
 
-    // add new columns
+    // add new columns with datatype
     newColumns.filter(col=>!datasetColumns.includes(col)).forEach(col=>{
-      tempColumnType[col] = "metric"
+      tempColumnType[col] = columnValue[col] === parseInt(columnValue[col], 10) ? "metric" : "dimension";
     })
+
     setDatasetColumnType(tempColumnType)
     setDatasetColumns( newColumns )
   }
 
   const columns = datasetColumns.map(col=>{return {title: col, dataIndex: col, key: col }});  
-  const queryDataTable = <Table columns={columns} dataSource={queryData} pagination={false} size="small" bordered={true} />
 
+  const dataTable = queryData && queryData.length && columns.length ? calculateColumnsWidth(columns, queryData , 400) : {}
+  const queryDataTable = <Table className={style.antdTable} columns={queryData ? dataTable.columns : columns} dataSource={queryData ? dataTable.source : queryData} pagination={false} size="small" bordered={true} scroll={{ x: queryData ? 1200 : dataTable.tableWidth, y: 450 }} />
 
   const radioOptions = [{ label: 'Measure', value: 'metric' },
                         { label: 'Dimension', value: 'dimension' },
@@ -157,12 +173,14 @@ export default function Dataset(props) {
     }, 
     {
       title: "Column Type", 
-      dataIndex: "action", 
+      dataIndex: "name", 
       key: "action",
       align: "right",
-      render: (text, record) => {
+      render: (name, record) => {
+        // let value = dataTable.columns.filter(c=>c.title==name)[0].align == "left" ? "dimension" : "metric"
         return <Radio.Group
             options={radioOptions}
+            disabled={viewOnlyMode}
             onChange={e=>{setDatasetColumnType({...datasetColumnType, [record]: e.target.value})}}
             value={datasetColumnType[record]}
           />
@@ -173,58 +191,54 @@ export default function Dataset(props) {
 
   return (
     <>
-      <div className="col-5">
-      <div className={`${style.dataset} col-5`}>
-        <div className={style.datasetName}>
-          <Input className={style.nameInput} placeholder="Enter Dataset name" onChange={e=>setDatasetName(e.target.value)} value={datasetName}/>
+      <div className={`xl:w-9/12 ${style.dataset}`}>
+        <div className={`lg:w-6/12 ${style.datasetName}`}>
+          <Input className={`${style.nameInput}`} placeholder="Enter Dataset name" onChange={e=>setDatasetName(e.target.value)} value={datasetName}/>
         </div>
         <div className={style.selectConnection}>
-          <SelectConnection value={datasetConnection} onChange={setDatasetConnection} />
+          <SelectConnection value={datasetConnection} disabled={ viewOnlyMode } onChange={setDatasetConnection} />
         </div>
         <div className={style.SQLEditor}>
-          <SQLEditor value={datasetSql} setValue={setDatasetSql}/>
+          <SQLEditor value={datasetSql} disabled={ viewOnlyMode } setValue={setDatasetSql}/>
         </div>
-        {
-          queryData && queryData.length ? 
-            <div className={style.dataTable}>
-              {queryDataTable}
-            </div> : null
-        }
+        <div className={style.buttons}>
+          <div className={style.run}>
+            <Button type="primary" onClick={runDatasetQuery} loading={loadingQueryData}>Run SQL</Button>
+          </div>
+        </div>
+        <div className={`compact-table ${style.dataTable}`}>
+          {queryDataTable}
+        </div>
         {
           !datasetColumns.length ? null :
             <>
-              <div className={style.typeSelectorTable}>
+              <div className={`xl:w-8/12 ${style.typeSelectorTable}`}>
                 <p>Select type for columns: </p>
                 {selectFieldTypeTable}
               </div>
               <div className={style.granularity}>
                 <p>Granularity: </p>
-                    <Select style={{ width: 120 }} placeholder="Select granularity" value={datasetGranularity} onChange={setDatasetGranlarity}>
+                    <Select style={{ width: 120 }} placeholder="Select granularity" value={datasetGranularity} onChange={setDatasetGranlarity} disabled={viewOnlyMode} >
                       <Option value="hour">Hour</Option>
                       <Option value="day">Day</Option>
-                      <Option value="week">Week</Option>
                     </Select>
               </div>
             </>
         }
         <div className={style.buttons}>
-          <div className={style.run}>
-            <Button type="primary" onClick={runDatasetQuery} loading={loadingQueryData}>Run SQL</Button>
-          </div>
-          { params.datasetId && datasetDetails.anomalyDefinitionCount ? null 
-            :
           <div className={style.save}>
-            <Button type="primary" onClick={saveDataset} disabled={queryData && queryData.length ? false : true }>Save Dataset</Button>
+            <Button type="primary" onClick={saveDataset} disabled={ viewOnlyMode || !(queryData && queryData.length) }>Save Dataset</Button>
           </div>
-          }
         </div>
-      </div>   
-      </div>
-
+      </div> 
     </>
   );
 
 }
+
+
+
+
 
 
 export function SQLEditor(props){
@@ -316,6 +330,8 @@ export function SQLEditor(props){
         width="100%"
         height="100%"
         readOnly={false}
+        readOnly={props.disabled ? props.disabled : false}
+        disabled={true}
         wrapEnabled={true}
         showPrintMargin={false}
         highlightActiveLine={true}

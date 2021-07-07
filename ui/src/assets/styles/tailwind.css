@@ -2401,6 +2401,14 @@ video {
   width: 50%;
 }
 
+.w-8\/12 {
+  width: 66.666667%;
+}
+
+.w-9\/12 {
+  width: 75%;
+}
+
 .w-10\/12 {
   width: 83.333333%;
 }
@@ -2714,6 +2722,11 @@ video {
   .md\:w-8\/12 {
     width: 66.666667%;
   }
+
+  .md\:w-9\/12 {
+    width: 75%;
+  }
+
 }
 
 @media (min-width: 1024px) {
@@ -2902,6 +2915,10 @@ video {
   .xl\:w-8\/12 {
     width: 66.666667%;
   }
+
+  .xl\:w-9\/12 {
+    width: 75%;
+  }
 }
 
 
@@ -2925,3 +2942,22 @@ video {
 .settings-div .ant-tabs-nav{
   margin-bottom: 0 !important;
 }
+
+
+
+.compact-table .ant-table {
+    font-size: 12px !important;
+  }
+
+.compact-table th.ant-table-column-has-actions{
+    text-align: left !important;
+  }
+
+.compact-table .ant-table-thead{
+    background: $gray-1 !important;
+  }
+
+.compact-table .ant-table-body {
+    margin: 0px 0px !important;
+  }
+  
