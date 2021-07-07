@@ -4,6 +4,7 @@ import { LeftOutlined } from '@ant-design/icons';
 
 import style from "./style.module.scss";
 import connectionService from "services/connection.js";
+const {TextArea} = Input;
 
 export default function AddConnection(props) {
   const [connectionTypes, setConnectionTypes] = useState([]);
@@ -71,19 +72,28 @@ export default function AddConnection(props) {
             >
           <Switch />
         </Form.Item>
+      case 'json':
+        return <Form.Item 
+              key={field.name} 
+              label={field.label} 
+              rules={field.properties.rules}
+              name={field.name}
+            >
+
+            <TextArea rows={3} 
+            className={style.inputFileArea}
+            />
+        </Form.Item>
       default:
         return <Form.Item 
           key={field.name} 
           label={field.label} 
           rules={field.properties.rules}
           name={field.name}
-          
-
         >
       <Input
         type={field.isEncrypted ? "password" : "text"}
         className={style.inputArea}
-        
       />
       </Form.Item>
     }

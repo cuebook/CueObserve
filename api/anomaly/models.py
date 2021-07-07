@@ -23,7 +23,7 @@ class ConnectionParam(models.Model):  # no ui
         db_index=True,
         related_name="connectionTypeParam",
     )
-    properties = models.TextField(null=True, blank=True)  # for ui
+    properties = models.JSONField(null=True, blank=True) # for ui
     file = models.JSONField(default=dict)
 
     def __str__(self):

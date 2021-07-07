@@ -12,7 +12,7 @@ export default function Sidebar(props) {
       "icon": "fa-exclamation-triangle"
     },
     {
-      "label": "Anomaly Definition",
+      "label": "Anomaly Definitions",
       "path": "/anomalyDefinitions",
       "icon": "fa-cog"
     },

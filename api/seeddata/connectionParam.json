@@ -336,7 +336,7 @@
         "pk": 18,
         "fields": {
           "name": "file",
-          "label": "Json Content",
+          "label": "JSON",
           "isEncrypted": false,
           "connectionType": 4,
           "properties": {
@@ -346,7 +346,7 @@
               "message": "File details can't be empty !"
               }
             ],
-            "type": "text",
+            "type": "json",
             "width": "100%"
           }
         }

@@ -6,12 +6,19 @@ from anomaly.models import Anomaly, Dataset, Connection, ConnectionType, Anomaly
 class ConnectionSerializer(serializers.ModelSerializer):
     connectionTypeId = serializers.SerializerMethodField()
     connectionType = serializers.SerializerMethodField()
+    datasetCount = serializers.SerializerMethodField()
+
 
     def get_connectionTypeId(self, obj):
         return obj.connectionType.id
 
     def get_connectionType(self, obj):
         return obj.connectionType.name
+
+    def get_datasetCount(self, obj):
+        connectionId = obj.id
+        datasetCount = Dataset.objects.filter(connection_id = connectionId).count()
+        return datasetCount
 
     class Meta:
         model = Connection
@@ -21,6 +28,7 @@ class ConnectionSerializer(serializers.ModelSerializer):
             "description",
             "connectionTypeId",
             "connectionType",
+            "datasetCount"
         ]
 
 

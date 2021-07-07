@@ -106,7 +106,7 @@ export default function DatasetsTable(props) {
 
   return (
     <div>
-      <div style={{float: "right", paddingBottom: "5px"}}>
+      <div className={`d-flex flex-column justify-content-center text-right mb-2`}>
         <Button onClick={createDataset} type="primary">New Dataset</Button>
       </div>
       <Table
