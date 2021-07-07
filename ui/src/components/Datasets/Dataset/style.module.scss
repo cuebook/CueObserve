@@ -1,16 +1,16 @@
 .dataset {
-
 	.datasetName {
 		padding: 5px;
 		padding-bottom: 20px;
 		.nameInput {
-		  font-size: 1.5rem;
+		  font-size: 1.35rem;
 		  border: none;
 		  padding: 10px 0 !important;
 		  background: none;
 		  border-radius: 0;
 		  border-bottom: 2px solid #a6adb5;
-		  height: 40px;
+		  height: 30px;
+		  box-shadow: none;
 		}
 	}
 
@@ -23,15 +23,23 @@
 	}
 
 	.dataTable {
-		padding: 5px;
+		padding: 2px;
 		padding-top: 10px;
+	}
+
+	.antdTable {
+	  height: 100%;
+	  border: none;
+	  overflow: auto;
+	  td{
+	    padding: 2px !important;
+	  }
 	}
 
 	.typeSelectorTable {
 
 		padding:  5px;
 		padding-left: 25px;
-		width:  50%;
 		p {
 			margin-left: -20px;
 			font-size: 15px ;
