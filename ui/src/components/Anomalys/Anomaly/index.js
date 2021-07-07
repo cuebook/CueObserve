@@ -39,7 +39,9 @@ export default function Anomaly(props) {
 
   if (!anomalyData) return null;
 
-  const min = calculateMin(anomalyData.chartData.actual)
+  console.log(anomalyData)
+
+  const min = calculateMin(anomalyData.data.anomalyData.actual)
 
   // find min & null vals
   var deno = 1,
@@ -79,7 +81,7 @@ export default function Anomaly(props) {
     <div className={style.chartDiv}>
       <Chart scale={cols} forceFit={true} width={1200} height={400}>
         <Tooltip crosshairs={{ type: "line" }} />
-        <View data={anomalyData.chartData.band}>
+        <View data={anomalyData.data.anomalyData.band}>
           <Geom
             type="area"
             position="ds*y"
@@ -88,7 +90,7 @@ export default function Anomaly(props) {
             color={"#777"}
           />
         </View>
-          <View data={anomalyData.chartData.actual}>
+          <View data={anomalyData.data.anomalyData.actual}>
             <Axis name="ds" />
             <Axis name="y" />
             <Geom
@@ -145,7 +147,7 @@ export default function Anomaly(props) {
               size={2}
             />
           </View>
-            <View data={anomalyData.chartData.predicted}>
+            <View data={anomalyData.data.anomalyData.predicted}>
               <Geom
                 type="line"
                 position={"ds*y"}

@@ -1,7 +1,8 @@
 import json
+from django.template import Template, Context
 from utils.apiResponse import ApiResponse
-from anomaly.models import Dataset
-from anomaly.serializers import DatasetsSerializer, DatasetSerializer
+from anomaly.models import Dataset, Anomaly, AnomalyCardTemplate
+from anomaly.serializers import DatasetsSerializer, DatasetSerializer, AnomalySerializer
 
 
 class Anomalys:
@@ -14,23 +15,23 @@ class Anomalys:
         """
         Gets anomalys
         """
-        res = ApiResponse("Error in getting datasets")
-        # datasets = Dataset.objects.all()
-        # data = DatasetsSerializer(datasets, many=True).data
-        data = [
-            {
-                "id": 5,
-                "title": "Card title",
-                "text": "Card text",
-                "dimVal": "Delhi",
-                "filterContribution": 34,
-                "data": {
-                    "chartData": [],
-                },
-                "lastAnomalyTimeISO": "20190403",
-            }
-        ]
-        res.update(True, "Successfully retrieved datasets", data)
+        res = ApiResponse("Error in getting anomalies")
+        # data = [
+        #     {
+        #         "id": 5,
+        #         "title": "Card title",
+        #         "text": "Card text",
+        #         "dimVal": "Delhi",
+        #         "filterContribution": 34,
+        #         "data": {
+        #             "chartData": [],
+        #         },
+        #         "lastAnomalyTimeISO": "20190403",
+        #     }
+        # ]
+        anomalies = Anomaly.objects.all()
+        data = AnomalySerializer(anomalies, many=True).data
+        res.update(True, "Successfully retrieved anomalies", data)
         return res
 
     @staticmethod
@@ -39,9 +40,15 @@ class Anomalys:
         Gets anomaly
         :param anomalyId: id of anomaly to fetch
         """
-        res = ApiResponse("Error in getting datasets")
+        res = ApiResponse("Error in getting specified anomaly")
+        anomalyObj = Anomaly.objects.get(id=anomalyId)
 
-        data = None
+        data = AnomalySerializer(anomalyObj).data
 
-        res.update(True, "Successfully retrieved datasets", data)
+        cardTemplate = AnomalyCardTemplate.objects.get(templateName="Anomaly Daily Template")
+
+        data["title"] = Template(cardTemplate.title).render(Context(data))
+        data["text"] = Template(cardTemplate.bodyText).render(Context(data))
+
+        res.update(True, "Successfully retrieved specified anomaly", data)
         return res
