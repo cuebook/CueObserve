@@ -23,11 +23,11 @@ export default function SelectConnection(props) {
 
 	return (
 		<Select
-		    showSearch
 		    style={{ width: 200 }}
 		    placeholder="Select a connection"
 		    optionFilterProp="children"
 		    onChange={props.onChange}
+		    disabled={props.disabled ? props.disabled : false }
 		    value={props.value}
 		    filterOption={(input, option) =>
 		      option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0

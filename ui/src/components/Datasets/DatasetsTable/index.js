@@ -10,7 +10,7 @@ import {
   Popconfirm,
   Tooltip
 } from "antd";
-import { DeleteOutlined, EyeOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import PopconfirmButton from "components/Utils/PopconfirmButton";
 
 export default function DatasetsTable(props) {
@@ -47,7 +47,7 @@ export default function DatasetsTable(props) {
 
   const columns = [
     {
-      title: "Datasets",
+      title: "Dataset Name",
       dataIndex: "name",
       key: "name",
       sorter: (a, b) => a.name.localeCompare(b.name),
@@ -57,25 +57,20 @@ export default function DatasetsTable(props) {
       dataIndex: "connection",
       key: "connection",
       sorter: (a, b) => a.connection.name.localeCompare(b.connection.name),
+      render: connection => { return <p>{connection.name}</p>}
     },
     {
       title: "Granularity",
       dataIndex: "granularity",
       key: "granularity",
       sorter: (a, b) => a.granularity.name.localeCompare(b.granularity.name),
-      render: granularity => {
-        if (granularity == "day") return "daily"
-        else if (granularity == "hour") return "hourly"
-        else if (granularity == "year") return "yearly"
-        else if (granularity == "month") return "monthly"
-        else if (granularity == "week") return "weekly"
-        else return null
-      }
+      render: granularity => { return _.capitalize(granularity) }
     },
     {
       title: "Anomaly Definitions",
       dataIndex: "anomalyDefinitionCount",
       key: "anomalyDefinitionCount",
+      className: "text-right",
       sorter: (a, b) => a.anomalyDefinitionCount - b.anomalyDefinitionCount,
     },
     {
@@ -87,20 +82,21 @@ export default function DatasetsTable(props) {
         return (
           <div className={style.actions}>
              <Tooltip title={"View Dataset"}>
-                 <EyeOutlined onClick={()=>editDataset(record)} />
+                 <EditOutlined onClick={()=>editDataset(record)} />
              </Tooltip>
-
-             <Popconfirm
-                 title={"Are you sure to delete '"+ record.name +"'?"}
-                 onConfirm={() => deleteDataset(record)}
-                 // onCancel={cancel}
-                 okText="Yes"
-                 cancelText="No"
-             >
-                 <Tooltip title={"Delete Dataset"}>
-                     <DeleteOutlined />
-                 </Tooltip>
-             </Popconfirm>
+             { record.anomalyDefinitionCount ? null :
+               <Popconfirm
+                   title={"Are you sure to delete '"+ record.name +"'?"}
+                   onConfirm={() => deleteDataset(record)}
+                   // onCancel={cancel}
+                   okText="Yes"
+                   cancelText="No"
+               >
+                   <Tooltip title={"Delete Dataset"}>
+                       <DeleteOutlined />
+                   </Tooltip>
+               </Popconfirm>
+             }
            </div>
         );
       }
