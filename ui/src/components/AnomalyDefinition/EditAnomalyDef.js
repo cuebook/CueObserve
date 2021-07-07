@@ -106,19 +106,19 @@ function getMetricHelpText(value, opts) {
     options = [
       ...allOptions.highOrLow
     ];
-    return " by STATE";
+    return "";
   }
 
 function getTopHelpText(value, opts) {
 //   options = []
   options = [...allOptions.highOrLow]
-  return "Top Values"
+  return ""
 }
 
 function getOperationHelpText(value, opts) {
 //   options = []
   options = [...allOptions.highOrLow]
-  return "Number"
+  return ""
 }
 
 function getHelpText(selectedOption) {
@@ -197,14 +197,16 @@ export default function EditAnomalyDef(props){
     });
 
     getEditAnomaly(payload)
-    props.onEditAnomalyDefSuccess(false)
-    setSelectedOption([])
 
   };
 
   const getEditAnomaly = async (payload) =>{
   const response = await anomalyDefService.editAnomalyDef(payload)
+
+  props.onEditAnomalyDefSuccess(false)
+  setSelectedOption([])
   }
+  
 
  const handleDatasetChange = value => {
     setSelectedOption([])
@@ -291,35 +293,16 @@ export default function EditAnomalyDef(props){
     return (
       <div>
           <Drawer
-            title="Edit Anomlay Definition"
-            width="50%"
+            title="Edit Anomaly Definition"
+            width="30%"
             centered
             visible={true}
             key="editAnomalyModal"
             centered="true"
             onClose={handleOnCancel}
-            footer={
-              <div style={{textAlign:"right"}}>
-              
-              <Button
-                key="back"
-                onClick={handleOnCancel}
-                style={{marginRight: 8}}
-              >
-                Cancel
-              </Button>
-              <Button
-                key="save"
-                type="primary"
-                onClick={() => handelEditAnomaly()}
-              >
-                Save Anomaly Definition 
-              </Button>
-              </div>
-            }
           >
             <div>
-              <div className="pb-6">
+              <div className="mb-6">
                 <Select
                   className={`${style.selectEditor}`}
                   showSearch
@@ -341,8 +324,7 @@ export default function EditAnomalyDef(props){
                   {datasetOption}
                 </Select>
               </div>
-              <div>
-
+              <div className="mb-6">
               <CreatableSelect
                 styles={{
                   indicatorSeparator: () => {}, // removes the "stick"
@@ -369,7 +351,17 @@ export default function EditAnomalyDef(props){
                 options={options}
                 placeholder={`Measure [Dimension Top N] [High/Low] `}
               />
+
             </div>
+            <div className="mb-6">
+            <Button
+                key="save"
+                type="primary"
+                onClick={() => handelEditAnomaly()}
+              >
+                Save Anomaly Definition 
+              </Button>
+              </div>
             </div>
             
           </Drawer>

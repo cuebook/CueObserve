@@ -115,9 +115,10 @@ function updateHelpText(selectedOption) {
       let elements = document.getElementsByClassName("autoCueOptions");
       let element = elements[elements.length - 1];
       let helpText = getHelpText(selectedOption);
-      if (element)
-        element.innerHTML +=
-          "<span class='autocue-help'>" + helpText + "</span>";
+      // if (element){
+      //   element.innerHTML +=
+      //     "<span class='autocue-help'>" + helpText + "</span>";
+      // }
     }, 150);
   }
 }
@@ -125,27 +126,25 @@ function updateHelpText(selectedOption) {
 
 
 function getMetricHelpText(value, opts) {
-  if(opts){
     options = [
       ...allOptions.dimension,
       ...allOptions.highOrLow
     ];
-    return "";
-  }
+    return " [Dimension Top 10]";
   }
 
 function getDimensionHelpText(value, opts) {
   if(opts){
     options = [];
     options = [...options, ...allOptions.top];
-    return "Measure";
+    return " [High/Low]";
   }
 }
 
 function getTopHelpText(value, opts) {
   options = []
   options = [...options, ...allOptions.dimVal]
-  return "by State"
+  return ""
 }
 
 function getDimValHelpText(value, opts) {
@@ -372,33 +371,15 @@ const getDataset = async (datasetId) => {
       <div>
           <Drawer
             title="Add Anomaly Definition"
-            width="50%"
+            width="30%"
             centered
             visible={true}
             key="addAnomalyModal"
             centered="true"
             onClose={handleOnCancel}
-            footer={
-              <div style={{textAlign: "right"}}>
-              <Button
-                key="addingAnomalyButton"
-                onClick={handleOnCancel}
-                style={{marginRight: 8}}
-              >
-                Cancel
-              </Button>
 
-              <Button
-              key="back"
-              type="primary"
-              onClick={() => handleAddAnomaly()}
-              >
-              Save Anomaly Definition
-              </Button>
-              </div>
-            }
           >
-            <div>
+            <div >
               <div className="mb-6">
                 <Select
                 className={`${style.selectEditor}`}
@@ -418,6 +399,7 @@ const getDataset = async (datasetId) => {
                   {datasetOption}
                 </Select>
               </div>
+            <div className="mb-6">
               <CreatableSelect
                 styles={{
                   indicatorSeparator: () => {}, // removes the "stick"
@@ -441,7 +423,8 @@ const getDataset = async (datasetId) => {
                 options={options}
                 placeholder="Measure [Dimension Top N] [High/Low] "
               />
-            {/* <div style={{float:"left"}}>
+              </div>
+            <div className="mb-6">
             <Button
               key="back"
               type="primary"
@@ -449,7 +432,7 @@ const getDataset = async (datasetId) => {
               >
               Save Anomaly Definition
               </Button>
-              </div> */}
+              </div>
           </div>
             
           </Drawer>

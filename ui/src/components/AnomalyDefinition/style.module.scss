@@ -62,9 +62,10 @@
 }
 
 .filterEditor {
-  float: left !important;
-  width: 50%;
+  width: 80%;
   margin-bottom: 2px;
+  display: block;
+
 }
 
 .cuelSqlRadio {
@@ -93,6 +94,6 @@
 }
 
 .selectEditor{
-  width: 50%;
+  width: 80%;
   margin-bottom: 2px;
 }
