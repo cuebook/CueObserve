@@ -9,15 +9,33 @@ class AnomalyDefService {
     }
     async addAnomalyDef(payload){
         const response = await apiService.post("anomaly/addAnomalyDef" , payload)
-        return response
+        if(response.success == true){
+            message.success(response.message)
+            return response
+        } else {
+            message.error(response.message);
+            return null
+        }
     }
     async editAnomalyDef(payload){
         const response = await apiService.put("anomaly/editAnomalyDef",payload)
-        return response
+        if(response.success == true){
+            message.success(response.message)
+            return response
+        } else {
+            message.error(response.message);
+            return null
+        }
     }
     async deleteAnomalyDef(id){
         const response = await apiService.delete("anomaly/anomalyDef/" + id)
-        return response
+        if(response.success == true){
+            message.success(response.message)
+            return response
+        } else {
+            message.error(response.message);
+            return null
+        }
     }
 
 }

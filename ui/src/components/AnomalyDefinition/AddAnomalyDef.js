@@ -222,7 +222,6 @@ export default function AddAnomalyDef(props){
   const [allDatasets, setAllDatasets] = useState([]);
   const [datasetId, setDatasetId] = useState();
   const [selectedOption, setSelectedOption] = useState([]);
-  const [addingAnomaly, setAddingAnomaly] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
 
   useEffect(()=>{
@@ -282,8 +281,9 @@ const getDataset = async (datasetId) => {
   const getAddAnomaly = async (payload) =>{
     const response = await anomalyDefService.addAnomalyDef(payload)
     // check success in response and add show error message if failed
-    setAddingAnomaly(false)
-    props.onAddAnomalyDefSuccess(false)
+    if(response.success){
+      props.onAddAnomalyDefSuccess(true)
+    }
     setSelectedOption([])
   }
 
@@ -352,7 +352,6 @@ const getDataset = async (datasetId) => {
 
   const handleOnCancel = () =>{
     props.onAddAnomalyDefSuccess(false)
-    setAddingAnomaly(false)
     setSelectedOption([])
   }
 

@@ -20,8 +20,6 @@ export default function Connection() {
   const [editAnomalyDef, setEditAnomalyDef] = useState([]);
   const [editAnomalyDefinition, setEditAnomalyDefinition] = useState(false);
   const [addAnomalyDef, setAddAnomalyDef] = useState(false);
-  const [isAddAnomalyDefDrawerVisible, setIsAddAnomalyDefDrawerVisible] = useState(false);
-  const [isEditAnomalyDefDrawerVisible, setIsEditAnomalyDefDrawerVisible] = useState(false);
 
   useEffect(() => {
     if (!data) {
@@ -36,41 +34,38 @@ export default function Connection() {
     }
   }
 
+const getDeleteAnomalyDef = async (id) =>{
+  const response = await anomalyDefService.deleteAnomalyDef(id)
+  if(response.success){
+    fetchData() // Refresh table
+  }
 
+}
 const deleteAnomalyDef = (anomalyDef) =>{
-  const response = anomalyDefService.deleteAnomalyDef(anomalyDef.id)
-  fetchData()
-}
-
-const closeAddAnomalyDefDrawer = () => {
-  setIsAddAnomalyDefDrawerVisible(false)
-}
-
-const closeViewConnectionDrawer = () =>{
-  setIsEditAnomalyDefDrawerVisible(false)
+  getDeleteAnomalyDef(anomalyDef.id)
+  
 }
 
 const addingAnomaly = (val) => {
   setAddAnomalyDef(val)
 }
 
-
 const editAnomlay = (anomalyDef) => {
   setEditAnomalyDefinition(true)
-
-
   setEditAnomalyDef(anomalyDef)
 }
 const onEditAnomalyDefSuccess = (val) => {
-  setEditAnomalyDefinition(val)
-  setIsEditAnomalyDefDrawerVisible(val)
-  fetchData()
+  if(val){
+    fetchData() // Refresh table 
+  }
+  setEditAnomalyDefinition(!editAnomalyDefinition)
 }
 
 const onAddAnomalyDefSuccess = (val) =>{
-  setAddAnomalyDef(val)
-  setIsAddAnomalyDefDrawerVisible(val)
-  fetchData()
+  if(val){
+    fetchData() // Refresh table 
+  }
+  setAddAnomalyDef(!addAnomalyDef)
 }
   const columns = [
       
@@ -157,7 +152,6 @@ const onAddAnomalyDefSuccess = (val) =>{
             <Popconfirm
                 title={"Are you sure to delete Anomaly of id "+ record.id +"?"}
                 onConfirm={() => deleteAnomalyDef(record)}
-                // onCancel={cancel}
                 okText="Yes"
                 cancelText="No"
             >
@@ -192,13 +186,16 @@ const onAddAnomalyDefSuccess = (val) =>{
             }}
             
         />
-        {addAnomalyDef ? 
-        <AddAnomalyDef onAddAnomalyDefSuccess={onAddAnomalyDefSuccess}  />
-        : null
-      }
-        {editAnomalyDefinition ? 
+        {
+          addAnomalyDef ? 
+          <AddAnomalyDef onAddAnomalyDefSuccess={onAddAnomalyDefSuccess}  />
+          : null
+        }
+        {
+          editAnomalyDefinition ? 
           <EditAnomalyDef onEditAnomalyDefSuccess={onEditAnomalyDefSuccess} editAnomalyDef={editAnomalyDef}/> 
-          : null }
-           </div>
+          : null
+        }
+      </div>
     );
   }

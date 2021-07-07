@@ -202,8 +202,9 @@ export default function EditAnomalyDef(props){
 
   const getEditAnomaly = async (payload) =>{
   const response = await anomalyDefService.editAnomalyDef(payload)
-
-  props.onEditAnomalyDefSuccess(false)
+  if(response.success){
+    props.onEditAnomalyDefSuccess(true)
+  }
   setSelectedOption([])
   }
   
@@ -276,7 +277,7 @@ export default function EditAnomalyDef(props){
   };
   const handleOnCancel = () =>{
       props.onEditAnomalyDefSuccess(false)
-    setSelectedOption([])
+      setSelectedOption([])
   }
 
   const handleIsFocused = (val) => {
