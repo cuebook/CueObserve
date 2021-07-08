@@ -6,7 +6,6 @@ class AnomalyService {
         return apiService.get("anomaly/anomalys")
         .then(response => {
             if(response.success == true){
-                console.log(response)
                 return response.data
             } else {
                 message.error(response.message);

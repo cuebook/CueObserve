@@ -13,10 +13,10 @@ class AnomalyDefinitions:
         This method is used to get all anomlayObj
         """
 
-        response = ApiResponse("Error in getting AnomalyObject")
-        anomalyDef = AnomalyDefinition.objects.all()
+        response = ApiResponse("Error in getting Anomaly Definition !")
+        anomalyDef = AnomalyDefinition.objects.all().order_by("-id")
         anomalyDefSerializer = AnomalyDefinitionSerializer(anomalyDef, many=True)
-        response.update(True, "AnomalyObj retrived successfully", anomalyDefSerializer.data)
+        response.update(True, "AnomalyDefinitions retrived successfully !", anomalyDefSerializer.data)
 
         return response
 
@@ -25,7 +25,7 @@ class AnomalyDefinitions:
         """
         This method is used to add anomaly to AnomalyDefinition table
         """
-        response = ApiResponse("Error in creating AnomalyObject")
+        response = ApiResponse("Error in creating Anomaly Definition !")
         anomalyObj = AnomalyDefinition.objects.create(
             dataset_id=datasetId,
             metric=metric,
@@ -33,8 +33,7 @@ class AnomalyDefinitions:
             highOrLow=highOrLow,
             top=top
         )
-        anomalyObj.save()
-        response.update(True, "AnomalyDefinition created successfully !")
+        response.update(True, "Anomaly Definition created successfully !")
         return response
 
     @staticmethod
@@ -42,10 +41,10 @@ class AnomalyDefinitions:
         """
         Delete anomaly objects of given id
         """
-        response = ApiResponse("Error in creating AnomalyObject")
+        response = ApiResponse("Error in creating Anomaly Definition !")
         anomalyObj = AnomalyDefinition.objects.get(id=anomalyId)
         anomalyObj.delete()
-        response.update(True,"Anomaly Object successfully deleted")
+        response.update(True,"Anomaly Definition successfully deleted !")
         return response
 
     @staticmethod
@@ -53,11 +52,11 @@ class AnomalyDefinitions:
         """
         Update anomaly objects of given anomalyId
         """
-        response = ApiResponse("Error in updating AnomalyObject")
+        response = ApiResponse("Error in updating Anomaly Definition !")
         anomalyObj = AnomalyDefinition.objects.get(id=anomalyId)
         anomalyObj.highOrLow = highOrLow
         anomalyObj.save()
-        response.update(True, "AnomalyObj updated successfully")
+        response.update(True, "Anomaly Definition updated successfully !")
         return response
 
         
