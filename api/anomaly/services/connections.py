@@ -50,13 +50,13 @@ class Connections:
         connectionResponse = False
         res = ApiResponse("Error in adding connection")
         connectionType = ConnectionType.objects.get(id=payload["connectionType_id"])
+        connectionName = connectionType.name
 
         # Do this verification using Querys service
 
-        file = payload["params"].get(
-            "file", {}
-        )  # now it's only for BigQuery connection
-        if payload["connectionType_id"] == 4:
+        # now it's only for BigQuery connection
+        if connectionName == "BigQuery":
+            file = payload["params"].get("file", {})
             connectionResponse = BigQuery.checkConnection(file)
 
             if connectionResponse:
@@ -64,7 +64,6 @@ class Connections:
                     name=payload["name"],
                     description=payload["description"],
                     connectionType=connectionType,
-                    file=file,
                 )
 
                 for param in payload["params"]:
@@ -87,7 +86,6 @@ class Connections:
                 name=payload["name"],
                 description=payload["description"],
                 connectionType=connectionType,
-                file=file,
             )
             for param in payload["params"]:
                 cp = ConnectionParam.objects.get(
