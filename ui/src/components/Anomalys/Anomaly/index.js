@@ -3,7 +3,7 @@ import style from "./style.module.scss";
 import { useParams, useHistory } from 'react-router-dom';
 import { message } from "antd"
 import _ from "lodash";
-import { Chart, Geom, Axis, Tooltip, track, G2, View } from "bizcharts";
+import { Chart, Geom, Axis, Tooltip, track, G2, View, Legend } from "bizcharts";
 import anomalyService from "services/anomalys";
 import { Select } from 'antd';
 
@@ -39,7 +39,9 @@ export default function Anomaly(props) {
 
   if (!anomalyData) return null;
 
-  const min = calculateMin(anomalyData.chartData.actual)
+  console.log(anomalyData)
+
+  const min = calculateMin(anomalyData.data.anomalyData.actual)
 
   // find min & null vals
   var deno = 1,
@@ -79,7 +81,7 @@ export default function Anomaly(props) {
     <div className={style.chartDiv}>
       <Chart scale={cols} forceFit={true} width={1200} height={400}>
         <Tooltip crosshairs={{ type: "line" }} />
-        <View data={anomalyData.chartData.band}>
+        <View data={anomalyData.data.anomalyData.band}>
           <Geom
             type="area"
             position="ds*y"
@@ -88,7 +90,7 @@ export default function Anomaly(props) {
             color={"#777"}
           />
         </View>
-          <View data={anomalyData.chartData.actual}>
+          <View data={anomalyData.data.anomalyData.actual}>
             <Axis name="ds" />
             <Axis name="y" />
             <Geom
@@ -145,7 +147,7 @@ export default function Anomaly(props) {
               size={2}
             />
           </View>
-            <View data={anomalyData.chartData.predicted}>
+            <View data={anomalyData.data.anomalyData.predicted}>
               <Geom
                 type="line"
                 position={"ds*y"}
@@ -161,8 +163,9 @@ export default function Anomaly(props) {
   return (<>
     <div className="flex">
     <div className={`w-10/12 ${style.chartPanel}`}>
-      <div className={style.anomalyTitle}>{anomalyData.title}</div>
-      <div className={style.anomalyText}>{anomalyData.text}</div>
+      <div className={style.anomalyTitle} dangerouslySetInnerHTML={{ __html: anomalyData.title }} />
+      <p />
+      <div className={style.anomalyText} dangerouslySetInnerHTML={{ __html: anomalyData.text }} />
       {chart}
     </div>
     </div>

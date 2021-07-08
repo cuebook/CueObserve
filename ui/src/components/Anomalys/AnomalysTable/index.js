@@ -36,10 +36,32 @@ export default function AnomalysTable(props) {
 
   const columns = [
     {
-      title: "Title",
-      dataIndex: "title",
-      key: "title",
-      sorter: (a, b) => a.title.localeCompare(b.title),
+      title: "Dataset",
+      dataIndex: "datasetName",
+      key: "datasetName",
+      sorter: (a, b) => a.datasetName.localeCompare(b.datasetName),
+      render: text => {
+        return (
+          <p>{text}</p>
+        );
+      }
+    },
+    {
+      title: "Granularity",
+      dataIndex: "granularity",
+      key: "granularity",
+      sorter: (a, b) => a.granularity.localeCompare(b.granularity),
+      render: text => {
+        return (
+          <p>{text}</p>
+        );
+      }
+    },
+    {
+      title: "Measure",
+      dataIndex: "metric",
+      key: "metric",
+      sorter: (a, b) => a.metric.localeCompare(b.metric),
       render: text => {
         return (
           <p>{text}</p>
@@ -48,9 +70,20 @@ export default function AnomalysTable(props) {
     },
     {
       title: "Filter",
-      dataIndex: "dimVal",
-      key: "dimVal",
-      sorter: (a, b) => a.dimVal.localeCompare(b.dimVal),
+      dataIndex: "dimensionVal",
+      key: "dimensionVal",
+      sorter: (a, b) => a.dimensionVal.localeCompare(b.dimensionVal),
+      render: text => {
+        return (
+          <p>{text}</p>
+        );
+      }
+    },
+    {
+      title: "Latest Anomaly Timestamp",
+      dataIndex: "anomalyTimestamp",
+      key: "anomalyTimestamp",
+      sorter: (a, b) => a.anomalyTimestamp.localeCompare(b.anomalyTimestamp),
       render: text => {
         return (
           <p>{text}</p>

@@ -1,5 +1,6 @@
 import os
 import datetime as dt
+import pandas as pd
 from celery import shared_task, group
 from celery.result import allow_join_result
 
@@ -10,11 +11,12 @@ from ops.anomalyDetection import anomalyService
 
 
 @shared_task
-def _anomalyDetectionSubTask(anomalyDef, dimVal, df):
+def _anomalyDetectionSubTask(anomalyDef_id, dimVal, dfDict):
     """
     Internal anomaly detection subtask to be grouped by celery for each anomaly object
     """
-    anomalyProcess = anomalyService(anomalyDef, dimVal, df)
+    anomalyDefinition = AnomalyDefinition.objects.get(id=anomalyDef_id)
+    anomalyProcess = anomalyService(anomalyDefinition, dimVal, pd.DataFrame(dfDict))
 
 
 @shared_task
@@ -26,9 +28,11 @@ def anomalyDetectionJob(anomalyDef_id: int):
     anomalyDefinition = AnomalyDefinition.objects.get(id=anomalyDef_id)
     datasetDf = Data.fetchDatasetDataframe(anomalyDefinition.dataset)
     dimVals, dataframes = prepareAnomalyDataframes(datasetDf, anomalyDefinition.dataset.timestampColumn, anomalyDefinition.metric, anomalyDefinition.dimension, anomalyDefinition.top)
-    detectionJobs = group(
-        _anomalyDetectionSubTask.s(anomalyDefinition, dimVals[i], dataframes[i]) for i in range(len(dimVals))
-    )
-    _detectionJobs = detectionJobs.apply_async()
-    with allow_join_result():
-        result = _detectionJobs.get()
+    for i in range(len(dimVals)):
+        _anomalyDetectionSubTask(anomalyDef_id, dimVals[i], dataframes[i].to_dict("records"))
+    # detectionJobs = group(
+    #     _anomalyDetectionSubTask.s(anomalyDef_id, dimVals[i], dataframes[i].to_dict("records")) for i in range(len(dimVals))
+    # )
+    # _detectionJobs = detectionJobs.apply_async()
+    # with allow_join_result():
+    #     result = _detectionJobs.get()
