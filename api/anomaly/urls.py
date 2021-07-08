@@ -24,5 +24,10 @@ urlpatterns = [
         "anomalyDef/<int:anomalyId>", views.AnomalyDefView.as_view(), name="anomalyDef"
     ),
     path("addAnomalyDef", views.AnomalyDefView.as_view(), name="addAnomalyDef"),
-    path("editAnomalyDef",  views.AnomalyDefView.as_view(), name="editAnomalyDef")
+    path("editAnomalyDef",  views.AnomalyDefView.as_view(), name="editAnomalyDef"), 
+    # Schedules
+    path("schedules/", views.ScheduleView.as_view(), name="scheduleView"),
+    path("schedules/<int:scheduleId>", views.schedule, name="getSingleSchedule"),
+    path("timezones/", views.TimzoneView.as_view(), name="timezoneView"),
+
 ]

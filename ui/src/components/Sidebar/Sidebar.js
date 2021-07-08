@@ -26,6 +26,11 @@ export default function Sidebar(props) {
       "path": "/connections",
       "icon": "fa-plug"
     },
+    {
+      "label": "Schedules",
+      "path": "/schedules",
+      "icon": "fa-calendar"
+    },
   ]
 
   let menuElements = []

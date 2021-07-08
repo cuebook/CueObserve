@@ -1,6 +1,8 @@
 # pylint: disable=C0115
 from typing import DefaultDict, Dict
 from django.db import models
+from django_celery_beat.models import  CrontabSchedule
+
 
 
 # eg. postgres, mysql
@@ -84,3 +86,6 @@ class AnomalyCardTemplate(models.Model):
 
     def __str__(self):
         return self.templateName
+    
+class CustomSchedule(CrontabSchedule):
+    name = models.CharField(max_length=200, blank=True, null=True)

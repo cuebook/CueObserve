@@ -370,7 +370,7 @@ const getDataset = async (datasetId) => {
       <div>
           <Drawer
             title="Add Anomaly Definition"
-            width="30%"
+            width="50%"
             centered
             visible={true}
             key="addAnomalyModal"
