@@ -3,7 +3,7 @@ import style from "./style.module.scss";
 import { useParams, useHistory } from 'react-router-dom';
 import { message } from "antd"
 import _ from "lodash";
-import { Chart, Geom, Axis, Tooltip, track, G2, View } from "bizcharts";
+import { Chart, Geom, Axis, Tooltip, track, G2, View, Legend } from "bizcharts";
 import anomalyService from "services/anomalys";
 import { Select } from 'antd';
 
@@ -163,8 +163,9 @@ export default function Anomaly(props) {
   return (<>
     <div className="flex">
     <div className={`w-10/12 ${style.chartPanel}`}>
-      <div className={style.anomalyTitle}>{anomalyData.title}</div>
-      <div className={style.anomalyText}>{anomalyData.text}</div>
+      <div className={style.anomalyTitle} dangerouslySetInnerHTML={{ __html: anomalyData.title }} />
+      <p />
+      <div className={style.anomalyText} dangerouslySetInnerHTML={{ __html: anomalyData.text }} />
       {chart}
     </div>
     </div>
