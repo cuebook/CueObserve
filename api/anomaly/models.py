@@ -87,5 +87,6 @@ class AnomalyCardTemplate(models.Model):
     def __str__(self):
         return self.templateName
     
-class CustomSchedule(CrontabSchedule):
+class CustomSchedule(models.Model):
     name = models.CharField(max_length=200, blank=True, null=True)
+    cronSchedule = models.ForeignKey(CrontabSchedule, on_delete=models.CASCADE, db_index=True)

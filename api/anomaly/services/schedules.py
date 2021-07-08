@@ -1,6 +1,6 @@
 import pytz
 import logging
-# from django_celery_beat.models import CrontabSchedule
+from django_celery_beat.models import CrontabSchedule
 from anomaly.models import CustomSchedule as Schedule
 from anomaly.serializers import ScheduleSerializer
 from utils.apiResponse import ApiResponse
@@ -15,7 +15,7 @@ class ScheduleService:
         Service to get all schedule objects
         """
         res = ApiResponse()
-        schedules = Schedule.objects.exclude(id=1)
+        schedules = Schedule.objects.all()
         data = ScheduleSerializer(schedules, many=True).data
         res.update(True, "Schedules fetched successfully", data)
         return res
@@ -34,14 +34,17 @@ class ScheduleService:
             res.update(False, "Crontab must contain five elements")
             return res        
         timezone = timezone if timezone else "UTC"
-        schedule = Schedule.objects.create(
+        crontabSchedule = CrontabSchedule.objects.create(
             minute=cronElements[0],
             hour=cronElements[1],
             day_of_month=cronElements[2],
             month_of_year=cronElements[3],
             day_of_week=cronElements[4],
             timezone=timezone,
+        )
+        schedule = Schedule.objects.create(
             name=name,
+            cronSchedule=crontabSchedule
         )
         res.update(True, "Schedule added successfully", schedule.id)
         return res
@@ -52,9 +55,8 @@ class ScheduleService:
         Service to get singleSchedule
         :param scheduleId: int
         """
-
         res = ApiResponse()
-        schedules = Schedule.objects.filter(crontabschedule_ptr_id=scheduleId)
+        schedules = Schedule.objects.filter(id=scheduleId)
         data = ScheduleSerializer(schedules, many=True).data
         res.update(True, "Schedules fetched successfully", data)
         return res
@@ -73,13 +75,14 @@ class ScheduleService:
         if len(cronElements) != 5:
             res.update(False, "Crontab must contain five elements")
             return res 
-        schedule = Schedule.objects.get(crontabschedule_ptr_id=id)
-        schedule.minute=cronElements[0]
-        schedule.hour=cronElements[1]
-        schedule.day_of_month=cronElements[2]
-        schedule.month_of_year=cronElements[3]
-        schedule.day_of_week=cronElements[4]
-        schedule.timezone = timezone
+        schedule = Schedule.objects.get(id=id)
+        schedule.cronSchedule.minute=cronElements[0]
+        schedule.cronSchedule.hour=cronElements[1]
+        schedule.cronSchedule.day_of_month=cronElements[2]
+        schedule.cronSchedule.month_of_year=cronElements[3]
+        schedule.cronSchedule.day_of_week=cronElements[4]
+        schedule.cronSchedule.timezone = timezone
+        schedule.cronSchedule.save()
         schedule.name = name
         schedule.save()
         res.update(True, "Schedules updated successfully", [])

@@ -186,11 +186,11 @@ class ScheduleSerializer(serializers.ModelSerializer):
         """
         Gets string form of the crontab
         """
-        return str(obj)
+        return str(obj.cronSchedule)
 
     def get_timezone(self, obj):
         """ Gets schedule timezone"""
-        return str(obj.timezone)
+        return str(obj.cronSchedule.timezone)
 
     def cronexp(self, field):
         return field and str(field).replace(' ', '') or '*'
@@ -198,9 +198,9 @@ class ScheduleSerializer(serializers.ModelSerializer):
     def get_crontab(self, obj):
         """Gets schedule crontab """
         return '{0} {1} {2} {3} {4}'.format(
-            self.cronexp(obj.minute), self.cronexp(obj.hour),
-            self.cronexp(obj.day_of_month), self.cronexp(obj.month_of_year),
-            self.cronexp(obj.day_of_week)
+            self.cronexp(obj.cronSchedule.minute), self.cronexp(obj.cronSchedule.hour),
+            self.cronexp(obj.cronSchedule.day_of_month), self.cronexp(obj.cronSchedule.month_of_year),
+            self.cronexp(obj.cronSchedule.day_of_week)
         )
 
     class Meta:
