@@ -24,7 +24,6 @@ class ConnectionParam(models.Model):  # no ui
         related_name="connectionTypeParam",
     )
     properties = models.JSONField(null=True, blank=True) # for ui
-    file = models.JSONField(default=dict)
 
     def __str__(self):
         return self.connectionType.name + "_" + self.name
@@ -40,7 +39,6 @@ class Connection(models.Model):
         related_name="connectionTypeConnection",
     )
     isActive = models.BooleanField(default=True)
-    file = models.JSONField(default=dict)
 
     def __str__(self):
         return self.name
