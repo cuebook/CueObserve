@@ -150,8 +150,28 @@ class AnomalySerializer(serializers.ModelSerializer):
     """
     Serializes data for anomaly
     """
-    anomalyDefinition = AnomalyDefinitionSerializer()
+    datasetName = serializers.SerializerMethodField()
+    granularity = serializers.SerializerMethodField()
+    metric = serializers.SerializerMethodField()
+    dimension = serializers.SerializerMethodField()
+    anomalyTimestamp = serializers.SerializerMethodField()
+
+    def get_datasetName(self, obj):
+        return obj.anomalyDefinition.dataset.name
+
+    def get_granularity(self, obj):
+        return obj.anomalyDefinition.dataset.granularity
+
+    def get_metric(self, obj):
+        return obj.anomalyDefinition.metric
+
+    def get_dimension(self, obj):
+        return obj.anomalyDefinition.dimension
+
+    def get_anomalyTimestamp(self, obj):
+        return obj.data["anomalyLatest"]["anomalyTimeISO"]
 
     class Meta:
         model = Anomaly
-        fields = ["id", "anomalyDefinition", "published", "dimensionVal", "data"]
+        fields = ["id", "datasetName", "published", "dimension", "dimensionVal", "granularity", "metric", "anomalyTimestamp", "data"]
+
