@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.http import HttpRequest
 
-from anomaly.services import Datasets, Connections, Querys, AnomalyDefinitions, Anomalys
+from anomaly.services import Datasets, Connections, Querys, AnomalyDefinitions, Anomalys, ScheduleService
 
 
 class AnomalysView(APIView):
@@ -169,4 +169,49 @@ class AnomalyDefView(APIView):
         anomalyDefId = request.data.get("anomalyDefId", 0)
         highOrLow = request.data.get("highOrLow", None)
         res = AnomalyDefinitions.editAnomalyDefinition(anomalyDefId, highOrLow)
+        return Response(res.json())
+
+class ScheduleView(APIView):
+    """
+    Class to get and add available crontab schedules
+    """
+    def get(self, request):
+        res = ScheduleService.getSchedules()
+        return Response(res.json())
+
+    def post(self, request):
+        name = request.data["name"]
+        cron = request.data["crontab"]
+        timezone = request.data["timezone"]
+        res = ScheduleService.addSchedule(cron=cron, timezone=timezone, name=name)
+        return Response(res.json())
+    
+    def put(self,request):
+        id = request.data["id"]
+        name = request.data["name"]
+        crontab = request.data["crontab"]
+        timezone = request.data["timezone"]
+        res = ScheduleService.updateSchedule(id=id, crontab=crontab, timezone=timezone, name=name)
+        return Response(res.json())
+
+@api_view(["GET", "PUT", "DELETE"])
+def schedule(request: HttpRequest, scheduleId: int) -> Response:
+    """
+    Method for crud operations on a single connection
+    :param request: HttpRequest
+    :param connection_id: Connection Id
+    """
+    if request.method == "GET":
+        res = ScheduleService.getSingleSchedule(scheduleId)
+        return Response(res.json())
+    if request.method == "DELETE":
+        res = ScheduleService.deleteSchedule(scheduleId)
+        return Response(res.json())
+
+class TimzoneView(APIView):
+    """
+    Class to get standard pytz timezones
+    """
+    def get(self, request):
+        res = ScheduleService.getTimezones()
         return Response(res.json())

@@ -1,6 +1,6 @@
 import json
 from rest_framework import serializers
-from anomaly.models import Anomaly, Dataset, Connection, ConnectionType, AnomalyDefinition
+from anomaly.models import Anomaly, Dataset, Connection, ConnectionType, AnomalyDefinition, CustomSchedule as Schedule
 
 
 class ConnectionSerializer(serializers.ModelSerializer):
@@ -175,3 +175,34 @@ class AnomalySerializer(serializers.ModelSerializer):
         model = Anomaly
         fields = ["id", "datasetName", "published", "dimension", "dimensionVal", "granularity", "metric", "anomalyTimestamp", "data"]
 
+class ScheduleSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the model CrontabSchedule
+    """
+    schedule = serializers.SerializerMethodField()
+    crontab = serializers.SerializerMethodField()
+    timezone = serializers.SerializerMethodField()
+    def get_schedule(self, obj):
+        """
+        Gets string form of the crontab
+        """
+        return str(obj.cronSchedule)
+
+    def get_timezone(self, obj):
+        """ Gets schedule timezone"""
+        return str(obj.cronSchedule.timezone)
+
+    def cronexp(self, field):
+        return field and str(field).replace(' ', '') or '*'
+    
+    def get_crontab(self, obj):
+        """Gets schedule crontab """
+        return '{0} {1} {2} {3} {4}'.format(
+            self.cronexp(obj.cronSchedule.minute), self.cronexp(obj.cronSchedule.hour),
+            self.cronexp(obj.cronSchedule.day_of_month), self.cronexp(obj.cronSchedule.month_of_year),
+            self.cronexp(obj.cronSchedule.day_of_week)
+        )
+
+    class Meta:
+        model = Schedule
+        fields = ["id", "schedule","name","timezone","crontab"]

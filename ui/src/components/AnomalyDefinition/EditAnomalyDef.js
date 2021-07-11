@@ -295,7 +295,7 @@ export default function EditAnomalyDef(props){
       <div>
           <Drawer
             title="Edit Anomaly Definition"
-            width="30%"
+            width="50%"
             centered
             visible={true}
             key="editAnomalyModal"

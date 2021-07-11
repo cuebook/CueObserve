@@ -2,7 +2,7 @@ import React from "react";
 import Connections from "components/Connections/index.js"
 
 
-export default function ConnectionFunctions() {
+export default function ConnectionView() {
   return (
     <>
       <div className="flex flex-wrap mh-full">
