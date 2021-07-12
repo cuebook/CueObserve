@@ -3,12 +3,9 @@ import style from "./style.module.scss";
 import { useParams, useHistory } from 'react-router-dom';
 import { message } from "antd"
 import _ from "lodash";
-import { Chart, Geom, Axis, Tooltip, track, G2, View, Legend } from "bizcharts";
+import { Chart, Geom, Axis, Tooltip, View, Legend } from "bizcharts";
 import anomalyService from "services/anomalys";
 import { Select } from 'antd';
-
-// track(false);
-// G2.track(false);
 
 const { Option } = Select;
 

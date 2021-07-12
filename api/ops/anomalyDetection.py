@@ -25,18 +25,6 @@ def isAnomaly(lowBand, highBand, value):
             return True
     return False
 
-def anomalyPointSeverity(lowBand, highBand, value):
-    """Calculates point wise severity of each point"""
-    mid = (lowBand + highBand) / 2
-    if value < lowBand or value > highBand:
-        if mid == 0:
-            return 100
-        else:
-            return (abs(value - mid) / mid) * 100
-    else:
-        return 0
-
-
 def checkLatestAnomaly(df):
     """
     Looks up latest anomaly in dataframe
@@ -56,6 +44,7 @@ def checkLatestAnomaly(df):
 
         return {
             "highOrLow": "high" if higher else "low",
+            "value": float(lastAnomalyRow["y"]),
             "percent": per,
             "anomalyTimeISO": dp.parse(anomalyTime).isoformat(),
             "anomalyTime": dp.parse(anomalyTime).timestamp() * 1000,
@@ -91,9 +80,8 @@ def detect(df, granularity):
     forecast.y = forecast.y.apply(lambda x: int(x))
     df = pd.merge(df, forecast[["ds", "lower", "upper"]], how="left")
     df["anomaly"] = df.apply(lambda row: 15 if isAnomaly(row.lower, row.upper, row.y) else 1, axis=1)
-    df["severity"] = df.apply(lambda row: anomalyPointSeverity(row.lower, row.upper, row.y), axis=1)
     anomalyLatest = checkLatestAnomaly(df)
-    df = df[["ds", "y", "anomaly", "severity"]]
+    df = df[["ds", "y", "anomaly"]]
     forecast["band"] = forecast.apply(lambda x: [x["lower"], x["upper"]], axis=1)
     band = forecast[["ds", "band"]]
     band.columns = ["ds", "y"]
@@ -112,7 +100,7 @@ def detect(df, granularity):
 
 
 
-def anomalyService(anomalyDef, dimVal, df):
+def anomalyService(anomalyDef, dimVal, contriPercent, df):
     """
     Method to conduct the anomaly detection process
     """
@@ -120,9 +108,12 @@ def anomalyService(anomalyDef, dimVal, df):
         return
     granularity = anomalyDef.dataset.granularity
     result = detect(df, granularity)
+    result["contribution"] = contriPercent
     anomalyObj, _ = Anomaly.objects.get_or_create(anomalyDefinition=anomalyDef, dimensionVal=dimVal)
     timeThreshold = 3600 * 24 * 5
     toPublish = dt.datetime.now().timestamp() - dp.parse(result["anomalyLatest"]["anomalyTimeISO"]).timestamp() <= timeThreshold
+    if anomalyDef.highOrLow:
+        toPublish = toPublish and anomalyDef.highOrLow.lower() == result["anomalyLatest"]["highOrLow"]
     anomalyObj.data = result
     anomalyObj.published = toPublish
     anomalyObj.save()

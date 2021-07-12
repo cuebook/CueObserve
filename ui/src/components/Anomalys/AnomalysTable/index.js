@@ -13,6 +13,12 @@ import {
 import { EyeOutlined } from '@ant-design/icons';
 import PopconfirmButton from "components/Utils/PopconfirmButton";
 
+const granularity = {
+  "day" : "Day",
+  "hour" : "Hour",
+  "week" : "Week"
+ }
+
 export default function AnomalysTable(props) {
   const [anomalys, setAnomalys] = useState(null);
   const history = useHistory();
@@ -53,8 +59,10 @@ export default function AnomalysTable(props) {
       sorter: (a, b) => a.granularity.localeCompare(b.granularity),
       render: text => {
         return (
-          <p>{text}</p>
-        );
+          <p>
+            {granularity[text]}
+          </p>
+        )
       }
     },
     {
@@ -73,43 +81,46 @@ export default function AnomalysTable(props) {
       dataIndex: "dimensionVal",
       key: "dimensionVal",
       sorter: (a, b) => a.dimensionVal.localeCompare(b.dimensionVal),
-      render: text => {
-        return (
-          <p>{text}</p>
-        );
-      }
-    },
-    {
-      title: "Latest Anomaly Timestamp",
-      dataIndex: "anomalyTimestamp",
-      key: "anomalyTimestamp",
-      sorter: (a, b) => a.anomalyTimestamp.localeCompare(b.anomalyTimestamp),
-      render: text => {
-        return (
-          <p>{text}</p>
-        );
-      }
-    },
-    {
-      title: "",
-      dataIndex: "action",
-      key: "actions",
-      className: "text-right",
       render: (text, record) => {
         return (
-          <div className={style.actions}>
-             <Tooltip title={"View Anomaly"}>
-                 <EyeOutlined onClick={()=>viewAnomaly(record)} />
-             </Tooltip>
-           </div>
+          <p>{record.dimension} = {text}</p>
         );
       }
     },
+    {
+      title: "Filter's Contribution",
+      dataIndex: "contribution",
+      key: "contribution",
+      sorter: (a, b) => a.data.contribution > b.data.contribution ? 1 : -1,
+      render: (text, record) => {
+        return (
+          <p>{record.data.contribution} %</p>
+        );
+      }
+    },
+    {
+      title: "Latest Anomaly",
+      dataIndex: "anomalyTimeStr",
+      key: "anomalyTimeStr",
+      sorter: (a, b) => a.anomalyTimeStr.localeCompare(b.anomalyTimeStr),
+      render: (text, record) => {
+        return (
+          <p>
+          <div>{text}</div>
+          <div>Actual Value: {record.data.anomalyLatest.value}</div>
+          <div>% Deviation: {record.data.anomalyLatest.percent}</div>
+          </p>
+        );
+      }
+    }
   ]
 
   return (
     <div>
       <Table
+        onRow={(record) => ({
+          onClick: () => viewAnomaly(record),
+        })}
         rowKey={"id"}
         scroll={{ x: "100%" }}
         columns={columns}
