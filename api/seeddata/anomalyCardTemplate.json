@@ -4,7 +4,7 @@
       "pk": 1,
       "fields": {
         "templateName": "Anomaly Daily Template",
-        "title": "<b>{{metric}}</b>{% if dimensionVal %} for filter <span style=\"background:#eeeeee; padding: 0 4px; border-radius: 4px;\">{{dimension}} = {{dimensionVal}}</span>{% endif %} was {{percent}} {{highOrLow}}er",
+        "title": "<b>{{metric}}</b>{% if dimensionVal %} for filter <span style=\"background:#eeeeee; padding: 0 4px; border-radius: 4px;\">{{dimension}} = {{dimensionVal}}</span>{% endif %} was {{percent}}% {{highOrLow}}er",
         "bodyText": "{% if dimensionVal %}For <span style=\"background:#eeeeee; padding: 0 4px; border-radius: 4px;\">{{dimension}} = {{dimensionVal}}</span> filter, {% endif %}{{datasetName}}.{{metric}} was {{percent|floatformat:\"0\"}}% {{highOrLow}}er than the expected value on {{anomalyTimeISO}}.{% if contribution %} This filter's contribution to {{metric}} was {{contribution|floatformat:\"1\"}}%.{% endif %}",
         "supportedVariables": "granularity, datasetName, metric, dimension, dimensionVal, percent, contribution, anomalyTimeISO, highOrLow"
       }
@@ -14,7 +14,7 @@
         "pk": 2,
         "fields": {
           "templateName": "Anomaly Hourly Template",
-          "title": "<b>{{metric}}</b>{% if dimensionVal %} for filter <span style=\"background:#eeeeee; padding: 0 4px; border-radius: 4px;\">{{dimension}} = {{dimensionVal}}</span>{% endif %} was {{percent}} {{highOrLow}}er",
+          "title": "<b>{{metric}}</b>{% if dimensionVal %} for filter <span style=\"background:#eeeeee; padding: 0 4px; border-radius: 4px;\">{{dimension}} = {{dimensionVal}}</span>{% endif %} was {{percent}}% {{highOrLow}}er",
           "bodyText": "{% if dimensionVal %}For <span style=\"background:#eeeeee; padding: 0 4px; border-radius: 4px;\">{{dimension}} = {{dimensionVal}}</span> filter, {% endif %}{{datasetName}}.{{metric}} was {{percent|floatformat:\"0\"}}% {{highOrLow}}er than the expected value on {{anomalyTimeISO}}.{% if contribution %} This filter's contribution to {{metric}} was {{contribution|floatformat:\"1\"}}%.{% endif %}",
           "supportedVariables": "granularity, datasetName, metric, dimension, dimensionVal, percent, contribution, anomalyTimeISO, highOrLow"
         }
