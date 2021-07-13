@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.http import HttpRequest
 
-from anomaly.services import Datasets, Connections, Querys, AnomalyDefinitions, Anomalys, ScheduleService
+from anomaly.services import Datasets, Connections, Querys, AnomalyDefinitions, Anomalys, ScheduleService, AnomalyDefJobServices
 
 
 class AnomalysView(APIView):
@@ -214,4 +214,25 @@ class TimzoneView(APIView):
     """
     def get(self, request):
         res = ScheduleService.getTimezones()
+        return Response(res.json())
+
+class AnomalyDefJob(APIView):
+    """
+    Class to get, add and update a NotebookJob details
+    The put and post methods only require request body and not path parameters
+    The get method requires the notebookJobId as the path parameter
+    """
+    # def get(self, request, notebookId=None):
+    #     offset = int(request.GET.get("offset", 0))
+    #     res = AnomalyDefJobServices.getNotebookJobDetails(notebookId=notebookId, runStatusOffset=offset)
+    #     return Response(res.json())
+
+    def post(self, request):
+        anomalyDefId = request.data["anomalyDefId"]
+        scheduleId = request.data["scheduleId"]
+        res = AnomalyDefJobServices.addAnomalyDefJob(anomalyDefId=anomalyDefId, scheduleId=scheduleId)
+        return Response(res.json())
+
+    def delete(self, request, anomalyDefId=None):
+        res = AnomalyDefJobServices.deleteAnomalyDefJob(anomalyDefId=anomalyDefId)
         return Response(res.json())

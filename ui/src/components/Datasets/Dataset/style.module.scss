@@ -39,20 +39,23 @@
 	.typeSelectorTable {
 
 		padding:  5px;
-		padding-left: 25px;
+		padding-top: 20px;
 		p {
-			margin-left: -20px;
-			font-size: 15px ;
+			font-size: 18px ;
+			padding-bottom: 5px;
 		}
 
 	}
 
 	.granularity {
+		display:  flex;
 		padding: 5px;
-		padding-left: 25px;
+		padding-top: 20px;
+		/*padding-left: 25px;*/
 		p {
-			margin-left: -20px;
-			font-size: 15px;
+			padding-right: 5px;
+			font-size: 16px;
+			margin-bottom: 0px;
 		}
 	}
 

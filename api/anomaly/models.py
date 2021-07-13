@@ -2,7 +2,8 @@
 from typing import DefaultDict, Dict
 from django.db import models
 
-# from django_celery_beat.models import  CrontabSchedule
+# from django_celery_beat.models import  CrontabSchedule, PeriodicTask
+
 
 
 # eg. postgres, mysql
@@ -72,6 +73,9 @@ class AnomalyDefinition(models.Model):
     dimension = models.TextField(null=True, blank=True)
     highOrLow = models.TextField(null=True, blank=True)
     top = models.IntegerField(default=10)
+    periodicTask = models.OneToOneField(
+        "django_celery_beat.PeriodicTask", on_delete=models.SET_NULL, db_index=True, null=True
+    )
 
 
 class Anomaly(models.Model):

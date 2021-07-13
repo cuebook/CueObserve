@@ -64,9 +64,8 @@ def test_anomalyService(client, mocker):
     
     df = pd.DataFrame(fakedata)
     df["y"] = pd.to_numeric(df["y"])
-
     dts = mixer.blend("anomaly.Dataset", granularity="day")
-    adf = mixer.blend("anomaly.AnomalyDefinition", dataset=dts)
+    adf = mixer.blend("anomaly.AnomalyDefinition", dataset=dts, periodicTask=None)
 
     anomalyService(adf, None, df)
 
