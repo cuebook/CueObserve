@@ -11,7 +11,7 @@ def test_anomalyDefinition(client, mocker):
     """
     Test cases for anomalyDefinition
     """
-
+    schedule = mixer.blend("anomaly.customSchedule", name="Test Schedule")
     # Get anomlay when no entry
     path = reverse('anomalyDefs')
     response = client.get(path)
@@ -42,7 +42,7 @@ def test_anomalyDefinition(client, mocker):
     assert response.data['data']
     anomaly = response.data['data'][0]["anomalyDef"]
 
-    #Update anomalys
+    # Update anomalys
     path = reverse('editAnomalyDef')
     data = {
         "anomalyDefId":anomaly["id"],
@@ -52,10 +52,22 @@ def test_anomalyDefinition(client, mocker):
     assert response.status_code == 200
     assert response.data
 
-    #Delete anomalys
+
+    # Add Schedule to AnomalyDefinition
+    path = reverse("addAnomalyDefSchedule")
+    data = {'anomalyDefId': anomaly["id"], 'scheduleId': schedule.id}
+    response = client.post(path, data=data, content_type="application/json")
+    assert response.status_code == 200
+    assert response.data
+
+    # Delete Schedule From AnomalyDefinition
+    path = reverse("deleteAnomalyDefSchedule", kwargs={'anomalyDefId': anomaly["id"]})
+    response = client.delete(path)
+    assert response.status_code == 200
+    assert response.data
+    
+    # Delete anomalys
     path = reverse('anomalyDef', kwargs={"anomalyId": anomaly["id"]})
     response = client.delete(path)
     assert response.status_code == 200
     assert response.data
-
-
