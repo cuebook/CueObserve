@@ -11,12 +11,12 @@ from ops.anomalyDetection import anomalyService
 
 
 @shared_task
-def _anomalyDetectionSubTask(anomalyDef_id, dimVal, dfDict):
+def _anomalyDetectionSubTask(anomalyDef_id, dimVal, contriPercent, dfDict):
     """
     Internal anomaly detection subtask to be grouped by celery for each anomaly object
     """
     anomalyDefinition = AnomalyDefinition.objects.get(id=anomalyDef_id)
-    anomalyProcess = anomalyService(anomalyDefinition, dimVal, pd.DataFrame(dfDict))
+    anomalyProcess = anomalyService(anomalyDefinition, dimVal, contriPercent, pd.DataFrame(dfDict))
 
 
 @shared_task
@@ -27,12 +27,12 @@ def anomalyDetectionJob(anomalyDef_id: int):
     """
     anomalyDefinition = AnomalyDefinition.objects.get(id=anomalyDef_id)
     datasetDf = Data.fetchDatasetDataframe(anomalyDefinition.dataset)
-    dimVals, dataframes = prepareAnomalyDataframes(datasetDf, anomalyDefinition.dataset.timestampColumn, anomalyDefinition.metric, anomalyDefinition.dimension, anomalyDefinition.top)
-    for i in range(len(dimVals)):
-        _anomalyDetectionSubTask(anomalyDef_id, dimVals[i], dataframes[i].to_dict("records"))
-    # detectionJobs = group(
-    #     _anomalyDetectionSubTask.s(anomalyDef_id, dimVals[i], dataframes[i].to_dict("records")) for i in range(len(dimVals))
-    # )
-    # _detectionJobs = detectionJobs.apply_async()
-    # with allow_join_result():
-    #     result = _detectionJobs.get()
+    dimValsData = prepareAnomalyDataframes(datasetDf, anomalyDefinition.dataset.timestampColumn, anomalyDefinition.metric, anomalyDefinition.dimension, anomalyDefinition.top)
+    # for obj in dimValsData:
+    #     _anomalyDetectionSubTask(anomalyDef_id, obj["dimVal"], obj["contriPercent"], obj["df"].to_dict("records"))
+    detectionJobs = group(
+        _anomalyDetectionSubTask.s(anomalyDef_id, obj["dimVal"], obj["contriPercent"], obj["df"].to_dict("records")) for obj in dimValsData
+    )
+    _detectionJobs = detectionJobs.apply_async()
+    with allow_join_result():
+        result = _detectionJobs.get()

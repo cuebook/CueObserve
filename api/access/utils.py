@@ -15,20 +15,20 @@ def prepareAnomalyDataframes(datasetDf, timestampCol, metricCol, dimensionCol=No
     Utility function to prepare anomaly dataframes by grouping on dimension
     """
     datasetDf[metricCol] = pd.to_numeric(datasetDf[metricCol])
-    dataframes = []
-    dimVals= []
+    dimValsData = []
     if dimensionCol:
         datasetDf = datasetDf[[timestampCol, dimensionCol, metricCol]]
         topValsDf = datasetDf[[dimensionCol, metricCol]].groupby(dimensionCol).sum().sort_values(metricCol, ascending=False)
         dimVals = list(topValsDf[:topN].index)
+        total = datasetDf[metricCol].sum()
         for dimVal in dimVals:
             tempDf = datasetDf[datasetDf[dimensionCol] == dimVal][[timestampCol, metricCol]]
-            dataframes.append(aggregateDf(tempDf, timestampCol))
+            contriPercent = int(10000 * (tempDf[metricCol].sum() / total)) / 100
+            dimValsData.append({"dimVal": dimVal, "contriPercent": contriPercent, "df": aggregateDf(tempDf, timestampCol)})
     else:
         tempDf = datasetDf[[timestampCol, metricCol]]
-        dimVals = [None]
-        dataframes.append(aggregateDf(tempDf, timestampCol))
+        dimValsData.append({"dimVal": None, "contriPercent": 100.0, "df": aggregateDf(tempDf, timestampCol)})
     
-    return dimVals, dataframes
+    return dimValsData
 
 

@@ -3,8 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Table, Button, Popconfirm, Input, message, Tooltip, Drawer } from "antd";
 import AddAnomalyDef from "./AddAnomalyDef.js"
 import EditAnomalyDef from "./EditAnomalyDef.js"
-import { EditOutlined, DeleteOutlined ,CloseOutlined} from '@ant-design/icons';
-// import ErrorBoundary from "antd/lib/alert/ErrorBoundary";
+import { EditOutlined, DeleteOutlined, PlayCircleOutlined, CloseOutlined } from '@ant-design/icons';
 import anomalyDefService from "services/anomalyDefinitions.js"
 import scheduleService from "services/schedules"
 import SelectSchedule from "components/Schedule/SelectSchedule"
@@ -18,6 +17,13 @@ const granularity = {
   "hour" : "Hour",
   "week" : "Week"
  }
+
+function anomalyDefName(record){
+  let name = record.anomalyDef.metric + " " + (record.anomalyDef.dimension ? record.anomalyDef.dimension : "")
+  name = name + (record.anomalyDef.top > 0 ? " Top " + record.anomalyDef.top : "")
+  return name
+}
+
 export default function Connection() {
   const [data, setData] = useState();
   const [editAnomalyDef, setEditAnomalyDef] = useState([]);
@@ -48,6 +54,10 @@ const getDeleteAnomalyDef = async (id) =>{
 const deleteAnomalyDef = (anomalyDef) =>{
   getDeleteAnomalyDef(anomalyDef.id)
   
+}
+
+const runAnomalyDef = async (anomalyDef) => {
+  const response = await anomalyDefService.runAnomalyDef(anomalyDef.id)
 }
 
 const addingAnomaly = (val) => {
@@ -109,7 +119,21 @@ const unassignSchedule = async (notebookId) => {
 
 
   const columns = [
-      
+      {
+        title: "",
+        dataIndex: "action",
+        key: "actions",
+        className: "text-right",
+        render: (text, record) => {
+          return (
+            <div className={style.actions}>
+              <Tooltip title={"Run Anomaly Detection"}>
+                  <PlayCircleOutlined onClick={()=> runAnomalyDef(record)} />
+              </Tooltip>
+            </div>
+          );
+        }
+      },      
       {
         title: "Dataset",
         dataIndex: "dataset",
@@ -218,7 +242,7 @@ const unassignSchedule = async (notebookId) => {
               <EditOutlined onClick={() => editAnomlay(record)} />
             </Tooltip>
             <Popconfirm
-                title={"Are you sure to delete Anomaly of id "+ record.id +"?"}
+                title={"Are you sure to delete "+ anomalyDefName(record) +"?"}
                 onConfirm={() => deleteAnomalyDef(record)}
                 okText="Yes"
                 cancelText="No"
