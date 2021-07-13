@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import style from "./style.module.scss";
 import { components } from "react-select";
 import CreatableSelect from "react-select/creatable";
-import { Modal, Select, Spin, Switch, Button, Radio, notification, Drawer } from "antd";
+import { Modal, Select, Spin, Switch, Button, Radio, message, Drawer } from "antd";
 import datasetService from "services/datasets";
 import anomalyDefService from "services/anomalyDefinitions.js";
 import  _ from "lodash";
@@ -241,9 +241,7 @@ const getDataset = async (datasetId) => {
 }
  const handleAddAnomaly = () => {
     if ( _.isNull(selectedOption ) ||  selectedOption.length < 1) {
-      notification.warning({
-        message: "At least Measure required to configure anomaly !"
-           });
+      message.error("At least Measure required to configure anomaly !");
       return;
     }
 
@@ -269,9 +267,7 @@ const getDataset = async (datasetId) => {
     });
 
     if(isDimension && _.isNull(topVal)){
-      notification.warning({
-        message: "Please Enter Top Values "
-           });
+      message.error("Please Enter Top Values");
       return;
     }
 
