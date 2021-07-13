@@ -213,7 +213,9 @@ export default function Dataset(props) {
           !datasetColumns.length ? null :
             <>
               <div className={`xl:w-8/12 ${style.typeSelectorTable}`}>
-                <p>Select type for columns: </p>
+                <p><b>
+                Map Dataset Schema: 
+                </b></p>
                 {selectFieldTypeTable}
               </div>
               <div className={style.granularity}>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Table, Button, Popconfirm, Input, message, Tooltip, Drawer, Modal , notification} from "antd";
+import { Table, Button, Popconfirm, Input, message, Tooltip, Drawer, Modal} from "antd";
 import style from "./style.module.scss";
 import connectionService from "services/connection.js";
 import AddConnection from "./AddConnection.js";
@@ -28,10 +28,8 @@ export default function Connection() {
 
   const deleteConnection = async (connection) => {
     if (connection.datasetCount > 0){
-      notification.info({
-            message: "Connection linked with datasets can't be deleted "
-      });
-           return ;
+      message.error("Connection linked with datasets can't be deleted");
+      return ;
     }
     const response = await connectionService.deleteConnection(connection.id);
     if(response.success){
