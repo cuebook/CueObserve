@@ -2,8 +2,11 @@ import logging
 from typing import List
 from utils.apiResponse import ApiResponse
 from dbConnections import BigQuery
-from anomaly.models import AnomalyDefinition, Dataset
+from anomaly.models import AnomalyDefinition, Dataset, CustomSchedule as Schedule
 from anomaly.serializers import AnomalyDefinitionSerializer
+from django_celery_beat.models import PeriodicTask, PeriodicTasks, CrontabSchedule
+
+CELERY_TASK_NAME = "ops.tasks.anomalyDetectionJob"
 
 class AnomalyDefinitions:
 
@@ -60,4 +63,34 @@ class AnomalyDefinitions:
         return response
 
         
+class AnomalyDefJobServices:
+    @staticmethod
+    def addAnomalyDefJob(anomalyDefId: str, scheduleId: int):
+        """
+        Service to add a new AnomalyDefJob
+        :param anomalyDefId: ID of the AnomalyDef for which to create job
+        :param scheduleId: ID of schedule
+        """
+        res = ApiResponse()
+        scheduleObj = Schedule.objects.get(id=scheduleId)
+        cronSchedule = scheduleObj.cronSchedule
+        ptask = PeriodicTask.objects.update_or_create(name = anomalyDefId ,defaults={"crontab" : cronSchedule, "task" : CELERY_TASK_NAME, "args" : f'["{anomalyDefId}"]'})
+        anomalyDefObj = AnomalyDefinition.objects.get(id=anomalyDefId)
+        anomalyDefObj.periodicTask = ptask
+        anomalyDefObj.periodicTask.save()
+        anomalyDefObj.save()
+        res.update(True, "AnomalyDefJob added successfully", None)
+        return res
 
+    @staticmethod
+    def deleteAnomalyDefJob(anomalyDefId: int):
+        """
+        Service to update crontab of an existing AnomalyDefJob
+        :param anomalyDefId: ID of the AnomalyDef for which to delete
+        """
+        res = ApiResponse()
+        anomalyDefObj = AnomalyDefinition.objects.get(id=anomalyDefId)
+        anomalyDefObj.periodicTask = None
+        anomalyDefObj.save()
+        res.update(True, "AnomalyDefJob deleted successfully", None)
+        return res

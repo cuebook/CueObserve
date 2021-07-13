@@ -97,3 +97,19 @@
   width: 100%;
   margin-bottom: 2px;
 }
+
+.scheduleText{
+  display: inline-block;
+
+  .icon{
+      cursor: pointer;
+      display:none;
+      margin-left: 5px;
+  }
+  &:hover{
+      .icon{
+          color: #1890ff;
+          display: inline-block;
+      }
+  }
+}
