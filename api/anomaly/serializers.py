@@ -133,6 +133,8 @@ class AnomalyDefinitionSerializer(serializers.ModelSerializer):
     """
     dataset = DatasetSerializer()
     anomalyDef = serializers.SerializerMethodField()
+    schedule = serializers.SerializerMethodField()
+
     def get_anomalyDef(self, obj):
         params = {}
         params["id"] = obj.id
@@ -141,10 +143,18 @@ class AnomalyDefinitionSerializer(serializers.ModelSerializer):
         params["highOrLow"] = obj.highOrLow
         params["top"] = obj.top
         return params
+
+    def get_schedule(self, obj):
+        name = None
+        if obj.periodicTask:
+            id = obj.periodicTask.crontab_id
+            name = Schedule.objects.get(cronSchedule_id=id).name
+        return name
+
     
     class Meta:
         model = AnomalyDefinition
-        fields = ["id",  "anomalyDef", "dataset"]
+        fields = ["id",  "anomalyDef", "dataset", "schedule"]
 
 class AnomalySerializer(serializers.ModelSerializer):
     """

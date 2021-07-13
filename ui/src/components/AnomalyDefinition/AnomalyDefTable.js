@@ -1,12 +1,15 @@
 
 import React, { useState, useEffect } from "react";
 import { Table, Button, Popconfirm, Input, message, Tooltip, Drawer } from "antd";
-import style from "./style.module.scss";
 import AddAnomalyDef from "./AddAnomalyDef.js"
 import EditAnomalyDef from "./EditAnomalyDef.js"
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import ErrorBoundary from "antd/lib/alert/ErrorBoundary";
+import { EditOutlined, DeleteOutlined ,CloseOutlined} from '@ant-design/icons';
+// import ErrorBoundary from "antd/lib/alert/ErrorBoundary";
 import anomalyDefService from "services/anomalyDefinitions.js"
+import scheduleService from "services/schedules"
+import SelectSchedule from "components/Schedule/SelectSchedule"
+import style from "./style.module.scss";
+
 
 const { Search } = Input;
 const ButtonGroup = Button.Group;
@@ -20,6 +23,7 @@ export default function Connection() {
   const [editAnomalyDef, setEditAnomalyDef] = useState([]);
   const [editAnomalyDefinition, setEditAnomalyDefinition] = useState(false);
   const [addAnomalyDef, setAddAnomalyDef] = useState(false);
+  const [selectedAnomalyDef, setSelectedAnomalyDef] = useState();
 
   useEffect(() => {
     if (!data) {
@@ -67,6 +71,43 @@ const onAddAnomalyDefSuccess = (val) =>{
   }
   setAddAnomalyDef(!addAnomalyDef)
 }
+
+const showScheduleDropDown = (notebookId) => {
+  setSelectedAnomalyDef(notebookId)
+}
+
+const addAnomalyDefSchedule = async (selectedSchedule) => {
+  if(selectedSchedule && selectedAnomalyDef && selectedSchedule !== -1){
+    const response = await scheduleService.addAnomalyDefSchedule(selectedAnomalyDef, selectedSchedule);
+    if(response.success){
+      message.success(response.message)
+    }
+    else{
+      message.error(response.message)
+    }
+    setSelectedAnomalyDef(null)
+    fetchData()
+    // getNotebooks((currentPage - 1)*limit)
+  }
+  else{
+    alert('Schedule not selected')
+  }
+}
+const unassignSchedule = async (notebookId) => {
+  const response = await scheduleService.unassignSchedule(notebookId);
+  if(response.success){
+    fetchData()
+    // refreshNotebooks()
+  }
+  else{
+    message.error(response.message)
+  }
+}
+
+
+
+
+
   const columns = [
       
       {
@@ -118,8 +159,35 @@ const onAddAnomalyDefSuccess = (val) =>{
       },
       {
         title: "Schedule",
-        dataIndex: "shedule",
-        key: "shedule",
+        dataIndex: "schedule",
+        key: "schedule",
+        render: (schedule, record) => {
+          if(schedule && selectedAnomalyDef != record.id){
+            return (
+              <>
+              <div className={style.scheduleText}>
+                <span>{schedule}</span>
+                <Tooltip title={"Unassign Schedule"}> 
+                  <span className={style.icon} onClick={()=>unassignSchedule(record.id)}><CloseOutlined /></span>
+                </Tooltip>
+              </div>
+              </>
+            )
+          }
+          else{
+            return (
+              <>
+                { 
+  
+                  selectedAnomalyDef == record.id ?
+                  <SelectSchedule onChange={addAnomalyDefSchedule} />
+                  :
+                  <a className={style.linkText} onClick={()=>showScheduleDropDown(record.id)}>Assign Schedule</a>
+                }
+              </>
+            );
+          }
+        }
 
       },
       {
@@ -163,6 +231,8 @@ const onAddAnomalyDefSuccess = (val) =>{
         )
       }
     ];
+    // console.log('selectedANomlaydef', selectedAnomalyDef)
+    console.log("anomalyDefTable", data)
     return (
       <div>
         <div className={`d-flex flex-column justify-content-center text-right mb-2`}>

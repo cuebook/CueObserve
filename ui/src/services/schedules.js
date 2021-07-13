@@ -29,13 +29,7 @@ class ScheduleService{
         else    
             return null
     }
-    
 
-
-    async addNotebookSchedule(notebookId, scheduleId){
-        const response = await apiService.post("anomaly/notebookjob/", {notebookId: notebookId,scheduleId: scheduleId})
-        return response
-    }
 
     async getTimezones(){
         const response = await apiService.get("anomaly/timezones/")
@@ -49,11 +43,21 @@ class ScheduleService{
         const response = await apiService.post("anomaly/schedules/", {"crontab": cronTabSchedule, "timezone": selectedTimezone, "name": scheduleName})
         return response
     }
+
     async updateSchedule(selectedScheduleId,cronTabSchedule, selectedTimezone, scheduleName){
         const response = await apiService.put("anomaly/schedules/", {"id":selectedScheduleId,"crontab": cronTabSchedule, "timezone": selectedTimezone, "name": scheduleName})
         return response
     }
 
+    async addAnomalyDefSchedule(anomalyDefId, scheduleId){
+        const response = await apiService.post("anomaly/anomalyDefJob/", {anomalyDefId: anomalyDefId,scheduleId: scheduleId})
+        return response
+    }
+
+    async unassignSchedule(anomalyDefId){
+        const response = await apiService.delete("anomaly/anomalyDefJob/" + anomalyDefId)
+        return response
+    }
 
 }
 

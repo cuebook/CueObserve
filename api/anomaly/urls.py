@@ -29,5 +29,7 @@ urlpatterns = [
     path("schedules/", views.ScheduleView.as_view(), name="scheduleView"),
     path("schedules/<int:scheduleId>", views.schedule, name="getSingleSchedule"),
     path("timezones/", views.TimzoneView.as_view(), name="timezoneView"),
+    path("anomalyDefJob/", views.AnomalyDefJob.as_view(), name="addAnomalyDefSchedule"),
+    path("anomalyDefJob/<int:anomalyDefId>", views.AnomalyDefJob.as_view(), name="deleteAnomalyDefSchedule"),
 
 ]
