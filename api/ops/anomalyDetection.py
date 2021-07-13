@@ -55,6 +55,7 @@ def detect(df, granularity):
     Method to perform anomaly detection on given dataframe
     """
     today = dt.datetime.now()
+    df["ds"] = pd.to_datetime(df["ds"])
     df["ds"] = df["ds"].apply(lambda date: date.isoformat()[:19])
     todayISO = today.replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=None).isoformat()[:19]
     df = df[df["ds"] < todayISO]
@@ -109,6 +110,7 @@ def anomalyService(anomalyDef, dimVal, contriPercent, df):
     granularity = anomalyDef.dataset.granularity
     result = detect(df, granularity)
     result["contribution"] = contriPercent
+    result["anomalyLatest"]["contribution"] = contriPercent
     anomalyObj, _ = Anomaly.objects.get_or_create(anomalyDefinition=anomalyDef, dimensionVal=dimVal)
     timeThreshold = 3600 * 24 * 5
     toPublish = dt.datetime.now().timestamp() - dp.parse(result["anomalyLatest"]["anomalyTimeISO"]).timestamp() <= timeThreshold

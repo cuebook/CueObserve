@@ -5,6 +5,7 @@ from dbConnections import BigQuery
 from anomaly.models import AnomalyDefinition, Dataset, CustomSchedule as Schedule
 from anomaly.serializers import AnomalyDefinitionSerializer
 from django_celery_beat.models import PeriodicTask, PeriodicTasks, CrontabSchedule
+from ops.tasks import anomalyDetectionJob
 
 CELERY_TASK_NAME = "ops.tasks.anomalyDetectionJob"
 
@@ -60,6 +61,17 @@ class AnomalyDefinitions:
         anomalyObj.highOrLow = highOrLow
         anomalyObj.save()
         response.update(True, "Anomaly Definition updated successfully !")
+        return response
+    
+    @staticmethod
+    def runAnomalyDetection(anomalyDefId: int):
+        """
+        Run anomaly detection on anomaly definition
+        :param anomalyDefId: ID of the anomaly definition
+        """
+        response = ApiResponse("Error in initiating anomaly detection task")
+        anomalyDetectionJob.delay(anomalyDefId)
+        response.update(True, "Successfully initiated anomaly detection task")
         return response
 
         

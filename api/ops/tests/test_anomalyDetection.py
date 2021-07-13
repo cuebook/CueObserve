@@ -67,7 +67,7 @@ def test_anomalyService(client, mocker):
     dts = mixer.blend("anomaly.Dataset", granularity="day")
     adf = mixer.blend("anomaly.AnomalyDefinition", dataset=dts, periodicTask=None)
 
-    anomalyService(adf, None, df)
+    anomalyService(adf, None, 20, df=df)
 
     
     assert Anomaly.objects.count() == 1

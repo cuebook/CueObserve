@@ -28,11 +28,11 @@ def anomalyDetectionJob(anomalyDef_id: int):
     anomalyDefinition = AnomalyDefinition.objects.get(id=anomalyDef_id)
     datasetDf = Data.fetchDatasetDataframe(anomalyDefinition.dataset)
     dimValsData = prepareAnomalyDataframes(datasetDf, anomalyDefinition.dataset.timestampColumn, anomalyDefinition.metric, anomalyDefinition.dimension, anomalyDefinition.top)
-    for obj in dimValsData:
-        _anomalyDetectionSubTask(anomalyDef_id, obj["dimVal"], obj["contriPercent"], obj["df"].to_dict("records"))
-    # detectionJobs = group(
-    #     _anomalyDetectionSubTask.s(anomalyDef_id, obj["dimVal"], obj["contriPercent"], obj["df"].to_dict("records")) for obj in dimValsData
-    # )
-    # _detectionJobs = detectionJobs.apply_async()
-    # with allow_join_result():
-    #     result = _detectionJobs.get()
+    # for obj in dimValsData:
+    #     _anomalyDetectionSubTask(anomalyDef_id, obj["dimVal"], obj["contriPercent"], obj["df"].to_dict("records"))
+    detectionJobs = group(
+        _anomalyDetectionSubTask.s(anomalyDef_id, obj["dimVal"], obj["contriPercent"], obj["df"].to_dict("records")) for obj in dimValsData
+    )
+    _detectionJobs = detectionJobs.apply_async()
+    with allow_join_result():
+        result = _detectionJobs.get()
