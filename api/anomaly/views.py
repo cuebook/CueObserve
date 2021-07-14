@@ -244,6 +244,5 @@ def runAnomalyDef(request: HttpRequest, anomalyDefId: int) -> Response:
     :param request: HttpRequest
     :param anomalyDefId: ID of the anomaly definition
     """
-    print(anomalyDefId)
     res = AnomalyDefinitions.runAnomalyDetection(anomalyDefId)
     return Response(res.json())
