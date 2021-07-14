@@ -236,3 +236,14 @@ class AnomalyDefJob(APIView):
     def delete(self, request, anomalyDefId=None):
         res = AnomalyDefJobServices.deleteAnomalyDefJob(anomalyDefId=anomalyDefId)
         return Response(res.json())
+
+@api_view(["POST"])
+def runAnomalyDef(request: HttpRequest, anomalyDefId: int) -> Response:
+    """
+    Method for run anomaly detection for a given anomaly definition
+    :param request: HttpRequest
+    :param anomalyDefId: ID of the anomaly definition
+    """
+    print(anomalyDefId)
+    res = AnomalyDefinitions.runAnomalyDetection(anomalyDefId)
+    return Response(res.json())

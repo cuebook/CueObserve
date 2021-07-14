@@ -37,6 +37,16 @@ class AnomalyDefService {
             return null
         }
     }
+    async runAnomalyDef(id){
+        const response = await apiService.post("anomaly/runAnomalyDef/" + id)
+        if(response.success == true){
+            message.success(response.message)
+            return response
+        } else {
+            message.error(response.message);
+            return null
+        }
+    }
 
 }
 let anomalyDefService = new AnomalyDefService();
