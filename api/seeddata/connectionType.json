@@ -33,6 +33,12 @@
         "fields": {
             "name": "Snowflake"
         }
+    },
+    {
+        "model": "anomaly.connectiontype",
+        "pk": 6,
+        "fields": {
+            "name": "Druid"
+        }
     }
-
 ]

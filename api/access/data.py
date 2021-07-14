@@ -1,5 +1,6 @@
 from dbConnections import BigQuery
 from anomaly.serializers import ConnectionDetailSerializer
+from dbConnections import Druid
 
 class Data:
     @staticmethod
@@ -8,6 +9,9 @@ class Data:
         if connectionType == "BigQuery":
             file = connectionParams['file']
             dataframe = BigQuery.fetchDataframe(file, query, limit=limit)
+        if connectionType == "Druid":
+            params = connectionParams
+            dataframe = Druid.fetchDataframe(params, query, limit=limit)
         return dataframe
     
     @staticmethod
