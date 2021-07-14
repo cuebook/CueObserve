@@ -402,7 +402,7 @@
           "properties": {
             "rules": [
               {
-                "required": true,
+                "required": false,
                 "message": "Database can't be empty"
               }
             ],
