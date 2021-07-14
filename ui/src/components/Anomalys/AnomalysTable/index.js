@@ -82,9 +82,9 @@ export default function AnomalysTable(props) {
       key: "dimensionVal",
       sorter: (a, b) => a.dimensionVal.localeCompare(b.dimensionVal),
       render: (text, record) => {
-        return (
+        return text ? (
           <p>{record.dimension} = {text}</p>
-        );
+        ) : "";
       }
     },
     {
@@ -94,12 +94,12 @@ export default function AnomalysTable(props) {
       sorter: (a, b) => a.data.contribution > b.data.contribution ? 1 : -1,
       render: (text, record) => {
         return (
-          <p>{record.data.contribution} %</p>
+          <p>{record.data.contribution}%</p>
         );
       }
     },
     {
-      title: "Latest Anomaly",
+      title: "Anomaly Time",
       dataIndex: "anomalyTimeStr",
       key: "anomalyTimeStr",
       sorter: (a, b) => a.anomalyTimeStr.localeCompare(b.anomalyTimeStr),
@@ -107,9 +107,22 @@ export default function AnomalysTable(props) {
         return (
           <p>
           <div>{text}</div>
-          <div>Actual Value: {record.data.anomalyLatest.value}</div>
-          <div>% Deviation: {record.data.anomalyLatest.percent}</div>
           </p>
+        );
+      }
+    },
+    {
+      title: "Last Anomaly",
+      dataIndex: "anomaly",
+      key: "anomaly",
+      sorter: (a, b) => a.data.anomalyLatest.percent > b.data.anomalyLatest.percent ? 1 : -1,
+      render: (text, record) => {
+        let percentColor = record.data.anomalyLatest.highOrLow == "high" ? "green" : "red"
+        return (
+          <div>
+          <div>Actual Value: <span style={{float: "right"}}>{record.data.anomalyLatest.value}</span></div>
+          <div>% Deviation: <span style={{float: "right", color: percentColor}}>{record.data.anomalyLatest.percent}</span></div>
+          </div>
         );
       }
     }
