@@ -395,26 +395,6 @@
         "model": "anomaly.connectionparam",
         "pk": 21,
         "fields": {
-          "name": "database",
-          "label": "Database",
-          "isEncrypted": false,
-          "connectionType": 6,
-          "properties": {
-            "rules": [
-              {
-                "required": false,
-                "message": "Database can't be empty"
-              }
-            ],
-            "type": "text",
-            "width": "75%"
-          }
-        }
-      },
-      {
-        "model": "anomaly.connectionparam",
-        "pk": 22,
-        "fields": {
           "name": "port",
           "label": "Port",
           "isEncrypted": false,
@@ -433,47 +413,7 @@
       },
       {
         "model": "anomaly.connectionparam",
-        "pk": 23,
-        "fields": {
-          "name": "username",
-          "label": "Username",
-          "isEncrypted": false,
-          "connectionType": 6,
-          "properties": {
-            "rules": [
-              {
-                "required": true,
-                "message": "Username  can't be empty"
-              }
-            ],
-            "type": "text",
-            "width": "50%"
-          }
-        }
-      },
-      {
-        "model": "anomaly.connectionparam",
-        "pk": 24,
-        "fields": {
-          "name": "password",
-          "label": "Password",
-          "isEncrypted": true,
-          "connectionType": 6,
-          "properties": {
-            "rules": [
-              {
-                "required": true,
-                "message": "Password  can't be empty"
-              }
-            ],
-            "type": "text",
-            "width": "50%"
-          }
-        }
-      },
-      {
-        "model": "anomaly.connectionparam",
-        "pk": 25,
+        "pk": 22,
         "fields": {
           "name": "sslRequired",
           "label": "SSL Required",
