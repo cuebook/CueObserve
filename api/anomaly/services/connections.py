@@ -131,7 +131,7 @@ class Connections:
                 res.update(False, "Connection Failed")
 
         elif connectionName == "Druid":
-            connectionResponse = Druid.checkConnecition(payload["params"])
+            connectionResponse = Druid.checkConnection(payload["params"])
 
             if connectionResponse:
                 connection = Connection.objects.create(

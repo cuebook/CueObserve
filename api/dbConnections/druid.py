@@ -11,7 +11,7 @@ class Druid:
     """
     Class to support functionalities on Druid connection
     """
-    def checkConnecition(params):
+    def checkConnection(params):
         res = True
 
         try:
