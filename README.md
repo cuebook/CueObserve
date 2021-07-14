@@ -9,3 +9,6 @@
 <br>
 
 # CueObserve
+With CueObserve, you can run anomaly(outlier) detection on data in your SQL data warehouses and databases.
+
+Read more at https://cueobserve.cuebook.ai/ 
