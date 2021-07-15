@@ -410,22 +410,6 @@
             "width": "25%"
           }
         }
-      },
-      {
-        "model": "anomaly.connectionparam",
-        "pk": 22,
-        "fields": {
-          "name": "sslRequired",
-          "label": "SSL Required",
-          "isEncrypted": false,
-          "connectionType": 6,
-          "properties": {
-            "rules": [
-            ],
-            "type": "boolean",
-            "width": "50%"
-          }
-        }
       }
     
 ]
