@@ -21,7 +21,6 @@ django-cors-headers==3.7.0
 django-timezone-field==4.1.1
 djangorestframework==3.12.2
 Faker==8.8.2
-pyarrow==3.0.0
 google-api-core==1.30.0
 google-auth==1.32.0
 google-cloud-bigquery==2.20.0
@@ -55,6 +54,7 @@ protobuf==3.17.3
 psycopg2==2.9.1
 ptyprocess==0.7.0
 py==1.10.0
+pyarrow==3.0.0
 pyasn1==0.4.8
 prophet==1.0.1
 pyasn1-modules==0.2.8
