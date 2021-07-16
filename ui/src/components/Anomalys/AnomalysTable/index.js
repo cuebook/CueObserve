@@ -94,7 +94,24 @@ export default function AnomalysTable(props) {
       sorter: (a, b) => a.data.contribution > b.data.contribution ? 1 : -1,
       render: (text, record) => {
         return (
-          <p>{record.data.contribution}%</p>
+          <p style={{float: "right"}}>{record.data.contribution.toFixed(2)}%</p>
+        );
+      }
+    },
+    {
+      title: "Last Anomaly",
+      dataIndex: "anomaly",
+      key: "anomaly",
+      sorter: (a, b) => a.data.anomalyLatest.percent > b.data.anomalyLatest.percent ? 1 : -1,
+      render: (text, record) => {
+        let percentColor = record.data.anomalyLatest.highOrLow == "high" ? "green" : "red"
+        let percentSign = record.data.anomalyLatest.highOrLow == "high" ? "+" : "-"
+        return (
+          <div>
+          <div><span style={{float: "right"}}>{record.data.anomalyLatest.value}</span></div>
+          <br />
+          <div><span style={{float: "right", color: percentColor}}>{percentSign}{record.data.anomalyLatest.percent}%</span></div>
+          </div>
         );
       }
     },
@@ -108,21 +125,6 @@ export default function AnomalysTable(props) {
           <p>
           <div>{text}</div>
           </p>
-        );
-      }
-    },
-    {
-      title: "Last Anomaly",
-      dataIndex: "anomaly",
-      key: "anomaly",
-      sorter: (a, b) => a.data.anomalyLatest.percent > b.data.anomalyLatest.percent ? 1 : -1,
-      render: (text, record) => {
-        let percentColor = record.data.anomalyLatest.highOrLow == "high" ? "green" : "red"
-        return (
-          <div>
-          <div>Actual Value: <span style={{float: "right"}}>{record.data.anomalyLatest.value}</span></div>
-          <div>% Deviation: <span style={{float: "right", color: percentColor}}>{record.data.anomalyLatest.percent}</span></div>
-          </div>
         );
       }
     }

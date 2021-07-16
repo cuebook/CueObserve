@@ -2,12 +2,13 @@ import logging
 from typing import List
 from utils.apiResponse import ApiResponse
 from dbConnections import BigQuery
-from anomaly.models import AnomalyDefinition, Dataset, CustomSchedule as Schedule
-from anomaly.serializers import AnomalyDefinitionSerializer
+from anomaly.models import AnomalyDefinition, Dataset, CustomSchedule as Schedule, RunStatus
+from anomaly.serializers import AnomalyDefinitionSerializer, RunStatusSerializer
 from django_celery_beat.models import PeriodicTask, PeriodicTasks, CrontabSchedule
 from ops.tasks import anomalyDetectionJob
 
 CELERY_TASK_NAME = "ops.tasks.anomalyDetectionJob"
+RUN_STATUS_LIMIT = 10
 
 class AnomalyDefinitions:
 
@@ -70,9 +71,39 @@ class AnomalyDefinitions:
         :param anomalyDefId: ID of the anomaly definition
         """
         response = ApiResponse("Error in initiating anomaly detection task")
-        anomalyDetectionJob.delay(anomalyDefId)
+        anomalyDetectionJob.delay(anomalyDefId, True)
         response.update(True, "Successfully initiated anomaly detection task")
         return response
+
+    @staticmethod
+    def getDetectionRuns(anomalyDefId: int, runStatusOffset: int = 0):
+        """
+        Service to fetch run status details of the selected AnomalyDefinition
+        :param anomalyDefId: ID of the Anomaly Definition
+        :param runStatusOffset: Offset for fetching run statuses
+        """
+        res = ApiResponse()
+        runStatusData = {}
+        runStatuses = RunStatus.objects.filter(anomalyDefinition_id=anomalyDefId).order_by("-startTimestamp")[runStatusOffset: runStatusOffset + RUN_STATUS_LIMIT]
+        runStatuseCount = RunStatus.objects.filter(anomalyDefinition_id=anomalyDefId).count()
+        runStatusData["runStatuses"] = RunStatusSerializer(runStatuses, many=True).data
+        runStatusData["count"] = runStatuseCount
+        res.update(True, "Run statuses retrieved successfully", runStatusData)
+        return res
+
+    @staticmethod
+    def isTaskRunning(anomalyDefId: int,):
+        """
+        Service to check whether a task is running for anomaly definition
+        :param anomalyDefId: ID of the Anomaly Definition
+        """
+        res = ApiResponse()
+        lastRunStatus = RunStatus.objects.filter(anomalyDefinition_id=anomalyDefId).order_by("-startTimestamp").first()
+        taskRunning = False
+        if lastRunStatus:
+            taskRunning = lastRunStatus.status == "RUNNING"
+        res.update(True, "Task Running status checked.", {"isRunning": taskRunning})
+        return res
 
         
 class AnomalyDefJobServices:

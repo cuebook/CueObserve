@@ -3,7 +3,8 @@ import React, { useState, useEffect } from "react";
 import { Table, Button, Popconfirm, Input, message, Tooltip, Drawer } from "antd";
 import AddAnomalyDef from "./AddAnomalyDef.js"
 import EditAnomalyDef from "./EditAnomalyDef.js"
-import { EditOutlined, DeleteOutlined, PlayCircleOutlined, CloseOutlined } from '@ant-design/icons';
+import RunStatus from "./RunStatus.js";
+import { EditOutlined, DeleteOutlined, PlayCircleOutlined, CloseOutlined, EyeOutlined } from '@ant-design/icons';
 import anomalyDefService from "services/anomalyDefinitions.js"
 import scheduleService from "services/schedules"
 import SelectSchedule from "components/Schedule/SelectSchedule"
@@ -24,12 +25,16 @@ function anomalyDefName(record){
   return name
 }
 
+let isTaskRunning = {}
+
 export default function Connection() {
   const [data, setData] = useState();
   const [editAnomalyDef, setEditAnomalyDef] = useState([]);
   const [editAnomalyDefinition, setEditAnomalyDefinition] = useState(false);
   const [addAnomalyDef, setAddAnomalyDef] = useState(false);
   const [selectedAnomalyDef, setSelectedAnomalyDef] = useState();
+  const [runStatusAnomalyDef, setRunStatusAnomalyDef] = useState();
+  const [isRunStatusDrawerVisible, setIsRunStatusDrawerVisible] = useState(false);
 
   useEffect(() => {
     if (!data) {
@@ -56,8 +61,29 @@ const deleteAnomalyDef = (anomalyDef) =>{
   
 }
 
+const checkIsRunning = async (anomalyDefId) => {
+  const response = await anomalyDefService.isTaskRunning(anomalyDefId)
+  if(!response.isRunning)
+  {
+    clearInterval(isTaskRunning[anomalyDefId])
+    delete isTaskRunning[anomalyDefId]
+    fetchData()
+  }
+}
+
 const runAnomalyDef = async (anomalyDef) => {
   const response = await anomalyDefService.runAnomalyDef(anomalyDef.id)
+  isTaskRunning[anomalyDef.id] = setInterval(() => checkIsRunning(anomalyDef.id), 5000);
+  fetchData()
+}
+
+const openRunStatus = (anomalyDef) => {
+  setRunStatusAnomalyDef(anomalyDef)
+  setIsRunStatusDrawerVisible(true)
+}
+
+const closeRunStatus = () => {
+  setIsRunStatusDrawerVisible(false)
 }
 
 const addingAnomaly = (val) => {
@@ -82,8 +108,8 @@ const onAddAnomalyDefSuccess = (val) =>{
   setAddAnomalyDef(!addAnomalyDef)
 }
 
-const showScheduleDropDown = (notebookId) => {
-  setSelectedAnomalyDef(notebookId)
+const showScheduleDropDown = (anomalyDefId) => {
+  setSelectedAnomalyDef(anomalyDefId)
 }
 
 const addAnomalyDefSchedule = async (selectedSchedule) => {
@@ -97,17 +123,15 @@ const addAnomalyDefSchedule = async (selectedSchedule) => {
     }
     setSelectedAnomalyDef(null)
     fetchData()
-    // getNotebooks((currentPage - 1)*limit)
   }
   else{
     alert('Schedule not selected')
   }
 }
-const unassignSchedule = async (notebookId) => {
-  const response = await scheduleService.unassignSchedule(notebookId);
+const unassignSchedule = async (anomalyDefId) => {
+  const response = await scheduleService.unassignSchedule(anomalyDefId);
   if(response.success){
     fetchData()
-    // refreshNotebooks()
   }
   else{
     message.error(response.message)
@@ -118,22 +142,7 @@ const unassignSchedule = async (notebookId) => {
 
 
 
-  const columns = [
-      {
-        title: "",
-        dataIndex: "action",
-        key: "actions",
-        className: "text-right",
-        render: (text, record) => {
-          return (
-            <div className={style.actions}>
-              <Tooltip title={"Run Anomaly Detection"}>
-                  <PlayCircleOutlined onClick={()=> runAnomalyDef(record)} />
-              </Tooltip>
-            </div>
-          );
-        }
-      },      
+  const columns = [    
       {
         title: "Dataset",
         dataIndex: "dataset",
@@ -238,6 +247,15 @@ const unassignSchedule = async (notebookId) => {
         key: "",
         render: (text, record) => (
          <div className={style.actions}>
+           {isTaskRunning[record.id]?(<Tooltip title={"Anomaly Detection Running"}>
+              <PlayCircleOutlined style={{opacity: 0.3}}/>
+            </Tooltip>):(<Tooltip title={"Run Anomaly Detection"}>
+              <PlayCircleOutlined onClick={()=> runAnomalyDef(record)} />
+            </Tooltip>)}
+
+           <Tooltip title={"View Anomaly Detection Runs"}>
+              <EyeOutlined onClick={() => openRunStatus(record)} />
+            </Tooltip>
            <Tooltip title={"Edit Anomaly Definition"}>
               <EditOutlined onClick={() => editAnomlay(record)} />
             </Tooltip>
@@ -255,8 +273,6 @@ const unassignSchedule = async (notebookId) => {
         )
       }
     ];
-    // console.log('selectedANomlaydef', selectedAnomalyDef)
-    console.log("anomalyDefTable", data)
     return (
       <div>
         <div className={`d-flex flex-column justify-content-center text-right mb-2`}>
@@ -290,6 +306,31 @@ const unassignSchedule = async (notebookId) => {
           <EditAnomalyDef onEditAnomalyDefSuccess={onEditAnomalyDefSuccess} editAnomalyDef={editAnomalyDef}/> 
           : null
         }
+      <Drawer
+          title={"Anomaly Detection Runs"}
+          width={720}
+          onClose={closeRunStatus}
+          visible={isRunStatusDrawerVisible}
+          bodyStyle={{ paddingBottom: 80 }}
+          footer={
+            <div
+              style={{
+                textAlign: 'right',
+              }}
+            >
+              <Button onClick={closeRunStatus} style={{ marginRight: 8 }}>
+                Close
+              </Button>
+            </div>
+          }
+        >
+          { isRunStatusDrawerVisible 
+            ? 
+            <RunStatus anomalyDef={runStatusAnomalyDef}></RunStatus>
+            :
+            null
+          }
+      </Drawer>
       </div>
     );
   }

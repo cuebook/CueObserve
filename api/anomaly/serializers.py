@@ -2,7 +2,7 @@ import json
 import dateutil.parser as dp
 import datetime as dt
 from rest_framework import serializers
-from anomaly.models import Anomaly, Dataset, Connection, ConnectionType, AnomalyDefinition, CustomSchedule as Schedule
+from anomaly.models import Anomaly, Dataset, Connection, ConnectionType, AnomalyDefinition, CustomSchedule as Schedule, RunStatus
 
 
 class ConnectionSerializer(serializers.ModelSerializer):
@@ -136,6 +136,8 @@ class AnomalyDefinitionSerializer(serializers.ModelSerializer):
     dataset = DatasetSerializer()
     anomalyDef = serializers.SerializerMethodField()
     schedule = serializers.SerializerMethodField()
+    lastRun = serializers.SerializerMethodField()
+    lastRunStatus = serializers.SerializerMethodField()
 
     def get_anomalyDef(self, obj):
         params = {}
@@ -152,11 +154,21 @@ class AnomalyDefinitionSerializer(serializers.ModelSerializer):
             id = obj.periodicTask.crontab_id
             name = Schedule.objects.get(cronSchedule_id=id).name
         return name
+    
+    def get_lastRun(self, obj):
+        runStatus = obj.runstatus_set.last()
+        if runStatus:
+            return runStatus.startTimestamp
+    
+    def get_lastRunStatus(self, obj):
+        runStatus = obj.runstatus_set.last()
+        if runStatus:
+            return runStatus.status
 
     
     class Meta:
         model = AnomalyDefinition
-        fields = ["id",  "anomalyDef", "dataset", "schedule"]
+        fields = ["id",  "anomalyDef", "dataset", "schedule", "lastRun", "lastRunStatus"]
 
 class AnomalySerializer(serializers.ModelSerializer):
     """
@@ -203,6 +215,7 @@ class ScheduleSerializer(serializers.ModelSerializer):
     schedule = serializers.SerializerMethodField()
     crontab = serializers.SerializerMethodField()
     timezone = serializers.SerializerMethodField()
+
     def get_schedule(self, obj):
         """
         Gets string form of the crontab
@@ -227,3 +240,17 @@ class ScheduleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Schedule
         fields = ["id", "schedule","name","timezone","crontab"]
+
+class RunStatusSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the model RunStatus
+    """
+    anomalyDefId = serializers.SerializerMethodField()
+
+    def get_anomalyDefId(self, obj):
+        """Gets AnomalyDefinition ID"""
+        return obj.anomalyDefinition.id
+
+    class Meta:
+        model = RunStatus
+        fields = ["id", "anomalyDefId", "startTimestamp", "endTimestamp", "status", "runType", "logs"]

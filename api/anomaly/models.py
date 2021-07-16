@@ -104,3 +104,14 @@ class CustomSchedule(models.Model):
     cronSchedule = models.ForeignKey(
         "django_celery_beat.CrontabSchedule", on_delete=models.CASCADE, db_index=True
     )
+
+class RunStatus(models.Model):
+    """
+    Model class to store logs and statuses of NotebookJob runs
+    """
+    startTimestamp = models.DateTimeField(auto_now_add=True)
+    endTimestamp = models.DateTimeField(null=True, default=None)
+    anomalyDefinition = models.ForeignKey(AnomalyDefinition, on_delete=models.CASCADE, db_index=True)
+    status = models.CharField(max_length=20)
+    runType = models.CharField(max_length=20, blank=True, null=True) # Manual/Scheduled
+    logs = models.JSONField(default=dict)
