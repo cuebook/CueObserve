@@ -21,6 +21,7 @@ django-cors-headers==3.7.0
 django-timezone-field==4.1.1
 djangorestframework==3.12.2
 Faker==8.8.2
+pyarrow==3.0.0
 google-api-core==1.30.0
 google-auth==1.32.0
 google-cloud-bigquery==2.20.0
@@ -86,4 +87,3 @@ wrapt==1.12.1
 pydruid==0.6.2
 snowflake_connector_python==2.4.6
 sqlalchemy==1.4.20
-pyarrow==3.0.0
