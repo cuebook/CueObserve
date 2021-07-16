@@ -85,7 +85,7 @@ export default function RunStatus(props) {
       render: text => {
         return (
           <span>
-            <Moment format="DD-MM-YYYY hh:mm:ss">{text}</Moment>
+            {text}
           </span>
         );
       }
@@ -149,7 +149,6 @@ export default function RunStatus(props) {
       }
   }
   ]
-
 
   return (
     <div className={style.runLogTable}>
