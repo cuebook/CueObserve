@@ -47,6 +47,20 @@ class AnomalyDefService {
             return null
         }
     }
+    async getDetectionRuns(anomalyDefId, offset){
+        const response = await apiService.get("anomaly/runStatus/" + anomalyDefId + "?offset=" + offset)
+        if(response.success == true)
+            return response.data
+        else
+            return null
+    }
+    async isTaskRunning(anomalyDefId){
+        const response = await apiService.get("anomaly/isTaskRunning/" + anomalyDefId)
+        if(response.success == true)
+            return response.data
+        else
+            return null
+    }
 
 }
 let anomalyDefService = new AnomalyDefService();

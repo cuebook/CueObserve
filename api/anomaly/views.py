@@ -244,6 +244,26 @@ def runAnomalyDef(request: HttpRequest, anomalyDefId: int) -> Response:
     :param request: HttpRequest
     :param anomalyDefId: ID of the anomaly definition
     """
-    print(anomalyDefId)
     res = AnomalyDefinitions.runAnomalyDetection(anomalyDefId)
+    return Response(res.json())
+
+@api_view(["GET"])
+def getDetectionRuns(request: HttpRequest, anomalyDefId: int) -> Response:
+    """
+    Method for fetching run statuses for a given anomaly definition
+    :param request: HttpRequest
+    :param anomalyDefId: ID of the anomaly definition
+    """
+    offset = int(request.GET.get("offset", 0))
+    res = AnomalyDefinitions.getDetectionRuns(anomalyDefId, offset)
+    return Response(res.json())
+
+@api_view(["GET"])
+def isTaskRunning(request: HttpRequest, anomalyDefId: int) -> Response:
+    """
+    Method for checking whether anomaly task is running
+    :param request: HttpRequest
+    :param anomalyDefId: ID of the anomaly definition
+    """
+    res = AnomalyDefinitions.isTaskRunning(anomalyDefId)
     return Response(res.json())

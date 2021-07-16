@@ -2,7 +2,7 @@ import json
 import dateutil.parser as dp
 import datetime as dt
 from rest_framework import serializers
-from anomaly.models import Anomaly, Dataset, Connection, ConnectionType, AnomalyDefinition, CustomSchedule as Schedule
+from anomaly.models import Anomaly, Dataset, Connection, ConnectionType, AnomalyDefinition, CustomSchedule as Schedule, RunStatus
 
 
 class ConnectionSerializer(serializers.ModelSerializer):
@@ -203,6 +203,7 @@ class ScheduleSerializer(serializers.ModelSerializer):
     schedule = serializers.SerializerMethodField()
     crontab = serializers.SerializerMethodField()
     timezone = serializers.SerializerMethodField()
+
     def get_schedule(self, obj):
         """
         Gets string form of the crontab
@@ -227,3 +228,17 @@ class ScheduleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Schedule
         fields = ["id", "schedule","name","timezone","crontab"]
+
+class RunStatusSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the model RunStatus
+    """
+    anomalyDefId = serializers.SerializerMethodField()
+
+    def get_anomalyDefId(self, obj):
+        """Gets AnomalyDefinition ID"""
+        return obj.anomalyDefinition.id
+
+    class Meta:
+        model = RunStatus
+        fields = ["id", "anomalyDefId", "startTimestamp", "endTimestamp", "status", "runType"]
