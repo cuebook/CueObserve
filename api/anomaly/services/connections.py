@@ -1,7 +1,7 @@
 import logging
 from typing import List
 from utils.apiResponse import ApiResponse
-from dbConnections import BigQuery, Redshift, Snowflake, Druid
+from dbConnections import BigQuery, Redshift, Snowflake, Druid, MySQL, Postgres
 from anomaly.models import (
     Connection,
     ConnectionParam,
@@ -40,6 +40,17 @@ class Connections:
         serializer = ConnectionDetailSerializer(connections)
         res.update(True, "Connection retrieved successfully", serializer.data)
         return res
+
+    @staticmethod
+    def getConnectionParams(connection_id):
+        """
+        Gets connection details of given connection_id
+        """
+        connection = Connection.objects.get(id=connection_id)
+        params = {}
+        for val in connection.cpvc.all():
+            params[val.connectionParam.name] = val.value
+        return connection.connectionType.name, params
 
     @staticmethod
     def addConnection(payload):
@@ -81,7 +92,7 @@ class Connections:
                 logger.error("DB connection failed :")
                 res.update(False, "Connection Failed")
         elif connectionName == "Redshift":
-            connectionResponse = Redshift.checkConnection()
+            connectionResponse = Redshift.checkConnection(payload["params"])
 
             if connectionResponse:
                 connection = Connection.objects.create(
@@ -106,7 +117,7 @@ class Connections:
                 res.update(False, "Connection Failed")
 
         elif connectionName == "Snowflake":
-            connectionResponse = Snowflake.checkConnection()
+            connectionResponse = Snowflake.checkConnection(payload["params"])
 
             if connectionResponse:
                 connection = Connection.objects.create(
@@ -155,8 +166,57 @@ class Connections:
                 logger.error("DB connection failed :")
                 res.update(False, "Connection Failed")
 
+        elif connectionName == "MySQL":
 
+            connectionResponse = MySQL.checkConnection(payload["params"])
 
+            if connectionResponse:
+                connection = Connection.objects.create(
+                    name=payload["name"],
+                    description=payload["description"],
+                    connectionType=connectionType,
+                )
+
+                for param in payload["params"]:
+                    cp = ConnectionParam.objects.get(
+                        name=param, connectionType=connectionType
+                    )
+                    ConnectionParamValue.objects.create(
+                        connectionParam=cp,
+                        value=payload["params"][param],
+                        connection=connection,
+                    )
+
+                res.update(True, "Connection added successfully")
+            else:
+                logger.error("DB connection failed :")
+                res.update(False, "Connection Failed")
+        elif connectionName == "Postgres":
+
+            connectionResponse = Postgres.checkConnection(payload["params"])
+
+            if connectionResponse:
+                connection = Connection.objects.create(
+                    name=payload["name"],
+                    description=payload["description"],
+                    connectionType=connectionType,
+                )
+
+                for param in payload["params"]:
+                    cp = ConnectionParam.objects.get(
+                        name=param, connectionType=connectionType
+                    )
+                    ConnectionParamValue.objects.create(
+                        connectionParam=cp,
+                        value=payload["params"][param],
+                        connection=connection,
+                    )
+
+                res.update(True, "Connection added successfully")
+            else:
+                logger.error("DB connection failed :")
+                res.update(False, "Connection Failed")
+        
         else:
             connection = Connection.objects.create(
                 name=payload["name"],
@@ -187,7 +247,9 @@ class Connections:
             Connection.objects.get(id=connection_id).delete()
             res.update(True, "Connection deleted successfully")
         else:
-            res.update(False, "Cannot delete connection because it is linked with datasets")
+            res.update(
+                False, "Cannot delete connection because it is linked with datasets"
+            )
         return res
 
     @staticmethod

@@ -17,7 +17,7 @@ def test_limitSql():
 @pytest.mark.django_db(transaction=True)
 def testDbConnection(client, mocker ):
 	""" Test DB connection"""
-
+	# Test cases for Druid connection 
 	connectionType = mixer.blend("anomaly.connectionType", name= "Druid")
 	mixer.blend("anomaly.connectionParam", connectionType = connectionType, name ="host")
 	mixer.blend("anomaly.connectionParam", connectionType = connectionType, name ="port")
@@ -36,4 +36,57 @@ def testDbConnection(client, mocker ):
 	assert response.status_code == 200
 	assert response.data["success"]
 	assert Connection.objects.all().count() == 1
-	
+
+	# Test cases for Postgres connection
+	postgresConnectionType = mixer.blend("anomaly.connectionType", name= "Postgres")
+	mixer.blend("anomaly.connectionParam", connectionType = postgresConnectionType, name ="host")
+	mixer.blend("anomaly.connectionParam", connectionType = postgresConnectionType, name ="port")
+	mixer.blend("anomaly.connectionParam", connectionType = postgresConnectionType, name ="database")
+	mixer.blend("anomaly.connectionParam", connectionType = postgresConnectionType, name ="username")
+	mixer.blend("anomaly.connectionParam", connectionType = postgresConnectionType, name ="password")
+
+
+	path = reverse("connections")
+
+	mockResponse = mocker.patch(
+		"dbConnections.postgres.Postgres.checkConnection",
+		new=mock.MagicMock(
+			autospec=True, return_value=True
+		),
+	)
+	mockResponse.start()
+	data = {'name': 'test connection', 'description': '', 'connectionType_id': postgresConnectionType.id, 'params': {'host': 'Location where postgres db is hosted', 'database': 'db name', 'port': '25060', 'username': 'username', 'password': '******'}}
+	response = client.post(path, data, content_type="application/json")	
+	mockResponse.stop()
+
+	assert response.status_code == 200
+	assert response.data["success"]
+	assert Connection.objects.all().count() == 2
+
+	# Test cases for MySQL connection  
+	mysqlConnectionType = mixer.blend("anomaly.connectionType", name= "MySQL")
+	mixer.blend("anomaly.connectionParam", connectionType = mysqlConnectionType, name ="host")
+	mixer.blend("anomaly.connectionParam", connectionType = mysqlConnectionType, name ="port")
+	mixer.blend("anomaly.connectionParam", connectionType = mysqlConnectionType, name ="database")
+	mixer.blend("anomaly.connectionParam", connectionType = mysqlConnectionType, name ="username")
+	mixer.blend("anomaly.connectionParam", connectionType = mysqlConnectionType, name ="password")
+
+
+	path = reverse("connections")
+
+	mockResponse = mocker.patch(
+		"dbConnections.mysql.MySQL.checkConnection",
+		new=mock.MagicMock(
+			autospec=True, return_value=True
+		),
+	)
+	mockResponse.start()
+	data = {'name': 'test connection', 'description': '', 'connectionType_id': mysqlConnectionType.id, 'params': {'host': 'Location where postgres db is hosted', 'database': 'db name', 'port': '25060', 'username': 'username', 'password': '******'}}
+	response = client.post(path, data, content_type="application/json")	
+	mockResponse.stop()
+
+	assert response.status_code == 200
+	assert response.data["success"]
+	assert Connection.objects.all().count() == 3
+
+
