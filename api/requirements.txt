@@ -84,3 +84,6 @@ vine==5.0.0
 wcwidth==0.2.5
 wrapt==1.12.1
 pydruid==0.6.2
+snowflake_connector_python==2.4.6
+sqlalchemy==1.4.20
+pyarrow==3.0.0

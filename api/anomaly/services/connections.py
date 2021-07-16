@@ -42,6 +42,17 @@ class Connections:
         return res
 
     @staticmethod
+    def getConnectionParams(connection_id):
+        """
+        Gets connection details of given connection_id
+        """
+        connection = Connection.objects.get(id=connection_id)
+        params = {}
+        for val in connection.cpvc.all():
+            params[val.connectionParam.name] = val.value
+        return connection.connectionType.name, params
+
+    @staticmethod
     def addConnection(payload):
         """
         Add connection or build new connection
@@ -81,7 +92,7 @@ class Connections:
                 logger.error("DB connection failed :")
                 res.update(False, "Connection Failed")
         elif connectionName == "Redshift":
-            connectionResponse = Redshift.checkConnection()
+            connectionResponse = Redshift.checkConnection(payload["params"])
 
             if connectionResponse:
                 connection = Connection.objects.create(
@@ -106,7 +117,7 @@ class Connections:
                 res.update(False, "Connection Failed")
 
         elif connectionName == "Snowflake":
-            connectionResponse = Snowflake.checkConnection()
+            connectionResponse = Snowflake.checkConnection(payload["params"])
 
             if connectionResponse:
                 connection = Connection.objects.create(
@@ -155,8 +166,6 @@ class Connections:
                 logger.error("DB connection failed :")
                 res.update(False, "Connection Failed")
 
-
-
         else:
             connection = Connection.objects.create(
                 name=payload["name"],
@@ -187,7 +196,9 @@ class Connections:
             Connection.objects.get(id=connection_id).delete()
             res.update(True, "Connection deleted successfully")
         else:
-            res.update(False, "Cannot delete connection because it is linked with datasets")
+            res.update(
+                False, "Cannot delete connection because it is linked with datasets"
+            )
         return res
 
     @staticmethod

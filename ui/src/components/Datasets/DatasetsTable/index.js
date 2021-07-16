@@ -57,7 +57,7 @@ export default function DatasetsTable(props) {
       dataIndex: "connection",
       key: "connection",
       sorter: (a, b) => a.connection.name.localeCompare(b.connection.name),
-      render: connection => { return <p>{connection.name}</p>}
+      render: connection => { return connection.name}
     },
     {
       title: "Granularity",
