@@ -1,32 +1,31 @@
-from pydruid.db import connect
 from dbConnections.utils import limitSql
 import json
 import logging
 import pandas as pd
-
+from MySQLdb import connect
 logger = logging.getLogger(__name__)
 
 
-class Druid:
+class MySQL:
     """
-    Class to support functionalities on Druid connection
+    Class to support functionalities on MySQL connection
     """
     def checkConnection(params):
         res = True
         try:
             host = params.get("host", "")
-            port = params.get("port", 8888)
+            port = int(params.get("port", 25060))
+            database = params.get("database", "")
+            username= params.get("username","")
+            password = params.get("password", "")
             conn = connect(
             host=host,
             port=port,
-            path="/druid/v2/sql/",
-            scheme="http"
+            db=database,
+            user=username,
+            password=password
             )
             curs = conn.cursor()
-            sql = "SELECT * FROM RETURNENTRY"
-            sql = limitSql(sql)
-            chunksize =  None
-            dataframe = pd.read_sql(sql, conn, chunksize=chunksize)
 
         except Exception as ex:
             logger.error("Can't connect to db with this credentials ")
@@ -37,15 +36,19 @@ class Druid:
         dataframe = None
         try:
             host = params.get("host", "")
-            port = params.get("port", 8888)
+            port = int(params.get("port", 25060))
+            database = params.get("database", "")
+            username= params.get("username","")
+            password = params.get("password", "")
             conn = connect(
             host=host,
             port=port,
-            path="/druid/v2/sql/",
-            scheme="http"
+            db=database,
+            user=username,
+            password=password
             )
-            if limit:
-                sql = limitSql(sql)
+            curs = conn.cursor()
+            sql = limitSql(sql)
             chunksize =  None
             dataframe = pd.read_sql(sql, conn, chunksize=chunksize)
             
