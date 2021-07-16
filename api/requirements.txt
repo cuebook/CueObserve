@@ -54,7 +54,7 @@ protobuf==3.17.3
 psycopg2==2.9.1
 ptyprocess==0.7.0
 py==1.10.0
-pyarrow==4.0.1
+pyarrow==3.0.0
 pyasn1==0.4.8
 prophet==1.0.1
 pyasn1-modules==0.2.8
@@ -84,3 +84,5 @@ vine==5.0.0
 wcwidth==0.2.5
 wrapt==1.12.1
 pydruid==0.6.2
+snowflake_connector_python==2.4.6
+sqlalchemy==1.4.20
