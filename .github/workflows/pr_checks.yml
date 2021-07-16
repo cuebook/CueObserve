@@ -8,6 +8,9 @@ on:
 
 jobs:
   Pylint:
+    needs: 
+      pull_request: 
+        :branches: [ main ] 
     runs-on: ubuntu-latest
 
     steps:
