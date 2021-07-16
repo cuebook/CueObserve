@@ -48,7 +48,8 @@ class MySQL:
             password=password
             )
             curs = conn.cursor()
-            sql = limitSql(sql)
+            if limit:
+                sql = limitSql(sql)
             chunksize =  None
             dataframe = pd.read_sql(sql, conn, chunksize=chunksize)
             
