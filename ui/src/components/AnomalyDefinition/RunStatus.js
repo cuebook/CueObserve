@@ -32,6 +32,11 @@ export default function RunStatus(props) {
     }
   }, []);
 
+  const parseLogs = (logs) => {
+    let logElement = <div className={style.logsDiv}>{logs.log}</div>
+    return logElement
+  }
+
   const getDetectionRuns = async (anomalyDefId, offset) => {
     setLoading(true)
     const response = await anomalyDefService.getDetectionRuns(anomalyDefId, offset);
@@ -85,7 +90,6 @@ export default function RunStatus(props) {
         );
       }
     },
-
     {
       title: "Duration",
       dataIndex: "",
@@ -118,7 +122,32 @@ export default function RunStatus(props) {
           </span>
         );
       }
-    }
+    },
+    {
+      title: "Anomalies",
+      dataIndex: "anomalies",
+      key: "anomalies",
+      width: "10%",
+      // align:"center",
+      render: (text ,record) => {
+        return (
+          <span>
+            {record.logs.numAnomaliesPulished} {record.logs.numAnomalySubtasks?("("+record.logs.numAnomalySubtasks+")"):""} 
+          </span>
+        );
+      }
+    },
+    {
+      title: "",
+      dataIndex: "logs",
+      key: "logs",
+      width: "10%",
+      render: (text) => {
+        return (
+          <a>Logs</a>
+        );
+      }
+  }
   ]
 
 
@@ -135,6 +164,11 @@ export default function RunStatus(props) {
           current: currentPage,
           pageSize: 10,
           total: detectionRuns ? detectionRuns.count : 0
+        }}
+        expandable={{
+          expandedRowRender: runStatus => parseLogs(runStatus.logs),
+          expandRowByClick: true,
+          expandIconColumnIndex: -1
         }}
         onChange={(event) => handleTableChange(event)}
       />

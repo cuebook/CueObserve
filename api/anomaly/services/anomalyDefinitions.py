@@ -98,7 +98,10 @@ class AnomalyDefinitions:
         :param anomalyDefId: ID of the Anomaly Definition
         """
         res = ApiResponse()
-        taskRunning = RunStatus.objects.filter(anomalyDefinition_id=anomalyDefId).order_by("-startTimestamp").first().status == "RUNNING"
+        lastRunStatus = RunStatus.objects.filter(anomalyDefinition_id=anomalyDefId).order_by("-startTimestamp").first()
+        taskRunning = False
+        if lastRunStatus:
+            taskRunning = lastRunStatus.status == "RUNNING"
         res.update(True, "Task Running status checked.", {"isRunning": taskRunning})
         return res
 

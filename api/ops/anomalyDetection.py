@@ -113,6 +113,7 @@ def anomalyService(anomalyDef, dimVal, contriPercent, df):
     anomalyObj.data = result
     anomalyObj.published = toPublish
     anomalyObj.save()
+    return toPublish
 
 
 

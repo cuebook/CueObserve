@@ -67,6 +67,7 @@ const checkIsRunning = async (anomalyDefId) => {
   {
     clearInterval(isTaskRunning[anomalyDefId])
     delete isTaskRunning[anomalyDefId]
+    fetchData()
   }
 }
 

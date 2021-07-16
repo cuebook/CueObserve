@@ -136,6 +136,8 @@ class AnomalyDefinitionSerializer(serializers.ModelSerializer):
     dataset = DatasetSerializer()
     anomalyDef = serializers.SerializerMethodField()
     schedule = serializers.SerializerMethodField()
+    lastRun = serializers.SerializerMethodField()
+    lastRunStatus = serializers.SerializerMethodField()
 
     def get_anomalyDef(self, obj):
         params = {}
@@ -152,11 +154,21 @@ class AnomalyDefinitionSerializer(serializers.ModelSerializer):
             id = obj.periodicTask.crontab_id
             name = Schedule.objects.get(cronSchedule_id=id).name
         return name
+    
+    def get_lastRun(self, obj):
+        runStatus = obj.runstatus_set.last()
+        if runStatus:
+            return runStatus.startTimestamp
+    
+    def get_lastRunStatus(self, obj):
+        runStatus = obj.runstatus_set.last()
+        if runStatus:
+            return runStatus.status
 
     
     class Meta:
         model = AnomalyDefinition
-        fields = ["id",  "anomalyDef", "dataset", "schedule"]
+        fields = ["id",  "anomalyDef", "dataset", "schedule", "lastRun", "lastRunStatus"]
 
 class AnomalySerializer(serializers.ModelSerializer):
     """
@@ -241,4 +253,4 @@ class RunStatusSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = RunStatus
-        fields = ["id", "anomalyDefId", "startTimestamp", "endTimestamp", "status", "runType"]
+        fields = ["id", "anomalyDefId", "startTimestamp", "endTimestamp", "status", "runType", "logs"]

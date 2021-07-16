@@ -1,4 +1,5 @@
-import os
+import json
+import traceback
 import datetime as dt
 import pandas as pd
 from celery import shared_task, group
@@ -19,7 +20,8 @@ def _anomalyDetectionSubTask(anomalyDef_id, dimVal, contriPercent, dfDict):
     Internal anomaly detection subtask to be grouped by celery for each anomaly object
     """
     anomalyDefinition = AnomalyDefinition.objects.get(id=anomalyDef_id)
-    anomalyProcess = anomalyService(anomalyDefinition, dimVal, contriPercent, pd.DataFrame(dfDict))
+    anomalyDetected= anomalyService(anomalyDefinition, dimVal, contriPercent, pd.DataFrame(dfDict))
+    return anomalyDetected
 
 
 @shared_task
@@ -32,6 +34,7 @@ def anomalyDetectionJob(anomalyDef_id: int, manualRun: bool = False):
     runType = "Manual" if manualRun else "Scheduled"
     anomalyDefinition = AnomalyDefinition.objects.get(id=anomalyDef_id)
     runStatusObj = RunStatus.objects.create(anomalyDefinition=anomalyDefinition, status=ANOMALY_DETECTION_RUNNING, runType=runType)
+    logs = {}
     try:
         datasetDf = Data.fetchDatasetDataframe(anomalyDefinition.dataset)
         dimValsData = prepareAnomalyDataframes(datasetDf, anomalyDefinition.dataset.timestampColumn, anomalyDefinition.metric, anomalyDefinition.dimension, anomalyDefinition.top)
@@ -41,9 +44,14 @@ def anomalyDetectionJob(anomalyDef_id: int, manualRun: bool = False):
         _detectionJobs = detectionJobs.apply_async()
         with allow_join_result():
             result = _detectionJobs.get()
-    except:
+        logs["numAnomaliesPulished"] = len([anomalyDetected for anomalyDetected in result if anomalyDetected])
+        logs["numAnomalySubtasks"] = len(_detectionJobs)
+        logs["log"] = json.dumps({detection.id: detection.result for detection in _detectionJobs})
+    except Exception as ex:
+        logs["log"] = json.dumps({"stackTrace": traceback.format_exc(), "message": str(ex)})
         runStatusObj.status = ANOMALY_DETECTION_ERROR
     else:
         runStatusObj.status = ANOMALY_DETECTION_SUCCESS
+    runStatusObj.logs = logs
     runStatusObj.endTimestamp = dt.datetime.now()
     runStatusObj.save()
