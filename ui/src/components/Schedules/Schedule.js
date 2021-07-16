@@ -94,7 +94,7 @@ const [isViewConnectionDrawerVisible, setIsViewConnectionDrawerVisible] = useSta
               okText="Yes"
               cancelText="No"
           >
-              <Tooltip title={"Delete Connection"}>
+              <Tooltip title={"Delete Schedule"}>
                   <DeleteOutlined />
               </Tooltip>
           </Popconfirm>
