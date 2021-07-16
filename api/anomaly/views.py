@@ -5,7 +5,15 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.http import HttpRequest
 
-from anomaly.services import Datasets, Connections, Querys, AnomalyDefinitions, Anomalys, ScheduleService, AnomalyDefJobServices
+from anomaly.services import (
+    Datasets,
+    Connections,
+    Querys,
+    AnomalyDefinitions,
+    Anomalys,
+    ScheduleService,
+    AnomalyDefJobServices,
+)
 
 
 class AnomalysView(APIView):
@@ -130,14 +138,8 @@ class QueryView(APIView):
         data = request.data
         sql = data["sql"]
         connectionId = data["connectionId"]
-        connectionRes = Connections.getConnection(connectionId).json()
-        if not connectionRes["success"]:
-            return Response(connectionRes)
-
-        connectionData = connectionRes["data"]
-        res = Querys.runQuery(
-            connectionData["connectionType"], connectionData["params"], sql
-        )
+        connectionType, connectionParams = Connections.getConnectionParams(connectionId)
+        res = Querys.runQuery(connectionType, connectionParams, sql)
         return Response(res.json())
 
 
@@ -171,10 +173,12 @@ class AnomalyDefView(APIView):
         res = AnomalyDefinitions.editAnomalyDefinition(anomalyDefId, highOrLow)
         return Response(res.json())
 
+
 class ScheduleView(APIView):
     """
     Class to get and add available crontab schedules
     """
+
     def get(self, request):
         res = ScheduleService.getSchedules()
         return Response(res.json())
@@ -185,14 +189,17 @@ class ScheduleView(APIView):
         timezone = request.data["timezone"]
         res = ScheduleService.addSchedule(cron=cron, timezone=timezone, name=name)
         return Response(res.json())
-    
-    def put(self,request):
+
+    def put(self, request):
         id = request.data["id"]
         name = request.data["name"]
         crontab = request.data["crontab"]
         timezone = request.data["timezone"]
-        res = ScheduleService.updateSchedule(id=id, crontab=crontab, timezone=timezone, name=name)
+        res = ScheduleService.updateSchedule(
+            id=id, crontab=crontab, timezone=timezone, name=name
+        )
         return Response(res.json())
+
 
 @api_view(["GET", "PUT", "DELETE"])
 def schedule(request: HttpRequest, scheduleId: int) -> Response:
@@ -208,13 +215,16 @@ def schedule(request: HttpRequest, scheduleId: int) -> Response:
         res = ScheduleService.deleteSchedule(scheduleId)
         return Response(res.json())
 
+
 class TimzoneView(APIView):
     """
     Class to get standard pytz timezones
     """
+
     def get(self, request):
         res = ScheduleService.getTimezones()
         return Response(res.json())
+
 
 class AnomalyDefJob(APIView):
     """
@@ -222,6 +232,7 @@ class AnomalyDefJob(APIView):
     The put and post methods only require request body and not path parameters
     The get method requires the notebookJobId as the path parameter
     """
+
     # def get(self, request, notebookId=None):
     #     offset = int(request.GET.get("offset", 0))
     #     res = AnomalyDefJobServices.getNotebookJobDetails(notebookId=notebookId, runStatusOffset=offset)
@@ -230,12 +241,15 @@ class AnomalyDefJob(APIView):
     def post(self, request):
         anomalyDefId = request.data["anomalyDefId"]
         scheduleId = request.data["scheduleId"]
-        res = AnomalyDefJobServices.addAnomalyDefJob(anomalyDefId=anomalyDefId, scheduleId=scheduleId)
+        res = AnomalyDefJobServices.addAnomalyDefJob(
+            anomalyDefId=anomalyDefId, scheduleId=scheduleId
+        )
         return Response(res.json())
 
     def delete(self, request, anomalyDefId=None):
         res = AnomalyDefJobServices.deleteAnomalyDefJob(anomalyDefId=anomalyDefId)
         return Response(res.json())
+
 
 @api_view(["POST"])
 def runAnomalyDef(request: HttpRequest, anomalyDefId: int) -> Response:

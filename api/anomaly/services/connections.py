@@ -1,8 +1,7 @@
 import logging
 from typing import List
-from dbConnections.postgres import Postgres
 from utils.apiResponse import ApiResponse
-from dbConnections import BigQuery, Redshift, Snowflake, Druid, MySQL
+from dbConnections import BigQuery, Redshift, Snowflake, Druid, MySQL, Postgres
 from anomaly.models import (
     Connection,
     ConnectionParam,
@@ -41,6 +40,17 @@ class Connections:
         serializer = ConnectionDetailSerializer(connections)
         res.update(True, "Connection retrieved successfully", serializer.data)
         return res
+
+    @staticmethod
+    def getConnectionParams(connection_id):
+        """
+        Gets connection details of given connection_id
+        """
+        connection = Connection.objects.get(id=connection_id)
+        params = {}
+        for val in connection.cpvc.all():
+            params[val.connectionParam.name] = val.value
+        return connection.connectionType.name, params
 
     @staticmethod
     def addConnection(payload):
@@ -82,7 +92,7 @@ class Connections:
                 logger.error("DB connection failed :")
                 res.update(False, "Connection Failed")
         elif connectionName == "Redshift":
-            connectionResponse = Redshift.checkConnection()
+            connectionResponse = Redshift.checkConnection(payload["params"])
 
             if connectionResponse:
                 connection = Connection.objects.create(
@@ -107,7 +117,7 @@ class Connections:
                 res.update(False, "Connection Failed")
 
         elif connectionName == "Snowflake":
-            connectionResponse = Snowflake.checkConnection()
+            connectionResponse = Snowflake.checkConnection(payload["params"])
 
             if connectionResponse:
                 connection = Connection.objects.create(
@@ -237,7 +247,9 @@ class Connections:
             Connection.objects.get(id=connection_id).delete()
             res.update(True, "Connection deleted successfully")
         else:
-            res.update(False, "Cannot delete connection because it is linked with datasets")
+            res.update(
+                False, "Cannot delete connection because it is linked with datasets"
+            )
         return res
 
     @staticmethod
