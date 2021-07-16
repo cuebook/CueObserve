@@ -36,8 +36,6 @@ export default function Anomaly(props) {
 
   if (!anomalyData) return null;
 
-  console.log(anomalyData)
-
   const min = calculateMin(anomalyData.data.anomalyData.actual)
 
   // find min & null vals
@@ -56,8 +54,8 @@ export default function Anomaly(props) {
 
   const cols = {
     y: {
-      alias: anomalyData.measure
-        ? anomalyData.measure
+      alias: anomalyData.metric
+        ? anomalyData.metric
         : "Value",
       sync: true,
       formatter: y => {
@@ -76,7 +74,8 @@ export default function Anomaly(props) {
 
   const chart = (
     <div className={style.chartDiv}>
-      <Chart scale={cols} forceFit={true} width={1200} height={400}>
+      <Chart scale={cols} autoFit padding={[10, 10, 25, 20]} height={400}>
+      <Legend visible={false} />
         <Tooltip crosshairs={{ type: "line" }} />
         <View data={anomalyData.data.anomalyData.band}>
           <Geom

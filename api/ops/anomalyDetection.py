@@ -17,12 +17,8 @@ def dataFrameEmpty(df):
 
 def isAnomaly(lowBand, highBand, value):
     """Condition for anomaly on a certain row"""
-    mid = (lowBand + highBand) / 2
     if value < lowBand or value > highBand:
-        if mid == 0:
-            return True
-        if (abs(value - mid) / mid) > 0.2:
-            return True
+        return True
     return False
 
 def checkLatestAnomaly(df):
@@ -33,14 +29,12 @@ def checkLatestAnomaly(df):
     if anomalies.shape[0] > 0:
         lastAnomalyRow = anomalies.iloc[-1]
         anomalyTime = lastAnomalyRow["ds"]
-        expected = (lastAnomalyRow["lower"] + lastAnomalyRow["upper"]) / 2
-        higher = lastAnomalyRow["y"] > expected
+        higher = lastAnomalyRow["y"] > lastAnomalyRow["upper"]
 
         per = 0
-        if expected > 0:
-            per = (
-                int(100 * (abs(lastAnomalyRow["y"] - expected) / expected))
-            )
+        denom = lastAnomalyRow["upper"] if higher else lastAnomalyRow["lower"]
+        if denom > 0:
+            per = int(100 * (abs(lastAnomalyRow["y"] - denom) / denom))
 
         return {
             "highOrLow": "high" if higher else "low",
@@ -64,7 +58,7 @@ def detect(df, granularity):
     prophetModel = Prophet(
         changepoint_prior_scale=0.01,
         seasonality_prior_scale=1.0,
-        uncertainty_samples=100,
+        interval_width=0.75
     )
     prophetModel.fit(df)
     numPredictions = 15 if granularity == "day" else 4
