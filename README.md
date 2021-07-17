@@ -12,12 +12,12 @@
 With CueObserve, you can run anomaly detection on data in your SQL data warehouses and databases.
 
 ## Getting Started
-### Install via Docker
+Install via Docker
 
 ```
 docker run -p 3000:80 cuebook/cueobserve
 ```
-Now visit localhost:3000 in your browser. 
+Now visit [http://localhost:3000](http://localhost:3000) in your browser. 
 
 ## How it works
 You write a SQL GROUP BY query, map its columns as dimensions and measures, and save it as a virtual Dataset.
