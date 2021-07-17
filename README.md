@@ -54,5 +54,5 @@ For general help using CueObserve, read the [documentation](https://cueobserve.c
 
 To report a bug or request a feature, open an [issue](https://github.com/cuebook/cueobserve/issues).
 
-# Contributing
+## Contributing
 We'd love contributions to CueObserve. Before you contribute, please first discuss the change you wish to make via an [issue](https://github.com/cuebook/cueobserve/issues) or a [discussion](https://github.com/cuebook/cueobserve/discussions). Contributors are expected to adhere to our [code of conduct](https://github.com/cuebook/cueobserve/blob/main/CODE_OF_CONDUCT.md).
