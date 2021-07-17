@@ -11,6 +11,8 @@
 # CueObserve
 With CueObserve, you can run anomaly detection on data in your SQL data warehouses and databases.
 
+![CueObserve](docs/images/Overview.gif)
+
 ## Getting Started
 Install via Docker
 
@@ -22,7 +24,13 @@ Now visit [http://localhost:3000](http://localhost:3000) in your browser.
 ## How it works
 You write a SQL GROUP BY query, map its columns as dimensions and measures, and save it as a virtual Dataset.
 
+![Dataset SQL](docs/images/Dataset_SQL_cropped.png)
+
+![Dataset Schema Map](docs/images/Dataset_Mapping_cropped.png)
+
 You then define one or more anomaly detection jobs on the dataset.
+
+![Anomaly Definition](docs/images/AnomalyDefinitions.png)
 
 When an anomaly detection job runs, CueObserve does the following:
 1. Executes the SQL GROUP BY query on your datawarehouse and stores the result as a Pandas dataframe.
