@@ -17,7 +17,7 @@ class Anomalys:
         Gets anomalys
         """
         res = ApiResponse("Error in getting anomalies")
-        anomalies = Anomaly.objects.all()
+        anomalies = Anomaly.objects.filter(published=True)
         data = AnomalySerializer(anomalies, many=True).data
         res.update(True, "Successfully retrieved anomalies", data)
         return res

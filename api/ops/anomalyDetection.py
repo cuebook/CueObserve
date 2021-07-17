@@ -1,4 +1,5 @@
 import dateutil.parser as dp
+from dateutil.relativedelta import relativedelta
 import pandas as pd, datetime as dt, json
 from prophet import Prophet
 
@@ -55,13 +56,16 @@ def detect(df, granularity):
     df = df[df["ds"] < todayISO]
     lastActualRow = df[-1:]
     lastISO = df.iloc[-1]["ds"]
+    if granularity == "hour":
+        lastWeekISO = (dp.parse(lastISO) + relativedelta(days=-7)).isoformat()
+        df = df[df["ds"] > lastWeekISO]
     prophetModel = Prophet(
         changepoint_prior_scale=0.01,
         seasonality_prior_scale=1.0,
         interval_width=0.75
     )
     prophetModel.fit(df)
-    numPredictions = 15 if granularity == "day" else 4
+    numPredictions = 15 if granularity == "day" else 24
     if granularity == "day":
         future = prophetModel.make_future_dataframe(periods=numPredictions)
     elif granularity == "hour":
@@ -83,11 +87,12 @@ def detect(df, granularity):
     forecast = forecast[forecast["ds"] > lastISO]
     forecast = forecast[["ds", "y"]]
     forecast = pd.concat([lastActualRow, forecast], ignore_index=True)
+    numActual = 45 if granularity == "day" else 24 * 7
     output = {
         "anomalyData": {
-            "actual": df[-(3 * numPredictions) :].to_dict("records"),
+            "actual": df[-numActual:].to_dict("records"),
             "predicted": forecast.to_dict("records"),
-            "band": band[-(4 * numPredictions) :].to_dict("records"),
+            "band": band[-(numActual + numPredictions):].to_dict("records"),
         },
         "anomalyLatest": anomalyLatest
     }
@@ -106,7 +111,7 @@ def anomalyService(anomalyDef, dimVal, contriPercent, df):
     result["contribution"] = contriPercent
     result["anomalyLatest"]["contribution"] = contriPercent
     anomalyObj, _ = Anomaly.objects.get_or_create(anomalyDefinition=anomalyDef, dimensionVal=dimVal)
-    timeThreshold = 3600 * 24 * 5
+    timeThreshold = 3600 * 24 * 5 if granularity == "day" else 3600 * 24
     toPublish = dt.datetime.now().timestamp() - dp.parse(result["anomalyLatest"]["anomalyTimeISO"]).timestamp() <= timeThreshold
     if anomalyDef.highOrLow:
         toPublish = toPublish and anomalyDef.highOrLow.lower() == result["anomalyLatest"]["highOrLow"]

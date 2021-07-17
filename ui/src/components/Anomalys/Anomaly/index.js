@@ -68,9 +68,11 @@ export default function Anomaly(props) {
       alias: anomalyData.timestampAlias
         ? anomalyData.timestampAlias
         : "Time",
-      mask: anomalyData.dateFormat
+      mask: anomalyData.granularity == "day" ? "YYYY-MM-DD" : "YYYY-MM-DD HH:00"
     }
   };
+
+  console.log(anomalyData)
 
   const chart = (
     <div className={style.chartDiv}>
