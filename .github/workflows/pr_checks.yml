@@ -18,12 +18,12 @@ jobs:
       run: |
         echo ${{ github.base_ref }}
         if [ -n ${{github.event.pull_request}} ]; then
+          echo "Skipping check if code is in sync with main branch"
+        else
           echo ${{github.event.pull_request.head.ref}}
           git fetch
           git rev-list --left-right --count origin/main...origin/${{github.event.pull_request.head.ref}}
           if [[ "$(git rev-list --left-right --count origin/main...origin/${{github.event.pull_request.head.ref}} | cut -f1)" > 0 ]]; then exit 1; fi
-        else
-          echo "Skipping check if code is in sync with main branch"
         fi
         
     - name: Set up Python 3.7
