@@ -138,6 +138,8 @@ class AnomalyDefinitionSerializer(serializers.ModelSerializer):
     schedule = serializers.SerializerMethodField()
     lastRun = serializers.SerializerMethodField()
     lastRunStatus = serializers.SerializerMethodField()
+    lastRunAnomalies = serializers.SerializerMethodField()
+
 
     def get_anomalyDef(self, obj):
         params = {}
@@ -164,11 +166,15 @@ class AnomalyDefinitionSerializer(serializers.ModelSerializer):
         runStatus = obj.runstatus_set.last()
         if runStatus:
             return runStatus.status
+    def get_lastRunAnomalies(self, obj):
+        runStatus = obj.runstatus_set.last()
+        if runStatus:
+            return runStatus.logs
 
     
     class Meta:
         model = AnomalyDefinition
-        fields = ["id",  "anomalyDef", "dataset", "schedule", "lastRun", "lastRunStatus"]
+        fields = ["id",  "anomalyDef", "dataset", "schedule", "lastRun", "lastRunStatus", "lastRunAnomalies"]
 
 class AnomalySerializer(serializers.ModelSerializer):
     """

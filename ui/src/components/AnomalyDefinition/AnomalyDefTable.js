@@ -194,6 +194,11 @@ const unassignSchedule = async (anomalyDefId) => {
         title: "Schedule",
         dataIndex: "schedule",
         key: "schedule",
+        sorter:(a, b) =>  { 
+          a = a && a.schedule || '';
+          b = b && b.schedule || '';
+          return a.localeCompare(b)
+      },
         render: (schedule, record) => {
           if(schedule && selectedAnomalyDef != record.id){
             return (
@@ -227,18 +232,35 @@ const unassignSchedule = async (anomalyDefId) => {
         title: "Last Run",
         dataIndex: "lastRun",
         key: "lastRun",
+        sorter: (a, b) =>{ return (new Date(a.lastRun) - new Date(b.lastRun))},
 
       },
       {
         title: "Last Run Status",
         dataIndex: "lastRunStatus",
         key: "lastRunStatus",
+        sorter: (a, b) => {
+          a = a.lastRunStatus || " ";
+          b = b.lastRunStatus || " ";
+          return a.localeCompare(b)},
 
       },
       {
         title: "Last Run Anomalies",
-        dataIndex: "lastRunAnomaly",
-        key: "lastRunAnomaly",
+        dataIndex: "lastRunAnomalies",
+        key: "lastRunAnomalies",
+        sorter: (a, b) => { 
+          a = (a.lastRunAnomalies && a.lastRunAnomalies.numAnomaliesPulished) || "";
+          b = (b.lastRunAnomalies && b.lastRunAnomalies.numAnomaliesPulished) || "";
+          return a - b
+        },
+        render: (text, record) => {
+          return (
+            <span>
+              { record.lastRunAnomalies && record.lastRunAnomalies.numAnomaliesPulished} {record.lastRunAnomalies && record.lastRunAnomalies.numAnomalySubtasks?("("+record.lastRunAnomalies.numAnomalySubtasks+")"):""} 
+            </span>
+          );
+        }
 
       },
       {
