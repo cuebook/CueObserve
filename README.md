@@ -1,9 +1,9 @@
 <p align="center">
   <a href="https://github.com/cuebook/cueobserve/actions/workflows/pr_checks.yml">
-    <img src="https://github.com/cuebook/cuelake/actions/workflows/pr_checks.yml/badge.svg" alt="Test Coverage">
+    <img src="https://github.com/cuebook/cueobserve/actions/workflows/pr_checks.yml/badge.svg" alt="Test Coverage">
   </a>
   <a href="https://github.com/cuebook/cueobserve/blob/main/LICENSE.md">
-    <img src="https://img.shields.io/github/license/cuebook/cuelake" alt="License">
+    <img src="https://img.shields.io/github/license/cuebook/cueobserve" alt="License">
   </a>
 </p>
 <br>
