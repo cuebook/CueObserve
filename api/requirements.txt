@@ -15,8 +15,8 @@ click-plugins==1.1.1
 click-repl==0.2.0
 coverage==5.5
 decorator==5.0.9
-Django==3.2.1
-django-celery-beat==2.2.0
+Django==3.2.5
+django-celery-beat==2.2.1
 django-cors-headers==3.7.0
 django-timezone-field==4.1.1
 djangorestframework==3.12.2
