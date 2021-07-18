@@ -1,4 +1,6 @@
 <p align="center">
+  <a href="https://codeclimate.com/github/cuebook/CueObserve/maintainability"><img src="https://api.codeclimate.com/v1/badges/a70e071b59d5dbc38846/maintainability" /></a>
+  <a href="https://codeclimate.com/github/cuebook/CueObserve/test_coverage"><img src="https://api.codeclimate.com/v1/badges/a70e071b59d5dbc38846/test_coverage" /></a>
   <a href="https://github.com/cuebook/cueobserve/actions/workflows/pr_checks.yml">
     <img src="https://github.com/cuebook/cueobserve/actions/workflows/pr_checks.yml/badge.svg" alt="Test Coverage">
   </a>
