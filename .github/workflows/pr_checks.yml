@@ -21,9 +21,13 @@ jobs:
       run: |
         echo ${{ github.base_ref }}
         echo ${{github.event.pull_request.head.ref}}
-        git fetch
-        git rev-list --left-right --count origin/main...origin/${{github.event.pull_request.head.ref}}
-        if [[ "$(git rev-list --left-right --count origin/main...origin/${{github.event.pull_request.head.ref}} | cut -f1)" > 0 ]]; then exit 1; fi
+        if [ -n ${{github.event.pull_request.head.ref}} ]; then
+          git fetch
+          git rev-list --left-right --count origin/main...origin/${{github.event.pull_request.head.ref}}
+          if [[ "$(git rev-list --left-right --count origin/main...origin/${{github.event.pull_request.head.ref}} | cut -f1)" > 0 ]]; then exit 1; fi
+        else
+          echo "Skipping check if code is in sync with main branch"
+        fi
         
     - name: Set up Python 3.7
       uses: actions/setup-python@v1
