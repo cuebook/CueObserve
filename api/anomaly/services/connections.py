@@ -65,10 +65,8 @@ class Connections:
 
         # Do this verification using Querys service
 
-        # now it's only for BigQuery connection
         if connectionName == "BigQuery":
-            file = payload["params"].get("file", {})
-            connectionResponse = BigQuery.checkConnection(file)
+            connectionResponse = BigQuery.checkConnection(payload["params"])
         elif connectionName == "Redshift":
             connectionResponse = Redshift.checkConnection(payload["params"])
         elif connectionName == "Snowflake":

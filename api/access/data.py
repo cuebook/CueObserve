@@ -9,8 +9,8 @@ class Data:
     def runQueryOnConnection(connectionType, connectionParams, query, limit=True):
         dataframe = None
         if connectionType == "BigQuery":
-            file = connectionParams["file"]
-            dataframe = BigQuery.fetchDataframe(file, query, limit=limit)
+            params = connectionParams
+            dataframe = BigQuery.fetchDataframe(params, query, limit=limit)
         if connectionType == "Druid":
             params = connectionParams
             dataframe = Druid.fetchDataframe(params, query, limit=limit)
