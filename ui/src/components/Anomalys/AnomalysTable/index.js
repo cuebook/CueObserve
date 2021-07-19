@@ -8,7 +8,8 @@ import {
   Table,
   Button,
   Popconfirm,
-  Tooltip
+  Tooltip,
+  Switch
 } from "antd";
 import { EyeOutlined } from '@ant-design/icons';
 import PopconfirmButton from "components/Utils/PopconfirmButton";
@@ -29,8 +30,8 @@ export default function AnomalysTable(props) {
     }
   }, []);
 
-  const getAnomalys = async () => {
-    const data = await anomalyService.getAnomalys()
+  const getAnomalys = async (publishedOnly) => {
+    const data = await anomalyService.getAnomalys(publishedOnly)
     if (data && data.length){
       setAnomalys(data);
     }
@@ -135,6 +136,9 @@ export default function AnomalysTable(props) {
 
   return (
     <div>
+      <div className={`d-flex flex-column justify-content-center text-right mb-2`}>
+        Published Only: <Switch onChange={getAnomalys} />          
+      </div>
       <Table
         onRow={(record) => ({
           onClick: () => viewAnomaly(record),
