@@ -155,7 +155,6 @@ function getHelpText(selectedOption) {
 }
 
 export default function EditAnomalyDef(props){
-  const [allDatasets, setAllDatasets] = useState([]);
   const [selectedOption, setSelectedOption] = useState([]);
   const [isFocused, setIsFocused] = useState(false);
   const [initialDataset, setInitialDataset] = useState([])
@@ -167,8 +166,8 @@ export default function EditAnomalyDef(props){
     if(props)
     {
         let anomalyDef = props.editAnomalyDef["anomalyDef"]
-        let dataset = props.editAnomalyDef["dataset"]
-        setInitialDataset(dataset["name"])
+        let datasetName = props.editAnomalyDef["datasetName"]
+        setInitialDataset(datasetName)
         let selected = getSelectedOptions(anomalyDef)
         setSelectedOption(selected)
         setAnomalyDefId(anomalyDef["id"])
@@ -284,12 +283,12 @@ export default function EditAnomalyDef(props){
     setIsFocused(val)
   }
 
-    var datasetOption = [];
-    datasetOption = allDatasets && allDatasets.map(dataset => (
-      <Option value={dataset.id} key={dataset.id}>
-        {dataset.name}
-      </Option>
-    ));
+    // var datasetOption = [];
+    // datasetOption = allDatasets && allDatasets.map(dataset => (
+    //   <Option value={dataset.id} key={dataset.id}>
+    //     {dataset.name}
+    //   </Option>
+    // ));
 
     return (
       <div>
@@ -322,7 +321,7 @@ export default function EditAnomalyDef(props){
                       .indexOf(input.toLowerCase()) >= 0
                   }
                 >
-                  {datasetOption}
+                  {/* {datasetOption} */}
                 </Select>
               </div>
               <div className="mb-6">

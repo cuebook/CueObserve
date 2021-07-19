@@ -9,6 +9,7 @@ import anomalyDefService from "services/anomalyDefinitions.js"
 import scheduleService from "services/schedules"
 import SelectSchedule from "components/Schedule/SelectSchedule"
 import style from "./style.module.scss";
+import { search } from "services/general.js"
 
 
 const { Search } = Input;
@@ -35,7 +36,8 @@ export default function Connection() {
   const [selectedAnomalyDef, setSelectedAnomalyDef] = useState();
   const [runStatusAnomalyDef, setRunStatusAnomalyDef] = useState();
   const [isRunStatusDrawerVisible, setIsRunStatusDrawerVisible] = useState(false);
-
+  const [searchText, setSearchText] = useState("");
+  const [searchedAnomalyDef, setSearchedAnomalyDef] = useState([]);
   useEffect(() => {
     if (!data) {
         fetchData();
@@ -139,20 +141,23 @@ const unassignSchedule = async (anomalyDefId) => {
 }
 
 
-
-
+const searchInAnomalyDef = (val) =>{
+  setSearchText(val)
+  let convertedAnomalyDef = search(data, ["datasetName", "datasetGranularity", "metric", "dimension", "highOrLow", "top"], val)
+  setSearchedAnomalyDef(convertedAnomalyDef)
+}
 
   const columns = [    
       {
         title: "Dataset",
-        dataIndex: "dataset",
+        dataIndex: "datasetName",
         key: "datasetName",
-        sorter:(a, b) =>   a.dataset.name.localeCompare(b.dataset.name),
+        sorter:(a, b) =>   a.datasetName.localeCompare(b.datasetName),
 
         render: (text, record) => {
           return (
             <div>
-              {record.dataset.name}
+              {record.datasetName}
             </div>
           )
         }
@@ -160,13 +165,13 @@ const unassignSchedule = async (anomalyDefId) => {
       },
       {
         title: "Granularity",
-        dataIndex: "granularity",
+        dataIndex: "datasetGranularity",
         key: "granularity",
-        sorter:(a, b) => a && a.dataset.granularity &&  a.dataset.granularity.localeCompare(b.dataset.granularity),
+        sorter:(a, b) => a.datasetGranularity.localeCompare(b.datasetGranularity),
         render: (text, record) => {
           return (
             <div>
-              {granularity[record.dataset.granularity]}
+              {granularity[record.datasetGranularity]}
             </div>
           )
         }
@@ -298,6 +303,14 @@ const unassignSchedule = async (anomalyDefId) => {
     return (
       <div>
         <div className={`d-flex flex-column justify-content-center text-right mb-2`}>
+
+        <Search
+                style={{ margin: "0 0 10px 0" , width:350, float: "left"}}
+                placeholder="Search"
+                enterButton="Search"
+                onSearch={searchInAnomalyDef}
+                className="mr-2"
+              />
         <Button
             type="primary"
             onClick={() => addingAnomaly(true)}
@@ -310,7 +323,7 @@ const unassignSchedule = async (anomalyDefId) => {
             rowKey={"id"}
             scroll={{ x: "100%" }}
             columns={columns}
-            dataSource={data}
+            dataSource={searchText.length > 0 ? searchedAnomalyDef : data}
             size={"small"}
             pagination={{
               pageSize:50,

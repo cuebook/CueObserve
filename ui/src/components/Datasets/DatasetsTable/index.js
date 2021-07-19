@@ -8,14 +8,19 @@ import {
   Table,
   Button,
   Popconfirm,
-  Tooltip
+  Tooltip,
+  Input
 } from "antd";
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import PopconfirmButton from "components/Utils/PopconfirmButton";
+import { search } from "services/general.js";
+ const {Search} = Input
 
 export default function DatasetsTable(props) {
   const [datasets, setDatasets] = useState(null);
   const history = useHistory();
+  const [searchText, setSearchText] = useState("");
+  const [searchedDatasets, setSearchedDatasets] = useState([]);
 
   useEffect(()=>{
     if (!datasets){
@@ -45,6 +50,11 @@ export default function DatasetsTable(props) {
     history.push("/dataset/create")
   }
 
+  const searchInDatasets = (val) =>{
+    setSearchText(val)
+    let convertedDatasets = search(datasets, ["name", "connectionName", "granularity"], val)
+    setSearchedDatasets(convertedDatasets)
+  }
   const columns = [
     {
       title: "Dataset Name",
@@ -106,13 +116,22 @@ export default function DatasetsTable(props) {
   return (
     <div>
       <div className={`d-flex flex-column justify-content-center text-right mb-2`}>
+
+        <Search
+          style={{ margin: "0 0 10px 0" , width:350, float: "left"}}
+          placeholder="Search"
+          enterButton="Search"
+          onSearch={searchInDatasets}
+          className="mr-2"
+          />
+      
         <Button onClick={createDataset} type="primary">Add Dataset</Button>
       </div>
       <Table
         rowKey={"id"}
         scroll={{ x: "100%" }}
         columns={columns}
-        dataSource={datasets}
+        dataSource={ searchText.length > 0 ? searchedDatasets : datasets}
         size={"small"}
         pagination={{
           pageSize:50,

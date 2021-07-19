@@ -4,14 +4,17 @@ import _ from "lodash";
 import anomalyService from "services/anomalys";
 import style from "./style.module.scss";
 import { useHistory } from "react-router-dom";
+import {search} from "services/general.js"
 import {
   Table,
   Button,
   Popconfirm,
-  Tooltip
+  Tooltip,
+  Input
 } from "antd";
 import { EyeOutlined } from '@ant-design/icons';
 import PopconfirmButton from "components/Utils/PopconfirmButton";
+const {Search} = Input
 
 const granularity = {
   "day" : "Day",
@@ -21,6 +24,9 @@ const granularity = {
 
 export default function AnomalysTable(props) {
   const [anomalys, setAnomalys] = useState(null);
+  const [searchText, setSearchText] = useState("");
+  const [searchedAnomaly, setSearchedAnomaly] = useState([]);
+
   const history = useHistory();
 
   useEffect(()=>{
@@ -132,9 +138,26 @@ export default function AnomalysTable(props) {
       }
     }
   ]
+const searchInAnomaly = (val) =>{
+  setSearchText(val)
+  let convertedAnomaly = search(anomalys, ["datasetName", "granularity", "metric", "dimensionVal"], val)
+  setSearchedAnomaly(convertedAnomaly)
+}
+
 
   return (
     <div>
+      <div className={`d-flex flex-column justify-content-center text-right mb-2`}>
+        <div style={{marginTop: -8}}>
+          <Search
+              style={{ margin: "0 0 10px 0" , width:350, float: "left"}}
+              placeholder="Search"
+              enterButton="Search"
+              onSearch={e=>{searchInAnomaly(e)}}
+              className="mr-2"
+            />
+          </div>
+      </div>
       <Table
         onRow={(record) => ({
           onClick: () => viewAnomaly(record),
@@ -142,12 +165,11 @@ export default function AnomalysTable(props) {
         rowKey={"id"}
         scroll={{ x: "100%" }}
         columns={columns}
-        dataSource={anomalys}
+        dataSource={ searchText.length > 0 ? searchedAnomaly: anomalys}
         pagination={{
           pageSize : 50,
           total : columns ? columns.length : 50
         }}
-        size={"small"}
       />
     </div>
   )
