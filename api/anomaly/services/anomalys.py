@@ -12,12 +12,12 @@ class Anomalys:
     """
 
     @staticmethod
-    def getAnomalys():
+    def getAnomalys(publishedOnly=False):
         """
         Gets anomalys
         """
         res = ApiResponse("Error in getting anomalies")
-        anomalies = Anomaly.objects.filter(published=True)
+        anomalies = Anomaly.objects.filter(published=True) if publishedOnly else Anomaly.objects.all()
         data = AnomalySerializer(anomalies, many=True).data
         res.update(True, "Successfully retrieved anomalies", data)
         return res
