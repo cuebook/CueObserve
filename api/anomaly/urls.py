@@ -6,7 +6,8 @@ from . import views
 
 urlpatterns = [
     # Anomalys
-    path("anomalys", views.AnomalysView.as_view(), name="anomalys"),
+    path("anomalys", views.AnomalysView.as_view(publishedOnly=True), name="anomalys"),
+    path("allanomalys", views.AnomalysView.as_view(publishedOnly=False), name="allAnomalys"),
     path("anomaly/<int:anomalyId>", views.AnomalyView.as_view(), name="anomaly"),
     # Datasets
     path("datasets", views.DatasetsView.as_view(), name="datasets"),

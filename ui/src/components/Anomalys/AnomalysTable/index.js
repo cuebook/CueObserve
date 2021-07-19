@@ -10,7 +10,8 @@ import {
   Button,
   Popconfirm,
   Tooltip,
-  Input
+  Input,
+  Switch
 } from "antd";
 import { EyeOutlined } from '@ant-design/icons';
 import PopconfirmButton from "components/Utils/PopconfirmButton";
@@ -35,8 +36,8 @@ export default function AnomalysTable(props) {
     }
   }, []);
 
-  const getAnomalys = async () => {
-    const data = await anomalyService.getAnomalys()
+  const getAnomalys = async (publishedOnly) => {
+    const data = await anomalyService.getAnomalys(publishedOnly)
     if (data && data.length){
       setAnomalys(data);
     }
@@ -148,7 +149,6 @@ const searchInAnomaly = (val) =>{
   return (
     <div>
       <div className={`d-flex flex-column justify-content-center text-right mb-2`}>
-        <div style={{marginTop: -8}}>
           <Search
               style={{ margin: "0 0 10px 0" , width:350, float: "left"}}
               placeholder="Search"
@@ -156,7 +156,9 @@ const searchInAnomaly = (val) =>{
               onSearch={e=>{searchInAnomaly(e)}}
               className="mr-2"
             />
-          </div>
+          <div>
+            Published Only: <Switch onChange={getAnomalys} />  
+          </div> 
       </div>
       <Table
         onRow={(record) => ({

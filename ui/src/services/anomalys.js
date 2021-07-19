@@ -2,8 +2,9 @@ import apiService from "./api";
 import { message } from "antd"
 
 class AnomalyService {
-    getAnomalys(){
-        return apiService.get("anomaly/anomalys")
+    getAnomalys(publishedOnly){
+        let url = publishedOnly ? "anomaly/anomalys" : "anomaly/allanomalys"
+        return apiService.get(url)
         .then(response => {
             if(response.success == true){
                 return response.data

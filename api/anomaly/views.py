@@ -20,10 +20,11 @@ class AnomalysView(APIView):
     """
     Provides views on datasets(many)
     """
+    publishedOnly = False
 
     def get(self, request):
         """get request"""
-        res = Anomalys.getAnomalys()
+        res = Anomalys.getAnomalys(publishedOnly=self.publishedOnly)
         return Response(res.json())
 
 
