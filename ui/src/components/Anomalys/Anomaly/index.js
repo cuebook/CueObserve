@@ -72,7 +72,6 @@ export default function Anomaly(props) {
     }
   };
 
-  console.log(anomalyData)
 
   const chart = (
     <div className={style.chartDiv}>
