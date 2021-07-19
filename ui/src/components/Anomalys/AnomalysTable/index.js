@@ -80,7 +80,10 @@ export default function AnomalysTable(props) {
       title: "Filter",
       dataIndex: "dimensionVal",
       key: "dimensionVal",
-      sorter: (a, b) => a.dimensionVal.localeCompare(b.dimensionVal),
+      sorter: (a, b) => {
+        a= a.dimensionVal || "";
+        b= b.dimensionVal ||  "";
+        return a.localeCompare(b)},
       render: (text, record) => {
         return text ? (
           <p>{record.dimension} = {text}</p>
@@ -122,9 +125,9 @@ export default function AnomalysTable(props) {
       sorter: (a, b) => a.anomalyTimeStr.localeCompare(b.anomalyTimeStr),
       render: (text, record) => {
         return (
-          <p>
-          <div>{text}</div>
-          </p>
+          <div>
+          <p>{text}</p>
+          </div>
         );
       }
     }
@@ -140,6 +143,10 @@ export default function AnomalysTable(props) {
         scroll={{ x: "100%" }}
         columns={columns}
         dataSource={anomalys}
+        pagination={{
+          pageSize : 50,
+          total : columns ? columns.length : 50
+        }}
         size={"small"}
       />
     </div>

@@ -6,7 +6,6 @@ class ScheduleService{
 
     async getSchedules(){
         const response = await apiService.get("anomaly/schedules/")
-        console.log('response get', response)
         if(response.success == true)
             return response.data
         else    

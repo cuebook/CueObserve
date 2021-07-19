@@ -6,7 +6,6 @@ class DatasetService {
         return apiService.get("anomaly/datasets")
         .then(response => {
             if(response.success == true){
-                console.log(response)
                 return response.data
             } else {
                 message.error(response.message);

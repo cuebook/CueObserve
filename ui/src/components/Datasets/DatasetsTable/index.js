@@ -63,7 +63,7 @@ export default function DatasetsTable(props) {
       title: "Granularity",
       dataIndex: "granularity",
       key: "granularity",
-      sorter: (a, b) => a.granularity.name.localeCompare(b.granularity.name),
+      sorter: (a, b) => a.granularity.localeCompare(b.granularity),
       render: granularity => { return _.capitalize(granularity) }
     },
     {
@@ -103,7 +103,6 @@ export default function DatasetsTable(props) {
 
     } 
   ]
-
   return (
     <div>
       <div className={`d-flex flex-column justify-content-center text-right mb-2`}>
@@ -115,6 +114,10 @@ export default function DatasetsTable(props) {
         columns={columns}
         dataSource={datasets}
         size={"small"}
+        pagination={{
+          pageSize:50,
+          total:  datasets ? datasets.length : 50
+        }}
       />
     </div>
   )

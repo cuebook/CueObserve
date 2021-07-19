@@ -313,8 +313,8 @@ const unassignSchedule = async (anomalyDefId) => {
             dataSource={data}
             size={"small"}
             pagination={{
-              pageSize:20,
-              total:  data ? data.length : 20
+              pageSize:50,
+              total:  data ? data.length : 50
             }}
             
         />
