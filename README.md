@@ -35,7 +35,7 @@ You then define one or more anomaly detection jobs on the dataset.
 ![Anomaly Definition](docs/images/AnomalyDefinitions.png)
 
 When an anomaly detection job runs, CueObserve does the following:
-1. Executes the SQL GROUP BY query on your datawarehouse and stores the result as a Pandas dataframe.
+1. Executes the SQL GROUP BY query on your data warehouse and stores the result as a Pandas dataframe.
 2. Generates one or more timeseries from the dataframe, as defined in your anomaly detection job.
 3. Generates a forecast for each timeseries using [Prophet](https://github.com/facebook/prophet).
 4. Creates a visual card for each timeseries. Marks the card as an anomaly if the last data point is anomalous.
