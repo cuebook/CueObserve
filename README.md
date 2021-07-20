@@ -1,4 +1,9 @@
 <p align="center">
+  <a href="https://cueobserve.cuebook.ai" target="_blank">
+    <img alt="CueObserve Logo" width="300" src="docs/images/cueObserve.png">
+  </a>
+</p>
+<p align="center">
   <a href="https://codeclimate.com/github/cuebook/CueObserve/maintainability"><img src="https://api.codeclimate.com/v1/badges/a70e071b59d5dbc38846/maintainability" /></a>
   <a href="https://codeclimate.com/github/cuebook/CueObserve/test_coverage"><img src="https://api.codeclimate.com/v1/badges/a70e071b59d5dbc38846/test_coverage" /></a>
   <a href="https://github.com/cuebook/cueobserve/actions/workflows/pr_checks.yml">
@@ -10,7 +15,6 @@
 </p>
 <br>
 
-# CueObserve
 With CueObserve, you can run anomaly detection on data in your SQL data warehouses and databases.
 
 ![CueObserve](docs/images/Overview.gif)
