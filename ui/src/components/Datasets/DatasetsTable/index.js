@@ -134,8 +134,8 @@ export default function DatasetsTable(props) {
         dataSource={ searchText.length > 0 ? searchedDatasets : datasets}
         size={"small"}
         pagination={{
-          pageSize:50,
-          total:  datasets ? datasets.length : 50
+          defaultPageSize:50,
+          total:  searchText.length > 0 ? searchedDatasets.length : datasets ? datasets.length : 50
         }}
       />
     </div>

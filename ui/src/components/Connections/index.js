@@ -137,7 +137,7 @@ export default function Connection() {
             dataSource={connections}
             size={"small"}
             pagination={{
-              pageSize:50,
+              defaultPageSize:50,
               total:  connections ? connections.length : 50
             }}
         />

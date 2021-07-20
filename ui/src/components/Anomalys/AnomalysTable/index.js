@@ -169,8 +169,8 @@ const searchInAnomaly = (val) =>{
         columns={columns}
         dataSource={ searchText.length > 0 ? searchedAnomaly: anomalys}
         pagination={{
-          pageSize : 50,
-          total : anomalys ? anomalys.length : 50
+          defaultPageSize : 50,
+          total : searchText.length > 0 ? searchedAnomaly.length: anomalys ? anomalys.length : 50
         }}
       />
     </div>

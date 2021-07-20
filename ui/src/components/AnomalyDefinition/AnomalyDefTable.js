@@ -326,8 +326,8 @@ const searchInAnomalyDef = (val) =>{
             dataSource={searchText.length > 0 ? searchedAnomalyDef : data}
             size={"small"}
             pagination={{
-              pageSize:50,
-              total:  data ? data.length : 50
+              defaultPageSize:50,
+              total:  searchText.length > 0 ? searchedAnomalyDef.length : data ? data.length : 50
             }}
             
         />

@@ -121,7 +121,7 @@ const [isViewConnectionDrawerVisible, setIsViewConnectionDrawerVisible] = useSta
             size={"small"}
             dataSource={schedules}
             pagination={{
-              pageSize: 50,
+              defaultPageSize: 50,
               total: schedules ? schedules.length : 50
             }}
         />
