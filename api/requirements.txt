@@ -51,7 +51,7 @@ pluggy==0.13.1
 prompt-toolkit==3.0.19
 proto-plus==1.19.0
 protobuf==3.17.3
-psycopg2==2.9.1
+psycopg2-binary==2.9.1
 ptyprocess==0.7.0
 py==1.10.0
 pyarrow==3.0.0
