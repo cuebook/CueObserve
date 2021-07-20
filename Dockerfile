@@ -1,5 +1,5 @@
 # build environment
-FROM node:12-alpine as builder
+FROM node:12-slim as builder
 WORKDIR /app
 ENV PATH /app/node_modules/.bin:$PATH
 COPY ui/package.json /app/package.json
@@ -10,7 +10,7 @@ RUN npm run build
 
 
 # production environment
-FROM python:3.7-buster
+FROM python:3.7-slim-buster
 ENV PYTHONUNBUFFERED=1
 RUN apt-get update && apt-get install nginx redis-server -y --no-install-recommends
 WORKDIR /code
