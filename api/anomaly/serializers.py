@@ -230,7 +230,6 @@ class AnomalySerializer(serializers.ModelSerializer):
     granularity = serializers.SerializerMethodField()
     metric = serializers.SerializerMethodField()
     dimension = serializers.SerializerMethodField()
-    anomalyTimeStr = serializers.SerializerMethodField()
 
     def get_datasetName(self, obj):
         return obj.anomalyDefinition.dataset.name
@@ -244,21 +243,9 @@ class AnomalySerializer(serializers.ModelSerializer):
     def get_dimension(self, obj):
         return obj.anomalyDefinition.dimension
 
-    def get_anomalyTimeStr(self, obj):
-        anomalyTs = dp.parse(obj.data["anomalyLatest"]["anomalyTimeISO"])
-        gran = obj.anomalyDefinition.dataset.granularity
-        if gran == "day":
-            delta = (dt.datetime.now() - anomalyTs).days
-            if delta <= 1:
-                return "Yesterday"
-            return f"{delta} days ago"
-        elif gran == "hour":
-            delta = int((dt.datetime.now() - anomalyTs).total_seconds() / 3600)
-            return f"{delta} hours ago"
-
     class Meta:
         model = Anomaly
-        fields = ["id", "datasetName", "published", "dimension", "dimensionVal", "granularity", "metric", "anomalyTimeStr", "data"]
+        fields = ["id", "datasetName", "published", "dimension", "dimensionVal", "granularity", "metric", "data"]
 
 class ScheduleSerializer(serializers.ModelSerializer):
     """

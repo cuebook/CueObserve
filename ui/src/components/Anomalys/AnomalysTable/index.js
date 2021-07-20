@@ -23,6 +23,25 @@ const granularity = {
   "week" : "Week"
  }
 
+ let today = new Date()
+
+ function humanizeIsoTimestamp(timestamp, granularity){
+  let hours = Math.floor((today.getTime() - Date.parse(timestamp))/(3600 * 1000))
+  if(granularity === "hour")
+  {
+    return hours + " hours ago"
+  }
+  if(granularity === "day")
+  {
+    let days = Math.floor(hours/24)
+    if(days <= 1)
+    {
+      return "Yesterday"
+    }
+    return days + " days ago"
+  }
+ }
+
 export default function AnomalysTable(props) {
   const [anomalys, setAnomalys] = useState(null);
   const [searchText, setSearchText] = useState("");
@@ -127,13 +146,13 @@ export default function AnomalysTable(props) {
     },
     {
       title: "Anomaly Time",
-      dataIndex: "anomalyTimeStr",
-      key: "anomalyTimeStr",
-      sorter: (a, b) => a.anomalyTimeStr.localeCompare(b.anomalyTimeStr),
+      dataIndex: "anomalyTimeISO",
+      key: "anomalyTimeISO",
+      sorter: (a, b) => -a.data.anomalyLatest.anomalyTimeISO.localeCompare(b.data.anomalyLatest.anomalyTimeISO),
       render: (text, record) => {
         return (
           <div>
-          <p>{text}</p>
+          <p>{humanizeIsoTimestamp(record.data.anomalyLatest.anomalyTimeISO, record.granularity)}</p>
           </div>
         );
       }
