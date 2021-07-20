@@ -149,7 +149,7 @@ export default function AnomalysTable(props) {
         dataSource={anomalys}
         pagination={{
           pageSize : 50,
-          total : columns ? columns.length : 50
+          total : anomalys ? anomalys.length : 50
         }}
         size={"small"}
       />
