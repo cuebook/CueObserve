@@ -33,13 +33,12 @@ def test_datasets(client, mocker):
     assert response.status_code == 200
     assert response.data['success'] 
 
-
     # Get datasets
     path = reverse('datasets')
     response = client.get(path)
     assert response.status_code == 200
     assert response.data['data']
-    assert set(response.data['data'][0].keys()) == set(['anomalyDefinitionCount', 'connection', 'granularity', 'name', 'id'])
+    assert set(response.data['data'][0].keys()) == set(['anomalyDefinitionCount', 'connection', 'granularity', 'name', 'id','connectionName'])
 
     dataset = response.data['data'][0]
 
