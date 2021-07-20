@@ -12,7 +12,7 @@ RUN npm run build
 # production environment
 FROM python:3.7-slim-buster
 ENV PYTHONUNBUFFERED=1
-RUN apt-get update && apt-get install nginx redis-server -y --no-install-recommends
+RUN apt-get update && apt-get install nginx default-libmysqlclient-dev build-essential redis-server -y --no-install-recommends
 WORKDIR /code
 COPY api/requirements.txt /code/
 RUN pip install -r requirements.txt
