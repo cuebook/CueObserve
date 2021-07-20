@@ -13,6 +13,7 @@ from anomaly.services import (
     Anomalys,
     ScheduleService,
     AnomalyDefJobServices,
+    Settings,
 )
 
 
@@ -20,6 +21,7 @@ class AnomalysView(APIView):
     """
     Provides views on datasets(many)
     """
+
     publishedOnly = False
 
     def get(self, request):
@@ -262,6 +264,7 @@ def runAnomalyDef(request: HttpRequest, anomalyDefId: int) -> Response:
     res = AnomalyDefinitions.runAnomalyDetection(anomalyDefId)
     return Response(res.json())
 
+
 @api_view(["GET"])
 def getDetectionRuns(request: HttpRequest, anomalyDefId: int) -> Response:
     """
@@ -273,6 +276,7 @@ def getDetectionRuns(request: HttpRequest, anomalyDefId: int) -> Response:
     res = AnomalyDefinitions.getDetectionRuns(anomalyDefId, offset)
     return Response(res.json())
 
+
 @api_view(["GET"])
 def isTaskRunning(request: HttpRequest, anomalyDefId: int) -> Response:
     """
@@ -282,3 +286,20 @@ def isTaskRunning(request: HttpRequest, anomalyDefId: int) -> Response:
     """
     res = AnomalyDefinitions.isTaskRunning(anomalyDefId)
     return Response(res.json())
+
+
+class SettingsView(APIView):
+    """
+    Provides views on settings
+    """
+
+    def get(self, request):
+        """get request"""
+        res = Settings.getSettings()
+        return Response(res.json())
+
+    def post(self, request):
+        """post request"""
+        data = request.data
+        res = Settings.updateSettings(data)
+        return Response(res.json())
