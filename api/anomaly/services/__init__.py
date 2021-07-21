@@ -5,3 +5,4 @@ from .anomalyDefinitions import AnomalyDefinitions, AnomalyDefJobServices
 from .anomalys import Anomalys
 from .schedules import ScheduleService
 from .settings import Settings
+from .slack import SlackAlert
