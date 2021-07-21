@@ -2,7 +2,7 @@ import json
 import dateutil.parser as dp
 import datetime as dt
 from rest_framework import serializers
-from anomaly.models import Anomaly, AnomalyDefinition, Connection,ConnectionType, CustomSchedule as Schedule, Dataset, RunStatus
+from anomaly.models import Anomaly, AnomalyDefinition, Connection,ConnectionType, CustomSchedule as Schedule, Dataset, RunStatus, Setting
 
 
 class ConnectionSerializer(serializers.ModelSerializer):
@@ -293,3 +293,11 @@ class RunStatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = RunStatus
         fields = ["id", "anomalyDefId", "startTimestamp", "endTimestamp", "status", "runType", "logs"]
+
+class SettingSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the model Setting
+    """
+    class Meta:
+        model = Setting
+        fields = ["name", "value"]

@@ -15,6 +15,7 @@ import Datasets from "views/admin/Datasets";
 import Connections from "views/admin/Connections"
 import AnomalyDefTable from "views/admin/AnomalyDefTable";
 import Schedules from "views/admin/Schedules";
+import Settings from "views/admin/Settings";
 
 // contexts
 import { GlobalContextProvider } from "./GlobalContext";
@@ -39,6 +40,7 @@ export default function Admin() {
               <Route path="/connections" exact component={Connections} />
               <Route path="/anomalyDefinitions" exact component={AnomalyDefTable} />
               <Route path="/schedules" exact component={Schedules} />
+              <Route path="/settings" exact component={Settings} />
               <Redirect from="/" to="/anomalies" />
             </Switch>
           </div>

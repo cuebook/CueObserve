@@ -5,7 +5,6 @@ from django.db import models
 # from django_celery_beat.models import  CrontabSchedule, PeriodicTask
 
 
-
 # eg. postgres, mysql
 class ConnectionType(models.Model):  # no ui
     name = models.CharField(max_length=200, db_index=True, unique=True)
@@ -74,7 +73,10 @@ class AnomalyDefinition(models.Model):
     highOrLow = models.TextField(null=True, blank=True)
     top = models.IntegerField(default=10)
     periodicTask = models.OneToOneField(
-        "django_celery_beat.PeriodicTask", on_delete=models.SET_NULL, db_index=True, null=True
+        "django_celery_beat.PeriodicTask",
+        on_delete=models.SET_NULL,
+        db_index=True,
+        null=True,
     )
 
 
@@ -105,13 +107,26 @@ class CustomSchedule(models.Model):
         "django_celery_beat.CrontabSchedule", on_delete=models.CASCADE, db_index=True
     )
 
+
 class RunStatus(models.Model):
     """
     Model class to store logs and statuses of NotebookJob runs
     """
+
     startTimestamp = models.DateTimeField(auto_now_add=True)
     endTimestamp = models.DateTimeField(null=True, default=None)
-    anomalyDefinition = models.ForeignKey(AnomalyDefinition, on_delete=models.CASCADE, db_index=True)
+    anomalyDefinition = models.ForeignKey(
+        AnomalyDefinition, on_delete=models.CASCADE, db_index=True
+    )
     status = models.CharField(max_length=20)
-    runType = models.CharField(max_length=20, blank=True, null=True) # Manual/Scheduled
+    runType = models.CharField(max_length=20, blank=True, null=True)  # Manual/Scheduled
     logs = models.JSONField(default=dict)
+
+
+class Setting(models.Model):
+    """
+    Model class to store settings/config related to application
+    """
+
+    name = models.TextField(null=True, blank=True)
+    value = models.TextField(null=True, blank=True)

@@ -9,6 +9,7 @@ from anomaly.models import AnomalyDefinition, RunStatus
 from access.data import Data
 from access.utils import prepareAnomalyDataframes
 from ops.anomalyDetection import anomalyService
+from anomaly.services.slack import SlackAlert
 
 ANOMALY_DETECTION_RUNNING = "RUNNING"
 ANOMALY_DETECTION_SUCCESS = "SUCCESS"
@@ -50,8 +51,15 @@ def anomalyDetectionJob(anomalyDef_id: int, manualRun: bool = False):
     except Exception as ex:
         logs["log"] = json.dumps({"stackTrace": traceback.format_exc(), "message": str(ex)})
         runStatusObj.status = ANOMALY_DETECTION_ERROR
+        title = "CueObserve Alerts "
+        message = "Anomaly Detection Job failed on AnomalyDefintion id : " + anomalyDef_id
+        name = "appAlert"
+        SlackAlert.slackAlertHelper(title, message, name)  # appAlert if anomalyDetection task failed
+
+
     else:
         runStatusObj.status = ANOMALY_DETECTION_SUCCESS
+        # anomalyAlert if anomalyDetection task succeeded
     runStatusObj.logs = logs
     runStatusObj.endTimestamp = dt.datetime.now()
     runStatusObj.save()
