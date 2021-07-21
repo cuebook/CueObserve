@@ -9,13 +9,28 @@ COPY ui /app
 RUN npm run build
 
 
+
+# compile-image
+FROM python:3.7-slim-buster AS compile-image
+RUN apt-get update
+RUN apt-get install -y --no-install-recommends build-essential gcc default-libmysqlclient-dev 
+RUN python -m venv /opt/venv
+# Make sure we use the virtualenv:
+ENV PATH="/opt/venv/bin:$PATH"
+
+COPY api/requirements.txt .
+RUN pip install -r requirements.txt
+
+
+
 # production environment
 FROM python:3.7-slim-buster
 ENV PYTHONUNBUFFERED=1
-RUN apt-get update && apt-get install nginx default-libmysqlclient-dev build-essential redis-server -y --no-install-recommends
+COPY --from=compile-image /opt/venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+RUN apt-get update && apt-get install -y --no-install-recommends redis-server nginx default-libmysqlclient-dev 
+
 WORKDIR /code
-COPY api/requirements.txt /code/
-RUN pip install -r requirements.txt
 COPY api /code/
 COPY --from=builder /app/build /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/sites-available/default
