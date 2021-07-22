@@ -79,6 +79,19 @@ class AnomalyDefinition(models.Model):
         null=True,
     )
 
+class RunStatus(models.Model):
+    """
+    Model class to store logs and statuses of NotebookJob runs
+    """
+
+    startTimestamp = models.DateTimeField(auto_now_add=True)
+    endTimestamp = models.DateTimeField(null=True, default=None)
+    anomalyDefinition = models.ForeignKey(
+        AnomalyDefinition, on_delete=models.CASCADE, db_index=True
+    )
+    status = models.CharField(max_length=20)
+    runType = models.CharField(max_length=20, blank=True, null=True)  # Manual/Scheduled
+    logs = models.JSONField(default=dict)
 
 class Anomaly(models.Model):
     anomalyDefinition = models.ForeignKey(
@@ -87,6 +100,7 @@ class Anomaly(models.Model):
     dimensionVal = models.TextField(null=True, blank=True)
     published = models.BooleanField(default=False)
     data = models.JSONField(default=dict)
+    latestRun = models.ForeignKey(RunStatus, on_delete=models.SET_NULL, null=True, default=None)
 
 
 class AnomalyCardTemplate(models.Model):
@@ -107,20 +121,6 @@ class CustomSchedule(models.Model):
         "django_celery_beat.CrontabSchedule", on_delete=models.CASCADE, db_index=True
     )
 
-
-class RunStatus(models.Model):
-    """
-    Model class to store logs and statuses of NotebookJob runs
-    """
-
-    startTimestamp = models.DateTimeField(auto_now_add=True)
-    endTimestamp = models.DateTimeField(null=True, default=None)
-    anomalyDefinition = models.ForeignKey(
-        AnomalyDefinition, on_delete=models.CASCADE, db_index=True
-    )
-    status = models.CharField(max_length=20)
-    runType = models.CharField(max_length=20, blank=True, null=True)  # Manual/Scheduled
-    logs = models.JSONField(default=dict)
 
 
 class Setting(models.Model):

@@ -264,6 +264,16 @@ def runAnomalyDef(request: HttpRequest, anomalyDefId: int) -> Response:
     res = AnomalyDefinitions.runAnomalyDetection(anomalyDefId)
     return Response(res.json())
 
+@api_view(["GET"])
+def runStatusAnomalies(request: HttpRequest, runStatusId: int) -> Response:
+    """
+    Method for fetch anomalies of a RunStatus and their urls
+    :param request: HttpRequest
+    :param anomalyDefId: ID of the anomaly definition
+    """
+    res = AnomalyDefinitions.runStatusAnomalies(runStatusId)
+    return Response(res.json())
+
 
 @api_view(["GET"])
 def getDetectionRuns(request: HttpRequest, anomalyDefId: int) -> Response:

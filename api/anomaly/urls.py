@@ -32,6 +32,7 @@ urlpatterns = [
     path("editAnomalyDef", views.AnomalyDefView.as_view(), name="editAnomalyDef"),
     path("runAnomalyDef/<int:anomalyDefId>", views.runAnomalyDef, name="runAnomalyDef"),
     # RunStatus
+    path("runStatusAnomalies/<int:runStatusId>", views.runStatusAnomalies, name="runStatusAnomalies"),
     path(
         "runStatus/<int:anomalyDefId>", views.getDetectionRuns, name="getDetectionRuns"
     ),

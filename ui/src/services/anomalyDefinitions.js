@@ -61,6 +61,13 @@ class AnomalyDefService {
         else
             return null
     }
+    async getRunStatusAnomalies(runStatusId){
+        const response = await apiService.get("anomaly/runStatusAnomalies/" + runStatusId)
+        if(response.success == true)
+            return response.data
+        else
+            return null
+    }
 
 }
 let anomalyDefService = new AnomalyDefService();
