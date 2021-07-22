@@ -92,7 +92,7 @@ class AnomalyDefinitions:
         return res
 
     @staticmethod
-    def isTaskRunning(anomalyDefId: int,):
+    def isTaskRunning(anomalyDefId: int):
         """
         Service to check whether a task is running for anomaly definition
         :param anomalyDefId: ID of the Anomaly Definition
@@ -103,6 +103,18 @@ class AnomalyDefinitions:
         if lastRunStatus:
             taskRunning = lastRunStatus.status == "RUNNING"
         res.update(True, "Task Running status checked.", {"isRunning": taskRunning})
+        return res
+    
+    @staticmethod
+    def runStatusAnomalies(runStatusId: int):
+        """
+        Service to fetch anomalies of a RunStatus and their metadata
+        :param anomalyDefId: ID of the Anomaly Definition
+        """
+        res = ApiResponse()
+        runStatus = RunStatus.objects.get(id=runStatusId)
+        anomaliesData = list(runStatus.anomaly_set.all().values("dimensionVal", "id", "published"))
+        res.update(True, "Run status anomalies retrieved successfully", anomaliesData)
         return res
 
         

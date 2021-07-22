@@ -1,9 +1,10 @@
 
 import React, { useState, useEffect } from "react";
-import { Table, Button, Popconfirm, Input, message, Tooltip, Drawer } from "antd";
+import { Table, Button, Popconfirm, Input, message, Tooltip, Drawer, Modal } from "antd";
 import AddAnomalyDef from "./AddAnomalyDef.js"
 import EditAnomalyDef from "./EditAnomalyDef.js"
 import RunStatus from "./RunStatus.js";
+import RunStatusAnomalies from "./RunStatusAnomalies.js";
 import { EditOutlined, DeleteOutlined, PlayCircleOutlined, CloseOutlined, EyeOutlined } from '@ant-design/icons';
 import anomalyDefService from "services/anomalyDefinitions.js"
 import scheduleService from "services/schedules"
@@ -38,6 +39,9 @@ export default function Connection() {
   const [isRunStatusDrawerVisible, setIsRunStatusDrawerVisible] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [searchedAnomalyDef, setSearchedAnomalyDef] = useState([]);
+  const [latestAnomaliesRunStatusId, setLatestAnomaliesRunStatusId] = useState();
+  const [latestAnomaliesModalVisibile, setLatestAnomaliesModalVisibile] = useState(false);
+
   useEffect(() => {
     if (!data) {
         fetchData();
@@ -77,6 +81,15 @@ const runAnomalyDef = async (anomalyDef) => {
   const response = await anomalyDefService.runAnomalyDef(anomalyDef.id)
   isTaskRunning[anomalyDef.id] = setInterval(() => checkIsRunning(anomalyDef.id), 5000);
   fetchData()
+}
+
+const openLatestAnomalies = (runStatusId) => {
+  setLatestAnomaliesRunStatusId(runStatusId)
+  setLatestAnomaliesModalVisibile(true)
+}
+
+const closeLatestAnomalies = () => {
+  setLatestAnomaliesModalVisibile(false)
 }
 
 const openRunStatus = (anomalyDef) => {
@@ -262,7 +275,9 @@ const searchInAnomalyDef = (val) =>{
         render: (text, record) => {
           return (
             <span>
+              <a className={style.linkText} onClick={()=> openLatestAnomalies(record.lastRunAnomalies.runStatusId)}>
               { record.lastRunAnomalies && record.lastRunAnomalies.numAnomaliesPulished} {record.lastRunAnomalies && record.lastRunAnomalies.numAnomalySubtasks?("("+record.lastRunAnomalies.numAnomalySubtasks+")"):""} 
+              </a>
             </span>
           );
         }
@@ -366,6 +381,16 @@ const searchInAnomalyDef = (val) =>{
             null
           }
       </Drawer>
+      <Modal 
+          title="Last Run Anomalies"
+          visible={latestAnomaliesModalVisibile}
+          onCancel={closeLatestAnomalies}
+          onOk={closeLatestAnomalies}
+        >
+          {
+            latestAnomaliesModalVisibile ? <RunStatusAnomalies runStatusId={latestAnomaliesRunStatusId} /> : null
+          }
+        </Modal>
       </div>
     );
   }

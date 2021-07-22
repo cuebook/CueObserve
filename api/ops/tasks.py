@@ -5,7 +5,7 @@ import pandas as pd
 from celery import shared_task, group
 from celery.result import allow_join_result
 
-from anomaly.models import AnomalyDefinition, RunStatus
+from anomaly.models import Anomaly, AnomalyDefinition, RunStatus
 from access.data import Data
 from access.utils import prepareAnomalyDataframes
 from ops.anomalyDetection import anomalyService
@@ -21,8 +21,8 @@ def _anomalyDetectionSubTask(anomalyDef_id, dimVal, contriPercent, dfDict):
     Internal anomaly detection subtask to be grouped by celery for each anomaly object
     """
     anomalyDefinition = AnomalyDefinition.objects.get(id=anomalyDef_id)
-    anomalyDetected= anomalyService(anomalyDefinition, dimVal, contriPercent, pd.DataFrame(dfDict))
-    return anomalyDetected
+    anomalyServiceResult = anomalyService(anomalyDefinition, dimVal, contriPercent, pd.DataFrame(dfDict))
+    return anomalyServiceResult
 
 
 @shared_task
@@ -34,6 +34,7 @@ def anomalyDetectionJob(anomalyDef_id: int, manualRun: bool = False):
     """
     runType = "Manual" if manualRun else "Scheduled"
     anomalyDefinition = AnomalyDefinition.objects.get(id=anomalyDef_id)
+    anomalyDefinition.anomaly_set.update(published=False)
     runStatusObj = RunStatus.objects.create(anomalyDefinition=anomalyDefinition, status=ANOMALY_DETECTION_RUNNING, runType=runType)
     logs = {}
     try:
@@ -45,7 +46,8 @@ def anomalyDetectionJob(anomalyDef_id: int, manualRun: bool = False):
         _detectionJobs = detectionJobs.apply_async()
         with allow_join_result():
             result = _detectionJobs.get()
-        logs["numAnomaliesPulished"] = len([anomalyDetected for anomalyDetected in result if anomalyDetected])
+        Anomaly.objects.filter(id__in=[anomaly["anomalyId"] for anomaly in result]).update(latestRun=runStatusObj)
+        logs["numAnomaliesPulished"] = len([anomaly for anomaly in result if anomaly["published"]])
         logs["numAnomalySubtasks"] = len(_detectionJobs)
         logs["log"] = json.dumps({detection.id: detection.result for detection in _detectionJobs})
     except Exception as ex:
@@ -55,8 +57,6 @@ def anomalyDetectionJob(anomalyDef_id: int, manualRun: bool = False):
         message = "Anomaly Detection Job failed on AnomalyDefintion id : " + anomalyDef_id
         name = "appAlert"
         SlackAlert.slackAlertHelper(title, message, name)  # appAlert if anomalyDetection task failed
-
-
     else:
         runStatusObj.status = ANOMALY_DETECTION_SUCCESS
         # anomalyAlert if anomalyDetection task succeeded
