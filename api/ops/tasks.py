@@ -37,6 +37,7 @@ def anomalyDetectionJob(anomalyDef_id: int, manualRun: bool = False):
     anomalyDefinition.anomaly_set.update(published=False)
     runStatusObj = RunStatus.objects.create(anomalyDefinition=anomalyDefinition, status=ANOMALY_DETECTION_RUNNING, runType=runType)
     logs = {}
+    allTasksSucceeded = False
     try:
         datasetDf = Data.fetchDatasetDataframe(anomalyDefinition.dataset)
         dimValsData = prepareAnomalyDataframes(datasetDf, anomalyDefinition.dataset.timestampColumn, anomalyDefinition.metric, anomalyDefinition.dimension, anomalyDefinition.top)
@@ -46,20 +47,32 @@ def anomalyDetectionJob(anomalyDef_id: int, manualRun: bool = False):
         _detectionJobs = detectionJobs.apply_async()
         with allow_join_result():
             result = _detectionJobs.get()
-        Anomaly.objects.filter(id__in=[anomaly["anomalyId"] for anomaly in result]).update(latestRun=runStatusObj)
-        logs["numAnomaliesPulished"] = len([anomaly for anomaly in result if anomaly["published"]])
+        Anomaly.objects.filter(id__in=[anomaly["anomalyId"] for anomaly in result if anomaly["success"]]).update(latestRun=runStatusObj)
+        logs["numAnomaliesPulished"] = len([anomaly for anomaly in result if anomaly.get("published")])
         logs["numAnomalySubtasks"] = len(_detectionJobs)
         logs["log"] = json.dumps({detection.id: detection.result for detection in _detectionJobs})
+        allTasksSucceeded = all([anomalyTask["success"] for anomalyTask in result])
     except Exception as ex:
         logs["log"] = json.dumps({"stackTrace": traceback.format_exc(), "message": str(ex)})
         runStatusObj.status = ANOMALY_DETECTION_ERROR
-        title = "CueObserve Alerts "
-        message = "Anomaly Detection Job failed on AnomalyDefintion id : " + anomalyDef_id
-        name = "appAlert"
-        SlackAlert.slackAlertHelper(title, message, name)  # appAlert if anomalyDetection task failed
     else:
         runStatusObj.status = ANOMALY_DETECTION_SUCCESS
-        # anomalyAlert if anomalyDetection task succeeded
+    if not allTasksSucceeded:
+        runStatusObj.status = ANOMALY_DETECTION_ERROR
     runStatusObj.logs = logs
     runStatusObj.endTimestamp = dt.datetime.now()
     runStatusObj.save()
+
+    # Slack alerts
+    title = "CueObserve Alerts"
+    if runStatusObj.status == ANOMALY_DETECTION_SUCCESS:
+        message = "Anomaly Detection Job succeeded for AnomalyDefintion id : " + str(anomalyDef_id)
+        message = message + str(logs["log"])
+        name = "anomalyAlert"
+        SlackAlert.slackAlertHelper(title, message, name)
+    
+    if runStatusObj.status == ANOMALY_DETECTION_ERROR:
+        message = "Anomaly Detection Job failed on AnomalyDefintion id : " + str(anomalyDef_id)
+        message = message + str(logs["log"])
+        name = "appAlert"
+        SlackAlert.slackAlertHelper(title, message, name)

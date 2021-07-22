@@ -6,15 +6,14 @@ import { Table } from "antd";
 import anomalyDefService from "services/anomalyDefinitions.js";
 
 export default function RunStatusAnomalies(props) {
-
+  
   const [runStatusAnomalies, setRunStatusAnomalies] = useState('');
   const [loading, setLoading] = useState('');
   
   useEffect(() => {
-    if (!runStatusAnomalies) {
-        getRunStatusAnomalies(props.runStatusId);
-    }
-  });
+    console.log(props)
+    getRunStatusAnomalies(props.runStatusId);
+  }, [props]);
 
   const getRunStatusAnomalies = async (runStatusId) => {
     setLoading(true)
