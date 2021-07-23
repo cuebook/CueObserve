@@ -2,8 +2,8 @@ from utils.apiResponse import ApiResponse
 from anomaly.models import Setting
 from anomaly.serializers import SettingSerializer
 
-ANOMALY_ALERT_SLACK_URL = "Anomaly Alert via Slack Webhook Url"
-APP_ALERTS_SLACK_URL = "App Alerts via Slack Webhook Url"
+ANOMALY_ALERT_SLACK_URL = "Slack Webhook URL for Anomaly Alerts"
+APP_ALERTS_SLACK_URL = "Slack Webhook URL for App Monitoring"
 
 
 class Settings:

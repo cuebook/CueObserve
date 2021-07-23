@@ -2,9 +2,9 @@ import apiService from "./api";
 import { message } from "antd"
 
 class AnomalyService {
-    getAnomalys(publishedOnly){
+    getAnomalys(publishedOnly, offset, limit, searchText, sorter){
         let url = publishedOnly ? "anomaly/anomalys" : "anomaly/allanomalys"
-        return apiService.get(url)
+        return apiService.get(url + "?offset="+offset+ "&limit="+limit +"&searchText="+searchText + "&sorter="+ JSON.stringify(sorter))
         .then(response => {
             if(response.success == true){
                 return response.data
