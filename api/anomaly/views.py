@@ -26,11 +26,7 @@ class AnomalysView(APIView):
 
     def get(self, request):
         """get request"""
-        offset = int(request.GET.get("offset", 0))
-        limit = int(request.GET.get("limit", 50))
-        searchQuery = request.GET.get("searchText", "")
-        sorter= json.loads(request.GET.get("sorter", {}))
-        res = Anomalys.getAnomalys(publishedOnly=self.publishedOnly, offset = offset, limit = limit, searchQuery = searchQuery, sorter=sorter)
+        res = Anomalys.getAnomalys(publishedOnly=self.publishedOnly)
         return Response(res.json())
 
 
