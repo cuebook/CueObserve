@@ -23,7 +23,7 @@ class Druid:
             scheme="http"
             )
             curs = conn.cursor()
-            dataframe = pd.read_sql("SELECT 1", conn)
+            # dataframe = pd.read_sql("SELECT 1", conn, chunksize=None)
 
         except Exception as ex:
             logger.error("Can't connect to db with this credentials ")

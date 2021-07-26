@@ -19,11 +19,6 @@ class Anomalys:
         Gets anomalys
         """
         res = ApiResponse("Error in getting anomalies")
-
-        print("offset", offset)
-        print("limit", limit)
-        print("searchQuery", searchQuery)
-        anomaliesObj = None
         anomaliesObj = Anomaly.objects.filter(published=True) if publishedOnly else Anomaly.objects.all()
         count = anomaliesObj.count()
 
@@ -65,7 +60,11 @@ class Anomalys:
         Gets anomaly on user search 
         """
 
-        return anomaliesObj.filter(Q(anomalyDefinition__metric__icontains=searchQuery) | Q(dimensionVal__icontains=searchQuery) |Q(anomalyDefinition__dataset__name__icontains=searchQuery) | Q(anomalyDefinition__dataset__granularity__icontains=searchQuery) | Q(anomalyDefinition__dimension__icontains=searchQuery))
+        return anomaliesObj.filter(Q(anomalyDefinition__metric__icontains=searchQuery) 
+                                | Q(dimensionVal__icontains=searchQuery)
+                                | Q(anomalyDefinition__dataset__name__icontains=searchQuery) 
+                                | Q(anomalyDefinition__dataset__granularity__icontains=searchQuery) 
+                                | Q(anomalyDefinition__dimension__icontains=searchQuery))
 
     @staticmethod
     def sortOnAnomalys(anomaliesObj, sorter):
