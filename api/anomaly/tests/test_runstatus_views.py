@@ -41,4 +41,4 @@ def test_runstatus(client, mocker):
 
     response = client.get(path)
     assert response.status_code == 200
-    assert response.data["data"] == [{"dimensionVal": "Lko", "id": 1, "published": False}]
+    assert response.data["data"] == [{"dimensionVal": "Lko", "id": anomaly.id, "published": False}]
