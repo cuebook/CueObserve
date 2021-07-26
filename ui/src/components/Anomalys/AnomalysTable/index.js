@@ -69,9 +69,7 @@ export default function AnomalysTable(props) {
   }, []);
 
   const getAnomalys = async (publishedOnly=currentPublishedOnlyRef.current, currentPage = currentPageRef.current, searchText = searchTextRef.current, sorter=sorterRef.current) => {
-    // console.log("sortersldfjd", sorter)
     const data = await anomalyService.getAnomalys(publishedOnly, (currentPage-1)*limit, limit, searchText, sorter)
-    console.log("data", data)
     if (data && data.anomalies){
       setAnomalys(data.anomalies);
       setTotal(data.count)
@@ -86,8 +84,6 @@ const getOnlyPublishedAnomalys = (event) => {
   getAnomalys(event, currentPage)
 }
   const handleTableChange = (event, filter, sorter) => {
-    // setSorter({columnKey: sorter.columnKey, order: sorter.order})
-    // setFilter(filter)
     setCurrentPage(event.current)
     setSorter({"columnKey":sorter.columnKey, "order":sorter.order})
     getAnomalys(publishedOnly, event.current,searchText ,{"columnKey":sorter.columnKey, "order":sorter.order})
@@ -95,6 +91,7 @@ const getOnlyPublishedAnomalys = (event) => {
   }
   const searchInAnomaly = (val) =>{
     setSearchText(val)
+    setCurrentPage(1)
     getAnomalys(publishedOnly, 1, val)
   }
 
