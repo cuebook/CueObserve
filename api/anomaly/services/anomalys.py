@@ -1,7 +1,9 @@
 from django.template import Template, Context
+from anomaly.services import anomalyDefinitions
 from utils.apiResponse import ApiResponse
 from anomaly.models import Anomaly, AnomalyCardTemplate
 from anomaly.serializers import AnomalySerializer
+from django.db.models import Q
 
 ANOMALY_DAILY_TEMPLATE = "Anomaly Daily Template"
 ANOMALY_HOURLY_TEMPLATE= "Anomaly Hourly Template"
@@ -12,13 +14,22 @@ class Anomalys:
     """
 
     @staticmethod
-    def getAnomalys(publishedOnly=False):
+    def getAnomalys(publishedOnly: bool=False,offset: int=0, limit:int = 50, searchQuery: str=None, sorter: dict = {}):
         """
         Gets anomalys
         """
         res = ApiResponse("Error in getting anomalies")
-        anomalies = Anomaly.objects.filter(published=True) if publishedOnly else Anomaly.objects.all()
-        data = AnomalySerializer(anomalies, many=True).data
+        anomaliesObj = Anomaly.objects.filter(published=True) if publishedOnly else Anomaly.objects.all()
+        count = anomaliesObj.count()
+
+        if searchQuery:
+            anomaliesObj = Anomalys.searchOnAnomalys(anomaliesObj, searchQuery)
+            count = anomaliesObj.count()
+        if sorter.get("order", False):
+            anomaliesObj = Anomalys.sortOnAnomalys(anomaliesObj, sorter)
+        anomaliesObj = anomaliesObj[offset:offset+limit]
+        anomalies = AnomalySerializer(anomaliesObj, many=True).data
+        data = {"anomalies":anomalies , "count":count}
         res.update(True, "Successfully retrieved anomalies", data)
         return res
 
@@ -42,3 +53,77 @@ class Anomalys:
 
         res.update(True, "Successfully retrieved specified anomaly", data)
         return res
+
+    @staticmethod
+    def searchOnAnomalys(anomaliesObj,searchQuery):
+        """
+        Gets anomaly on user search 
+        """
+
+        return anomaliesObj.filter(Q(anomalyDefinition__metric__icontains=searchQuery) 
+                                | Q(dimensionVal__icontains=searchQuery)
+                                | Q(anomalyDefinition__dataset__name__icontains=searchQuery) 
+                                | Q(anomalyDefinition__dataset__granularity__icontains=searchQuery) 
+                                | Q(anomalyDefinition__dimension__icontains=searchQuery))
+
+    @staticmethod
+    def sortOnAnomalys(anomaliesObj, sorter):
+        """
+        Sort anomaly on user input
+        """
+
+        columnToSort = sorter.get("columnKey","")
+        sortOrder = sorter.get("order", "")
+
+        if columnToSort == "datasetName" and sortOrder == "ascend":
+            anomaliesObj = anomaliesObj.order_by("anomalyDefinition__dataset__name")        
+        if columnToSort == "datasetName" and sortOrder == "descend":
+            anomaliesObj = anomaliesObj.order_by("-anomalyDefinition__dataset__name")
+        
+        if columnToSort == "granularity" and sortOrder == "ascend":
+            anomaliesObj = anomaliesObj.order_by("anomalyDefinition__dataset__granularity")
+
+        if columnToSort == "granularity" and sortOrder == "descend":
+            anomaliesObj = anomaliesObj.order_by("-anomalyDefinition__dataset__granularity")
+
+        if columnToSort == "metric" and sortOrder == "ascend":
+            anomaliesObj = anomaliesObj.order_by("anomalyDefinition__metric")
+
+        if columnToSort == "metric" and sortOrder == "descend":
+            anomaliesObj = anomaliesObj.order_by("-anomalyDefinition__metric")
+
+        if columnToSort == "dimensionVal" and sortOrder == "ascend":
+            anomaliesObj = anomaliesObj.order_by("dimensionVal")
+
+        if columnToSort == "dimensionVal" and sortOrder == "descend":
+            anomaliesObj = anomaliesObj.order_by("-dimensionVal")
+
+        if columnToSort == "contribution" and sortOrder == "ascend":
+            anomaliesObj = anomaliesObj.order_by("data__contribution")
+
+        if columnToSort == "contribution" and sortOrder == "descend":
+            anomaliesObj = anomaliesObj.order_by("-data__contribution")
+        
+        if columnToSort == "contribution" and sortOrder == "ascend":
+            anomaliesObj = anomaliesObj.order_by("data__contribution")
+
+        if columnToSort == "contribution" and sortOrder == "descend":
+            anomaliesObj = anomaliesObj.order_by("-data__contribution")
+
+        if columnToSort == "anomaly" and sortOrder == "ascend":
+            anomaliesObj = anomaliesObj.order_by("data__anomalyLatest__percent")
+
+        if columnToSort == "anomaly" and sortOrder == "descend":
+            anomaliesObj = anomaliesObj.order_by("-data__anomalyLatest__percent")
+
+        if columnToSort == "anomalyTimeISO" and sortOrder == "ascend":
+            anomaliesObj = anomaliesObj.order_by("-data__anomalyLatest__anomalyTime")
+
+        if columnToSort == "anomalyTimeISO" and sortOrder == "descend":
+            anomaliesObj = anomaliesObj.order_by("data__anomalyLatest__anomalyTime")
+
+        return anomaliesObj
+        
+
+
+

@@ -122,7 +122,6 @@ class CustomSchedule(models.Model):
     )
 
 
-
 class Setting(models.Model):
     """
     Model class to store settings/config related to application

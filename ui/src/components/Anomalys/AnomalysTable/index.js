@@ -15,6 +15,7 @@ import {
 } from "antd";
 import { EyeOutlined } from '@ant-design/icons';
 import PopconfirmButton from "components/Utils/PopconfirmButton";
+
 const {Search} = Input
 
 const granularity = {
@@ -43,10 +44,22 @@ const granularity = {
  }
 
 export default function AnomalysTable(props) {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [total, setTotal] = useState(0)
+  const [limit] = useState(50);
+  const [publishedOnly, setPublishedOnly]= useState(false);
   const [anomalys, setAnomalys] = useState(null);
+  const [sorter, setSorter] = useState({})
   const [searchText, setSearchText] = useState("");
   const [searchedAnomaly, setSearchedAnomaly] = useState([]);
-
+  const currentPageRef = useRef(currentPage);
+  currentPageRef.current = currentPage;
+  const currentPublishedOnlyRef = useRef(publishedOnly);
+  currentPublishedOnlyRef.current = publishedOnly;
+  const sorterRef = useRef(sorter);
+  sorterRef.current = sorter;
+  const searchTextRef = useRef(searchText);
+  searchTextRef.current = searchText;
   const history = useHistory();
 
   useEffect(()=>{
@@ -55,15 +68,31 @@ export default function AnomalysTable(props) {
     }
   }, []);
 
-  const getAnomalys = async (publishedOnly) => {
-    const data = await anomalyService.getAnomalys(publishedOnly)
-    if (data && data.length){
-      setAnomalys(data);
+  const getAnomalys = async (publishedOnly=currentPublishedOnlyRef.current, currentPage = currentPageRef.current, searchText = searchTextRef.current, sorter=sorterRef.current) => {
+    const data = await anomalyService.getAnomalys(publishedOnly, (currentPage-1)*limit, limit, searchText, sorter)
+    if (data && data.anomalies){
+      setAnomalys(data.anomalies);
+      setTotal(data.count)
     }
   }
-
   const viewAnomaly = async (anomaly) => {
     history.push('/anomaly/' + anomaly.id)
+  }
+
+const getOnlyPublishedAnomalys = (event) => {
+  setPublishedOnly(event)
+  getAnomalys(event, currentPage)
+}
+  const handleTableChange = (event, filter, sorter) => {
+    setCurrentPage(event.current)
+    setSorter({"columnKey":sorter.columnKey, "order":sorter.order})
+    getAnomalys(publishedOnly, event.current,searchText ,{"columnKey":sorter.columnKey, "order":sorter.order})
+
+  }
+  const searchInAnomaly = (val) =>{
+    setSearchText(val)
+    setCurrentPage(1)
+    getAnomalys(publishedOnly, 1, val)
   }
 
   const columns = [
@@ -71,7 +100,7 @@ export default function AnomalysTable(props) {
       title: "Dataset",
       dataIndex: "datasetName",
       key: "datasetName",
-      sorter: (a, b) => a.datasetName.localeCompare(b.datasetName),
+      sorter: () => {},
       render: text => {
         return (
           <p>{text}</p>
@@ -82,7 +111,7 @@ export default function AnomalysTable(props) {
       title: "Granularity",
       dataIndex: "granularity",
       key: "granularity",
-      sorter: (a, b) => a.granularity.localeCompare(b.granularity),
+      sorter: () => {},
       render: text => {
         return (
           <p>
@@ -95,7 +124,7 @@ export default function AnomalysTable(props) {
       title: "Measure",
       dataIndex: "metric",
       key: "metric",
-      sorter: (a, b) => a.metric.localeCompare(b.metric),
+      sorter: () => {},
       render: text => {
         return (
           <p>{text}</p>
@@ -106,10 +135,7 @@ export default function AnomalysTable(props) {
       title: "Filter",
       dataIndex: "dimensionVal",
       key: "dimensionVal",
-      sorter: (a, b) => {
-        a= a.dimensionVal || "";
-        b= b.dimensionVal ||  "";
-        return a.localeCompare(b)},
+      sorter: () => {},
       render: (text, record) => {
         return text ? (
           <p>{record.dimension} = {text}</p>
@@ -120,7 +146,7 @@ export default function AnomalysTable(props) {
       title: "Filter's Contribution",
       dataIndex: "contribution",
       key: "contribution",
-      sorter: (a, b) => a.data.contribution > b.data.contribution ? 1 : -1,
+      sorter: () => {},
       render: (text, record) => {
         return (
           <p style={{float: "right"}}>{record.data.contribution.toFixed(2)}%</p>
@@ -131,7 +157,7 @@ export default function AnomalysTable(props) {
       title: "Last Anomaly",
       dataIndex: "anomaly",
       key: "anomaly",
-      sorter: (a, b) => a.data.anomalyLatest.percent > b.data.anomalyLatest.percent ? 1 : -1,
+      sorter: () => {},
       render: (text, record) => {
         let percentColor = record.data.anomalyLatest.highOrLow == "high" ? "green" : "red"
         let percentSign = record.data.anomalyLatest.highOrLow == "high" ? "+" : "-"
@@ -148,7 +174,7 @@ export default function AnomalysTable(props) {
       title: "Anomaly Time",
       dataIndex: "anomalyTimeISO",
       key: "anomalyTimeISO",
-      sorter: (a, b) => -a.data.anomalyLatest.anomalyTimeISO.localeCompare(b.data.anomalyLatest.anomalyTimeISO),
+      sorter: () =>{},
       render: (text, record) => {
         return (
           <div>
@@ -158,11 +184,6 @@ export default function AnomalysTable(props) {
       }
     }
   ]
-const searchInAnomaly = (val) =>{
-  setSearchText(val)
-  let convertedAnomaly = search(anomalys, ["datasetName", "granularity", "metric", "dimensionVal"], val)
-  setSearchedAnomaly(convertedAnomaly)
-}
 
 
   return (
@@ -176,7 +197,7 @@ const searchInAnomaly = (val) =>{
               className="mr-2"
             />
           <div>
-            Published Only: <Switch onChange={getAnomalys} />  
+            Published Only: <Switch onChange={getOnlyPublishedAnomalys} />  
           </div> 
       </div>
       <Table
@@ -185,12 +206,16 @@ const searchInAnomaly = (val) =>{
         })}
         rowKey={"id"}
         scroll={{ x: "100%" }}
+        onChange={handleTableChange}
         columns={columns}
-        dataSource={ searchText.length > 0 ? searchedAnomaly: anomalys}
+        dataSource={anomalys}
         pagination={{
-          defaultPageSize : 50,
-          total : searchText.length > 0 ? searchedAnomaly.length: anomalys ? anomalys.length : 50
+          showSizeChanger: false,
+          current: currentPage,
+          pageSize : limit,
+          total : anomalys ? total : 50
         }}
+        size={"small"}
       />
     </div>
   )
