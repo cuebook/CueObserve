@@ -6,6 +6,7 @@ from anomaly.models import AnomalyDefinition, Dataset, CustomSchedule as Schedul
 from anomaly.serializers import AnomalyDefinitionSerializer, RunStatusSerializer
 from django_celery_beat.models import PeriodicTask, PeriodicTasks, CrontabSchedule
 from ops.tasks import anomalyDetectionJob
+from django.db.models import Q, Max
 
 CELERY_TASK_NAME = "ops.tasks.anomalyDetectionJob"
 RUN_STATUS_LIMIT = 10
@@ -13,17 +14,66 @@ RUN_STATUS_LIMIT = 10
 class AnomalyDefinitions:
 
     @staticmethod
-    def getAllAnomalyDefinition():
+    def getAllAnomalyDefinition(offset: int=0, limit: int=50, searchQuery: str=None, sorter: dict={}):
         """
         This method is used to get all anomlayObj
         """
-
         response = ApiResponse("Error in getting Anomaly Definition !")
-        anomalyDef = AnomalyDefinition.objects.all().order_by("-id")
-        anomalyDefSerializer = AnomalyDefinitionSerializer(anomalyDef, many=True)
-        response.update(True, "AnomalyDefinitions retrived successfully !", anomalyDefSerializer.data)
+        anomalyDefObjs = AnomalyDefinition.objects.all().order_by("-id")
+        count =  anomalyDefObjs.count()
+
+        if searchQuery:
+            anomalyDefObjs = AnomalyDefinitions.searchOnAnomalyDefinition(anomalyDefObjs, searchQuery)
+            count = anomalyDefObjs.count()
+        if sorter.get("order", False):
+            anomalyDefObjs = AnomalyDefinitions.sortOnAnomalyDefinition(anomalyDefObjs, sorter)
+        anomalyDefObjs = anomalyDefObjs[offset:offset+limit]
+        anomalyDefData = AnomalyDefinitionSerializer(anomalyDefObjs, many=True).data
+        data={"anomalyDefinition":anomalyDefData, "count":count}
+        
+        response.update(True, "AnomalyDefinitions retrived successfully !", data)
 
         return response
+
+    @staticmethod
+    def searchOnAnomalyDefinition(anomalyDefObjs, searchQuery):
+        """
+        Search on AnomalyDefinition 
+        """
+        return anomalyDefObjs.filter(
+            Q(dataset__name__icontains=searchQuery) |
+            Q(dataset__granularity__icontains=searchQuery) | 
+            Q(metric__icontains=searchQuery) | 
+            Q(highOrLow__icontains=searchQuery) | 
+            Q(dimension__icontains=searchQuery)| 
+            Q(top__icontains=searchQuery))
+
+    @staticmethod
+    def sortOnAnomalyDefinition(anomalyDefObjs: List[AnomalyDefinition], sorter):
+        """
+        Sort Anomaly Definition on given user column
+        """
+        columnToSort = sorter.get("columnKey", "")
+        order = sorter.get("order", "")
+        sortingPrefix = "" if order=="ascend" else "-"
+
+        if columnToSort == "datasetName":
+            anomalyDefObjs = anomalyDefObjs.order_by(sortingPrefix + "dataset__name")
+
+        if columnToSort == "granularity":
+            anomalyDefObjs = anomalyDefObjs.order_by(sortingPrefix + "dataset__granularity")
+
+        if columnToSort == "anomalyDef":
+            anomalyDefObjs = anomalyDefObjs.order_by(sortingPrefix + "top")
+
+        if columnToSort == "lastRun" :
+            anomalyDefObjs = anomalyDefObjs.annotate(latestRun=Max('runstatus__startTimestamp')).order_by(sortingPrefix + 'latestRun')
+            return anomalyDefObjs
+
+        if columnToSort == "lastRunStatus":
+            anomalyDefObjs = anomalyDefObjs.annotate(latestRun=Max('runstatus__status')).order_by(sortingPrefix + 'latestRun')
+        
+        return anomalyDefObjs
 
     @staticmethod
     def addAnomalyDefinition(metric: str = None, dimension: str = None, highOrLow: str = None, top: int = 0, datasetId: int = 0):

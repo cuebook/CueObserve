@@ -156,7 +156,11 @@ class AnomalyDefView(APIView):
     """
 
     def get(self, request):
-        res = AnomalyDefinitions.getAllAnomalyDefinition()
+        offset = int(request.GET.get("offset", 0))
+        limit = int(request.GET.get("limit", 50))
+        searchQuery = request.GET.get("searchText", "")
+        sorter = json.loads(request.GET.get("sorter", '{}'))
+        res = AnomalyDefinitions.getAllAnomalyDefinition(offset=offset, limit=limit, searchQuery=searchQuery, sorter=sorter)
         return Response(res.json())
 
     def post(self, request):
