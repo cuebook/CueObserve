@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Table, Button, Popconfirm, Input, message, Tooltip, Drawer, Modal } from "antd";
 import AddAnomalyDef from "./AddAnomalyDef.js"
 import EditAnomalyDef from "./EditAnomalyDef.js"
@@ -10,7 +10,7 @@ import anomalyDefService from "services/anomalyDefinitions.js"
 import scheduleService from "services/schedules"
 import SelectSchedule from "components/Schedule/SelectSchedule"
 import style from "./style.module.scss";
-import { search } from "services/general.js"
+// import { search } from "services/general.js"
 
 
 const { Search } = Input;
@@ -38,20 +38,29 @@ export default function Connection() {
   const [runStatusAnomalyDef, setRunStatusAnomalyDef] = useState();
   const [isRunStatusDrawerVisible, setIsRunStatusDrawerVisible] = useState(false);
   const [searchText, setSearchText] = useState("");
-  const [searchedAnomalyDef, setSearchedAnomalyDef] = useState([]);
   const [latestAnomaliesRunStatusId, setLatestAnomaliesRunStatusId] = useState();
   const [latestAnomaliesModalVisibile, setLatestAnomaliesModalVisibile] = useState(false);
-
+  const [limit] = useState(50)
+  const [total, setTotal] = useState(0) 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [sorter, setSorter] = useState({})
+  const currentPageRef = useRef(currentPage);
+  currentPageRef.current = currentPage;
+  const sorterRef = useRef(sorter);
+  sorterRef.current = sorter;
+  const searchTextRef = useRef(searchText);
+  searchTextRef.current = searchText;
   useEffect(() => {
     if (!data) {
         fetchData();
     }
   }, []);
 
-  const fetchData = async () => {
-    const response = await anomalyDefService.getAnomalyDefs();
-    if(response){
-      setData(response.data)
+  const fetchData = async (currentPage = currentPageRef.current, searchText = searchTextRef.current, sorter = sorterRef.current) => {
+    const response = await anomalyDefService.getAnomalyDefs((currentPage -1)*limit, limit, searchText, sorter);
+    if(response && response.data){
+      setData(response.data.anomalyDefinition)
+      setTotal(response.data.count)
     }
   }
 
@@ -152,12 +161,18 @@ const unassignSchedule = async (anomalyDefId) => {
     message.error(response.message)
   }
 }
+const handleTableChange = (event, filter, sorter) => {
+  setCurrentPage(event.current)
+  setSorter({"columnKey":sorter.columnKey, "order":sorter.order})
+  fetchData(event.current, searchText,{"columnKey":sorter.columnKey, "order":sorter.order})
+}
+
 
 
 const searchInAnomalyDef = (val) =>{
   setSearchText(val)
-  let convertedAnomalyDef = search(data, ["datasetName", "datasetGranularity", "metric", "dimension", "highOrLow", "top"], val)
-  setSearchedAnomalyDef(convertedAnomalyDef)
+  setCurrentPage(1)
+  fetchData(1, val, sorter)
 }
 
   const columns = [    
@@ -165,7 +180,7 @@ const searchInAnomalyDef = (val) =>{
         title: "Dataset",
         dataIndex: "datasetName",
         key: "datasetName",
-        sorter:(a, b) =>   a.datasetName.localeCompare(b.datasetName),
+        sorter:(a, b) =>   {},
 
         render: (text, record) => {
           return (
@@ -180,7 +195,7 @@ const searchInAnomalyDef = (val) =>{
         title: "Granularity",
         dataIndex: "datasetGranularity",
         key: "granularity",
-        sorter:(a, b) => a.datasetGranularity.localeCompare(b.datasetGranularity),
+        sorter:(a, b) => {},
         render: (text, record) => {
           return (
             <div>
@@ -193,7 +208,7 @@ const searchInAnomalyDef = (val) =>{
         title: "Anomaly Definition",
         dataIndex: "anomalyDef",
         key: "anomalyDef",
-        sorter:(a, b) => parseInt(a.anomalyDef.top) - parseInt(b.anomalyDef.top),
+        sorter:(a, b) => {},
         render:(text, record) => {
           return (         
                 <div style={{fontSize:14}}>
@@ -212,11 +227,7 @@ const searchInAnomalyDef = (val) =>{
         title: "Schedule",
         dataIndex: "schedule",
         key: "schedule",
-        sorter:(a, b) =>  { 
-          a = a && a.schedule || '';
-          b = b && b.schedule || '';
-          return a.localeCompare(b)
-      },
+        // sorter:(a, b) =>  {}, Will implement in future if needed
         render: (schedule, record) => {
           if(schedule && selectedAnomalyDef != record.id){
             return (
@@ -250,28 +261,21 @@ const searchInAnomalyDef = (val) =>{
         title: "Last Run",
         dataIndex: "lastRun",
         key: "lastRun",
-        sorter: (a, b) =>{ return (new Date(a.lastRun) - new Date(b.lastRun))},
+        sorter: (a, b) =>{},
 
       },
       {
         title: "Last Run Status",
         dataIndex: "lastRunStatus",
         key: "lastRunStatus",
-        sorter: (a, b) => {
-          a = a.lastRunStatus || " ";
-          b = b.lastRunStatus || " ";
-          return a.localeCompare(b)},
+        sorter: (a, b) => {},
 
       },
       {
         title: "Last Run Anomalies",
         dataIndex: "lastRunAnomalies",
         key: "lastRunAnomalies",
-        sorter: (a, b) => { 
-          a = (a.lastRunAnomalies && a.lastRunAnomalies.numAnomaliesPulished) || "";
-          b = (b.lastRunAnomalies && b.lastRunAnomalies.numAnomaliesPulished) || "";
-          return a - b
-        },
+        // sorter: (a, b) => {}, Will implement in future if needed
         render: (text, record) => {
           return (
             <span>
@@ -323,7 +327,7 @@ const searchInAnomalyDef = (val) =>{
                 style={{ margin: "0 0 10px 0" , width:350, float: "left"}}
                 placeholder="Search"
                 enterButton="Search"
-                onSearch={searchInAnomalyDef}
+                onSearch={e=>searchInAnomalyDef(e)}
                 className="mr-2"
               />
         <Button
@@ -338,12 +342,16 @@ const searchInAnomalyDef = (val) =>{
             rowKey={"id"}
             scroll={{ x: "100%" }}
             columns={columns}
-            dataSource={searchText.length > 0 ? searchedAnomalyDef : data}
-            size={"small"}
+            dataSource={data}
+            onChange={handleTableChange}
             pagination={{
-              defaultPageSize:50,
-              total:  searchText.length > 0 ? searchedAnomalyDef.length : data ? data.length : 50
+
+              showSizeChanger: false,
+              current: currentPage,
+              pageSize : limit,
+              total : data ? total : 50
             }}
+            size={"small"}
             
         />
         {

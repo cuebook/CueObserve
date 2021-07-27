@@ -146,34 +146,7 @@ class AnomalyDefinitionSerializer(serializers.ModelSerializer):
     lastRunAnomalies = serializers.SerializerMethodField()
     datasetName = serializers.SerializerMethodField()
     datasetGranularity = serializers.SerializerMethodField()
-    metric = serializers.SerializerMethodField()
-    dimension = serializers.SerializerMethodField()
-    highOrLow = serializers.SerializerMethodField()
-    top = serializers.SerializerMethodField()
-
-    def get_metric(self, obj):
-        """
-        Gets metric name
-        """
-        return obj.metric
-
-    def get_dimension(self, obj):
-        """
-        Gets metric name
-        """
-        return obj.dimension
-
-    def get_highOrLow(self, obj):
-        """
-        Gets metric name
-        """
-        return obj.highOrLow
-
-    def get_top(self, obj):
-        """
-        Gets metric name
-        """
-        return obj.top
+    
     def get_datasetName(self, obj):
         """
         Gets name of dataset
@@ -223,7 +196,7 @@ class AnomalyDefinitionSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = AnomalyDefinition
-        fields = ["id",  "anomalyDef", "schedule", "lastRun", "lastRunStatus", "lastRunAnomalies", "datasetName", "datasetGranularity", "metric", "dimension", "highOrLow", "top"]
+        fields = ["id",  "anomalyDef", "schedule", "lastRun", "lastRunStatus", "lastRunAnomalies", "datasetName", "datasetGranularity"]
 
 class AnomalySerializer(serializers.ModelSerializer):
     """

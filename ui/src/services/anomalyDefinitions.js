@@ -3,8 +3,8 @@ import { message } from "antd"
 
 class AnomalyDefService {
 
-    async getAnomalyDefs(){
-        const response = await apiService.get("anomaly/anomalyDefs")
+    async getAnomalyDefs(offset, limit, searchText, sorter){
+        const response = await apiService.get("anomaly/anomalyDefs"+"?offset="+offset+"&limit="+limit+"&searchText="+searchText+"&sorter="+JSON.stringify(sorter))
         return response
     }
     async addAnomalyDef(payload){
