@@ -66,13 +66,20 @@ def anomalyDetectionJob(anomalyDef_id: int, manualRun: bool = False):
     # Slack alerts
     title = "CueObserve Alerts"
     if runStatusObj.status == ANOMALY_DETECTION_SUCCESS:
-        message = "Anomaly Detection Job succeeded for AnomalyDefintion id : " + str(anomalyDef_id)
-        message = message + str(logs["log"])
+        message = "Anomaly Detection Job succeeded for AnomalyDefintion id : " + str(anomalyDef_id) + "\n"
+        message = message + "Numer of anomaly subtasks: " + str(logs["numAnomalySubtasks"]) + "\n"
+        message = message + "Numer of anomalies published: " + str(logs["numAnomaliesPulished"]) + "\n"
+        resultsLog = json.loads(logs["log"])
+        if len(resultsLog.values()) > 1:
+            message = message + "Dimension Values:" + "\n"
+            for subtask in resultsLog.values():
+                pub = "Published" if subtask["published"] else "Not Published"
+                message = message + "  " + subtask["dimVal"] + ": " + pub + "\n"
         name = "anomalyAlert"
         SlackAlert.slackAlertHelper(title, message, name)
     
     if runStatusObj.status == ANOMALY_DETECTION_ERROR:
-        message = "Anomaly Detection Job failed on AnomalyDefintion id : " + str(anomalyDef_id)
+        message = "Anomaly Detection Job failed on AnomalyDefintion id : " + str(anomalyDef_id) + "\n"
         message = message + str(logs["log"])
         name = "appAlert"
         SlackAlert.slackAlertHelper(title, message, name)
