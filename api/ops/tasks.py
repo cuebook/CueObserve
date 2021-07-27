@@ -2,14 +2,20 @@ import json
 import traceback
 import datetime as dt
 import pandas as pd
+import html2text
+from django.template import Template, Context
 from celery import shared_task, group
 from celery.result import allow_join_result
 
-from anomaly.models import Anomaly, AnomalyDefinition, RunStatus
+from anomaly.models import Anomaly, AnomalyDefinition, RunStatus, AnomalyCardTemplate
+from anomaly.serializers import AnomalySerializer
 from access.data import Data
 from access.utils import prepareAnomalyDataframes
 from ops.anomalyDetection import anomalyService
 from anomaly.services.slack import SlackAlert
+
+ANOMALY_DAILY_TEMPLATE = "Anomaly Daily Template"
+ANOMALY_HOURLY_TEMPLATE= "Anomaly Hourly Template"
 
 ANOMALY_DETECTION_RUNNING = "RUNNING"
 ANOMALY_DETECTION_SUCCESS = "SUCCESS"
@@ -66,13 +72,25 @@ def anomalyDetectionJob(anomalyDef_id: int, manualRun: bool = False):
     # Slack alerts
     title = "CueObserve Alerts"
     if runStatusObj.status == ANOMALY_DETECTION_SUCCESS:
-        message = "Anomaly Detection Job succeeded for AnomalyDefintion id : " + str(anomalyDef_id)
-        message = message + str(logs["log"])
-        name = "anomalyAlert"
-        SlackAlert.slackAlertHelper(title, message, name)
+        if logs.get("numAnomaliesPulished", 0) > 0:
+            message = f"{logs['numAnomaliesPulished']} anomalies published. \n"
+            message = message + f"Anomaly Definition: {anomalyDefinition.metric} {anomalyDefinition.dimension} {anomalyDefinition.highOrLow} \n"
+            message = message + f"Dataset: {anomalyDefinition.dataset.name} | Granularity: {anomalyDefinition.dataset.granularity} \n \n"
+            
+            highestContriAnomaly = anomalyDefinition.anomaly_set.order_by("data__contribution").last()
+            data = AnomalySerializer(highestContriAnomaly).data
+            templateName = ANOMALY_DAILY_TEMPLATE if anomalyDefinition.dataset.granularity == "day" else ANOMALY_HOURLY_TEMPLATE
+            cardTemplate = AnomalyCardTemplate.objects.get(templateName=templateName)
+            data.update(data["data"]["anomalyLatest"])
+            
+            message = message + html2text.html2text(Template(cardTemplate.title).render(Context(data))) + "\n"
+            message = message + html2text.html2text(Template(cardTemplate.bodyText).render(Context(data)))
+
+            name = "anomalyAlert"
+            SlackAlert.slackAlertHelper(title, message, name)
     
     if runStatusObj.status == ANOMALY_DETECTION_ERROR:
-        message = "Anomaly Detection Job failed on AnomalyDefintion id : " + str(anomalyDef_id)
+        message = "Anomaly Detection Job failed on AnomalyDefintion id : " + str(anomalyDef_id) + "\n"
         message = message + str(logs["log"])
         name = "appAlert"
         SlackAlert.slackAlertHelper(title, message, name)

@@ -204,6 +204,7 @@ const getOnlyPublishedAnomalys = (event) => {
         onRow={(record) => ({
           onClick: () => viewAnomaly(record),
         })}
+        rowClassName={style.row}
         rowKey={"id"}
         scroll={{ x: "100%" }}
         onChange={handleTableChange}
