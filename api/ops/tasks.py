@@ -85,13 +85,9 @@ def anomalyDetectionJob(anomalyDef_id: int, manualRun: bool = False):
             
             message = message + html2text.html2text(Template(cardTemplate.title).render(Context(data))) + "\n"
             message = message + html2text.html2text(Template(cardTemplate.bodyText).render(Context(data)))
-        else:
-            message = "No anomalies published. \n"
-            message = message + f"Anomaly Definition: {anomalyDefinition.metric} {anomalyDefinition.dimension} {anomalyDefinition.highOrLow} \n"
-            message = message + f"Dataset: {anomalyDefinition.dataset.name} | Granularity: {anomalyDefinition.dataset.granularity} \n \n"
 
-        name = "anomalyAlert"
-        SlackAlert.slackAlertHelper(title, message, name)
+            name = "anomalyAlert"
+            SlackAlert.slackAlertHelper(title, message, name)
     
     if runStatusObj.status == ANOMALY_DETECTION_ERROR:
         message = "Anomaly Detection Job failed on AnomalyDefintion id : " + str(anomalyDef_id) + "\n"
