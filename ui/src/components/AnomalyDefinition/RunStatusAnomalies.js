@@ -32,7 +32,7 @@ export default function RunStatusAnomalies(props) {
       render: (text, record) => {
         return (
           <span>
-            <a href={"#/anomaly/"+record.id}>{text}</a>
+            <a href={"#/anomaly/"+record.id} className={style.linkText}>{text}</a>
           </span>
         );
       }
