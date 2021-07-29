@@ -92,7 +92,10 @@ class ScheduleService:
     def deleteSchedule(scheduleId: int):
         """ Service to delete schedule of given scheduleId """
         res = ApiResponse()
-        Schedule.objects.filter(id=scheduleId).delete()
+        schedule = Schedule.objects.get(id=scheduleId)
+        crontabId = schedule.cronSchedule_id
+        CrontabSchedule.objects.get(id=crontabId).delete()
+        schedule.delete()
         res.update(True, "Schedules deleted successfully", [])
         return res
 
