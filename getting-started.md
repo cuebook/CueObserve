@@ -3,7 +3,7 @@
 ## Install via Docker
 
 ```text
-docker run -p 3000:80 cuebook/cueobserve
+docker run -p 3000:3000 cuebook/cueobserve
 ```
 
 Now visit [localhost:3000](http://localhost:3000) in your browser. 

@@ -3,7 +3,7 @@
 ## Install via Docker
 
 ```text
-docker run -p 3000:80 cuebook/cueobserve
+docker run -p 3000:3000 cuebook/cueobserve
 ```
 
 Now visit [localhost:3000](http://localhost:3000) in your browser. 
@@ -23,12 +23,8 @@ POSTGRES_DB_PORT=5432
 ```
 
 ```text
-docker run --env-file .env -dp 3000:80 cuebook/cueobserve
+docker run --env-file .env -dp 3000:3000 cuebook/cueobserve
 ```
 
-
-
-
-
-
+In case your postgres is hosted locally, pass flag `--network="host"` to connect docker to localhost of machine.
 
