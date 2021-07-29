@@ -1,5 +1,5 @@
 ---
-description: Commands for installation and running services locally
+description: Commands for installation and running services for development
 ---
 
 # Development
