@@ -23,7 +23,7 @@ With CueObserve, you can run anomaly detection on data in your SQL data warehous
 Install via Docker
 
 ```
-docker run -p 3000:80 cuebook/cueobserve
+docker run -p 3000:3000 cuebook/cueobserve
 ```
 Now visit [http://localhost:3000](http://localhost:3000) in your browser. 
 
