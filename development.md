@@ -4,14 +4,9 @@ description: Commands for installation and running services for development
 
 # Development
 
-### UI
+### UI 
 
-CueObserve's UI is built using 
-
-\[gitbook landing page\]\(https://www.gitbook.com/book/seadude/linking/details\)
-
-  
-, it's code can be found at `ui/`
+CueObserve's UI is `javascript` based. It's built using reactjs, a JavaScript library for building user interfaces. The code for UI can be found in `ui/` directory.
 
 #### Setup & Start UI server
 
@@ -21,9 +16,15 @@ npm i    # install dependencies
 npm start    # start development server
 ```
 
+The UI server by default runs on [http://localhost:3000/](https://reactjs.org/)
+
+### Backend 
+
+CueObserve's backend is `python3.7` based. It incorporates Django, a high-level Python Web framework .  Celery is used for running tasks like Anomaly Detection, scheduled or ran manually, which can be time consuming and run out of the request-response cycle. Celery Beat is used as a scheduler and Redis is a requirement for celery. The code for backend can be found in `api/` directory.
+
 #### Backend Setup 
 
-Requirements: `python3.7`
+Prerequisite: `python3.7`
 
 Note: Before running any command in `api` directory ensure you have python3.7 as `source`, as below:
 
@@ -48,10 +49,6 @@ python manage.py loaddata seeddata/*.json
 ```text
 python manage.py runserver
 ```
-
-
-
-Celery is used for running scheduled tasks like Anomaly Detection and is also used when tasks are ran manually. Redis is a requirement for celery.
 
 #### Run Redis via Docker
 
