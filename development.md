@@ -11,9 +11,9 @@ CueObserve's UI is `javascript` based. It's built using reactjs, a JavaScript li
 #### Setup & Start UI server
 
 ```text
-cd ui    # go to ui directory
-npm i    # install dependencies
-npm start    # start development server
+cd ui
+npm install    # install dependencies
+npm start      # start development server
 ```
 
 This starts UI server on [http://localhost:3000/](https://reactjs.org/)
@@ -29,9 +29,9 @@ Note: Before running any command in `api` directory ensure you have python3.7 as
 #### Backend Setup
 
 ```text
-cd api    # go to api directory
-python3.7 -m virtualenv myenv    # make python3.7 virtual environment
-source myenv/bin/activate         # activate virtual environment
+cd api
+python3.7 -m virtualenv myenv       # make python3.7 virtual environment
+source myenv/bin/activate           # activate virtual environment
 
 pip install -r requirements.txt     # install dependencies
 
