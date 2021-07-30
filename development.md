@@ -4,6 +4,15 @@ description: Commands for installation and running services for development
 
 # Development
 
+### UI
+
+CueObserve's UI is built using 
+
+\[gitbook landing page\]\(https://www.gitbook.com/book/seadude/linking/details\)
+
+  
+, it's code can be found at `ui/`
+
 #### Setup & Start UI server
 
 ```text
