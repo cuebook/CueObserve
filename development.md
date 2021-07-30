@@ -98,3 +98,17 @@ And then source these variables before running backend commands
 source .env.dev
 ```
 
+### Docker
+
+To build the docker image, run following command in main directory
+
+```text
+docker build -t cuebook/cueobserve .
+```
+
+To run the image, currently exposed on port 3000
+
+```text
+docker run -dp 3000:3000 cuebook/cueobserve
+```
+
