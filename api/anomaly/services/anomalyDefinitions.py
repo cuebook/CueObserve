@@ -76,7 +76,7 @@ class AnomalyDefinitions:
         return anomalyDefObjs
 
     @staticmethod
-    def addAnomalyDefinition(metric: str = None, dimension: str = None, highOrLow: str = None, top: int = 0, datasetId: int = 0):
+    def addAnomalyDefinition(metric: str = None, dimension: str = None, operation: str=None ,highOrLow: str = None, value: int = 0, datasetId: int = 0):
         """
         This method is used to add anomaly to AnomalyDefinition table
         """
@@ -86,7 +86,8 @@ class AnomalyDefinitions:
             metric=metric,
             dimension=dimension,
             highOrLow=highOrLow,
-            top=top
+            value=value,
+            operation=operation
         )
         response.update(True, "Anomaly Definition created successfully !")
         return response

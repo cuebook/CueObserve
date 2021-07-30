@@ -33,20 +33,23 @@ function getSelectedOptions(anomalyDef){
             color: "#12b1ff",
             isFixed: true
           });
-          temp.push({
-            value: "Top",
-            label: "Top",
-            optionType: "Top",
-            color: "#ff6767",
-            isFixed: true
-          });
-          temp.push({
-            value: anomalyDef.top,
-            label: anomalyDef.top,
-            optionType: "Dimension Values",
-            color: "#ff6767",
-            isFixed: true
-          });
+          if(anomalyDef.operation){
+
+            temp.push({
+              value: anomalyDef.operation,
+              label: anomalyDef.operation,
+              optionType: "Top",
+              color: "#ff6767",
+              isFixed: true
+            });
+            temp.push({
+              value: anomalyDef.value,
+              label: anomalyDef.value,
+              optionType: "Dimension Values",
+              color: "#ff6767",
+              isFixed: true
+            });
+          }
           
     }
     if(anomalyDef.highOrLow){
@@ -282,7 +285,7 @@ export default function EditAnomalyDef(props){
   const handleIsFocused = (val) => {
     setIsFocused(val)
   }
-
+console.log("selectedOption", selectedOption)
     // var datasetOption = [];
     // datasetOption = allDatasets && allDatasets.map(dataset => (
     //   <Option value={dataset.id} key={dataset.id}>
@@ -349,7 +352,7 @@ export default function EditAnomalyDef(props){
                   MultiValueContainer: multiValueContainer
                 }}
                 options={options}
-                placeholder={`Measure [Dimension Top N] [High/Low] `}
+                placeholder={`Measure [Dimension] [Top N / Min % Contribution X / Min Value Y] [High/Low] `}
               />
 
             </div>

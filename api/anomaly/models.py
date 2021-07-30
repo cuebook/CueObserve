@@ -71,7 +71,8 @@ class AnomalyDefinition(models.Model):
     metric = models.TextField(null=True, blank=True)
     dimension = models.TextField(null=True, blank=True)
     highOrLow = models.TextField(null=True, blank=True)
-    top = models.IntegerField(default=10)
+    value = models.CharField(default=0, max_length=500)
+    operation = models.CharField(null=True, blank=True, max_length=500)
     periodicTask = models.OneToOneField(
         "django_celery_beat.PeriodicTask",
         on_delete=models.SET_NULL,

@@ -166,7 +166,8 @@ class AnomalyDefinitionSerializer(serializers.ModelSerializer):
         params["metric"] = obj.metric
         params["dimension"] = obj.dimension
         params["highOrLow"] = obj.highOrLow
-        params["top"] = obj.top
+        params["operation"] = obj.operation
+        params["value"] = obj.value
         return params
 
     def get_schedule(self, obj):
