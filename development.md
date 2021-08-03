@@ -10,6 +10,8 @@ CueObserve's UI is `javascript` based. It's built using reactjs, a JavaScript li
 
 #### Setup & Start UI server
 
+Prerequisite: node v12 
+
 ```text
 cd ui
 npm install    # install dependencies
