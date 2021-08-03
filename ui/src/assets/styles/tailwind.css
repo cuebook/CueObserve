@@ -2961,3 +2961,16 @@ video {
     margin: 0px 0px !important;
   }
   
+
+
+// Styles for rca Table
+.rcaTable > .ant-table-tbody > tr > td {
+    padding: 0px 0px 0px 8px;
+    overflow-wrap: break-word;
+}
+.rcaTable {
+  padding-bottom: 10px !important;
+}
+.rcaTableSub > .ant-table-body {
+    overflow-y: hidden !important;
+}

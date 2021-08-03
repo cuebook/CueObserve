@@ -32,7 +32,11 @@ urlpatterns = [
     path("editAnomalyDef", views.AnomalyDefView.as_view(), name="editAnomalyDef"),
     path("runAnomalyDef/<int:anomalyDefId>", views.runAnomalyDef, name="runAnomalyDef"),
     # RunStatus
-    path("runStatusAnomalies/<int:runStatusId>", views.runStatusAnomalies, name="runStatusAnomalies"),
+    path(
+        "runStatusAnomalies/<int:runStatusId>",
+        views.runStatusAnomalies,
+        name="runStatusAnomalies",
+    ),
     path(
         "runStatus/<int:anomalyDefId>", views.getDetectionRuns, name="getDetectionRuns"
     ),
@@ -49,4 +53,6 @@ urlpatterns = [
     ),
     # Settings
     path("settings", views.SettingsView.as_view(), name="settings"),
+    # Root Cause Analysis
+    path("rca/<int:anomalyId>", views.RCAView.as_view(), name="rca"),
 ]
