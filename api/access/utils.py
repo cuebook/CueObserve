@@ -18,7 +18,6 @@ def prepareAnomalyDataframes(datasetDf, timestampCol, metricCol, dimensionCol=No
     if dimensionCol:
         if operation == "Top":
             dimValsData = topNDimensionalValues(datasetDf, timestampCol, metricCol, dimensionCol, value)
-            pass
         elif operation == "Min % Contribution":
             dimValsData = contributionOnDimensionalValues(datasetDf, timestampCol, metricCol, dimensionCol, value)
 

@@ -231,6 +231,7 @@ class ScheduleSerializer(serializers.ModelSerializer):
     schedule = serializers.SerializerMethodField()
     crontab = serializers.SerializerMethodField()
     timezone = serializers.SerializerMethodField()
+    assignedSchedule = serializers.SerializerMethodField()
 
     def get_schedule(self, obj):
         """
@@ -253,9 +254,14 @@ class ScheduleSerializer(serializers.ModelSerializer):
             self.cronexp(obj.cronSchedule.day_of_week)
         )
 
+    def get_assignedSchedule(self, obj):
+        """ Gets count of schedule assigned to Anomaly Definition"""
+        cronId = Schedule.objects.get(id=obj.id).cronSchedule_id
+        count = AnomalyDefinition.objects.filter(periodicTask__crontab_id=cronId).count()
+        return count
     class Meta:
         model = Schedule
-        fields = ["id", "schedule","name","timezone","crontab"]
+        fields = ["id", "schedule","name","timezone","crontab", "assignedSchedule"]
 
 class RunStatusSerializer(serializers.ModelSerializer):
     """
