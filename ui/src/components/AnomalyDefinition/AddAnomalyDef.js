@@ -390,7 +390,6 @@ const getDataset = async (datasetId) => {
       message.error("At least Measure required to configure Anomaly Definition !");
       return;
     }
-console.log("selectedOption", selectedOption)
     var payload = {
       datasetId: datasetId,
       measure: selectedOption[0].value
@@ -433,7 +432,6 @@ console.log("selectedOption", selectedOption)
         operationValueOnDimension = item.value
       }
     });
-    console.log("payload", payload)
 
     if(isDimension && _.isNull(operationOnDimension)){
       message.error("Please Enter Operation you want to perform on Dimension");

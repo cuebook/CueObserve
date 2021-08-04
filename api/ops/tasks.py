@@ -46,7 +46,7 @@ def anomalyDetectionJob(anomalyDef_id: int, manualRun: bool = False):
     allTasksSucceeded = False
     try:
         datasetDf = Data.fetchDatasetDataframe(anomalyDefinition.dataset)
-        dimValsData = prepareAnomalyDataframes(datasetDf, anomalyDefinition.dataset.timestampColumn, anomalyDefinition.metric, anomalyDefinition.dimension, anomalyDefinition.top)
+        dimValsData = prepareAnomalyDataframes(datasetDf, anomalyDefinition.dataset.timestampColumn, anomalyDefinition.metric, anomalyDefinition.dimension,anomalyDefinition.operation ,int(anomalyDefinition.value))
         detectionJobs = group(
             _anomalyDetectionSubTask.s(anomalyDef_id, obj["dimVal"], obj["contriPercent"], obj["df"].to_dict("records")) for obj in dimValsData
         )

@@ -46,7 +46,8 @@ class AnomalyDefinitions:
             Q(metric__icontains=searchQuery) | 
             Q(highOrLow__icontains=searchQuery) | 
             Q(dimension__icontains=searchQuery)| 
-            Q(top__icontains=searchQuery))
+            Q(value__icontains=searchQuery) |
+            Q(operation__icontains=searchQuery)) 
 
     @staticmethod
     def sortOnAnomalyDefinition(anomalyDefObjs: List[AnomalyDefinition], sorter):
@@ -64,7 +65,7 @@ class AnomalyDefinitions:
             anomalyDefObjs = anomalyDefObjs.order_by(sortingPrefix + "dataset__granularity")
 
         if columnToSort == "anomalyDef":
-            anomalyDefObjs = anomalyDefObjs.order_by(sortingPrefix + "top")
+            anomalyDefObjs = anomalyDefObjs.order_by(sortingPrefix + "metric")
 
         if columnToSort == "lastRun" :
             anomalyDefObjs = anomalyDefObjs.annotate(latestRun=Max('runstatus__startTimestamp')).order_by(sortingPrefix + 'latestRun')

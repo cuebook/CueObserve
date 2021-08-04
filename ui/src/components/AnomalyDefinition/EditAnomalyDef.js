@@ -190,12 +190,6 @@ export default function EditAnomalyDef(props){
       if (item.optionType === "High Or Low") {
         payload.highOrLow = item.value;
       }
-      if (item.optionType === "Dimension") {
-        payload.dimension = item.value;
-      }
-      if (item.optionType === "Dimension Values"){
-        payload.top = item.value
-      }
     });
 
     getEditAnomaly(payload)
@@ -285,7 +279,6 @@ export default function EditAnomalyDef(props){
   const handleIsFocused = (val) => {
     setIsFocused(val)
   }
-console.log("selectedOption", selectedOption)
     // var datasetOption = [];
     // datasetOption = allDatasets && allDatasets.map(dataset => (
     //   <Option value={dataset.id} key={dataset.id}>

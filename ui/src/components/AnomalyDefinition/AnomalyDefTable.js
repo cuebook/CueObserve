@@ -175,7 +175,6 @@ const searchInAnomalyDef = (val) =>{
   fetchData(1, val, sorter)
 }
 
-console.log("data", data)
   const columns = [    
       {
         title: "Dataset",

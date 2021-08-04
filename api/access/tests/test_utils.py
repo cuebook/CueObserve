@@ -160,14 +160,23 @@ def test_datasets(client, mocker):
         'ReceivedQty': Decimal('0E-9')}]
     
     datasetDf = pd.DataFrame(fakedata)
-    
-    dimValsData = prepareAnomalyDataframes(datasetDf, timestampCol="CREATEDTS", metricCol="ReceivedQty")
+    dimValsData = prepareAnomalyDataframes(datasetDf, timestampCol="CREATEDTS", metricCol="ReceivedQty", operation="Top")
+    assert (dimValsData[0]["df"].columns == ['ds', 'y']).all()
+    assert dimValsData[0]["df"].iloc[0]["y"] == 18
+    assert dimValsData[0]["dimVal"] == None
+
+    dimValsData = prepareAnomalyDataframes(datasetDf, timestampCol="CREATEDTS", metricCol="ReceivedQty", operation="Min % Contribution")
+    assert (dimValsData[0]["df"].columns == ['ds', 'y']).all()
+    assert dimValsData[0]["df"].iloc[0]["y"] == 18
+    assert dimValsData[0]["dimVal"] == None
+
+    dimValsData = prepareAnomalyDataframes(datasetDf, timestampCol="CREATEDTS", metricCol="ReceivedQty", operation="Min Value")
     assert (dimValsData[0]["df"].columns == ['ds', 'y']).all()
     assert dimValsData[0]["df"].iloc[0]["y"] == 18
     assert dimValsData[0]["dimVal"] == None
 
 
-    dimValsData = prepareAnomalyDataframes(datasetDf, timestampCol="CREATEDTS", metricCol="ReceivedQty", dimensionCol="DeliveryCity")
+    dimValsData = prepareAnomalyDataframes(datasetDf, timestampCol="CREATEDTS", metricCol="ReceivedQty", dimensionCol="DeliveryCity", operation="Top")
     assert (dimValsData[1]["df"].columns == ['ds', 'y']).all()
     assert dimValsData[1]["df"].iloc[0]["y"] == 7
     assert "Lucknow" in [dimVal["dimVal"] for dimVal in dimValsData]
