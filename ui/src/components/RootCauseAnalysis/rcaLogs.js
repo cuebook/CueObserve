@@ -14,7 +14,7 @@ export default function RCALogs(props){
 	const logsJSX = Object.keys(logs).map(key => {
 		return <div className="flex">
 			<span className="w-3/12"><strong>{key}</strong></span>
-			<span className="w-9/12">{logs[key]}</span>
+			<span className="w-9/12"><pre className="text-xs">{logs[key]}</pre></span>
 		</div>
 	})
 

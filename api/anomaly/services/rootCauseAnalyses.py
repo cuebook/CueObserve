@@ -65,6 +65,7 @@ class RootCauseAnalyses:
             "value": anomaly.data["anomalyLatest"]["value"],
             "anomalyContribution": anomaly.data["contribution"],
             "rcaAnomalies": rcaAnomaliesData,
+            "anomalyTime": anomaly.data["anomalyLatest"]["anomalyTimeISO"],
         }
 
         res.update(True, "Successfully retrieved RCA", data)
@@ -106,16 +107,17 @@ class RootCauseAnalyses:
             result["contribution"] = contriPercent
             result["anomalyLatest"]["contribution"] = contriPercent
 
+            rcaAnomaly, _ = RCAAnomaly.objects.get_or_create(
+                anomaly_id=anomalyId, dimension=dimension, dimensionValue=dimensionValue
+            )
+            rcaAnomaly.data = result
+            rcaAnomaly.save()
+            output["rcaAnomalyId"] = rcaAnomaly.id
+
         except Exception as ex:
             output["error"] = json.dumps(
                 {"message": str(ex), "stackTrace": traceback.format_exc()}
             )
             output["success"] = False
-        rcaAnomaly, _ = RCAAnomaly.objects.get_or_create(
-            anomaly_id=anomalyId, dimension=dimension, dimensionValue=dimensionValue
-        )
-        rcaAnomaly.data = result
-        rcaAnomaly.save()
-        output["rcaAnomalyId"] = rcaAnomaly.id
 
         return output

@@ -3,10 +3,13 @@ import style from "./style.module.scss";
 import { useParams, useHistory } from 'react-router-dom';
 import { Table, Button } from "antd";
 import { CaretUpOutlined, CaretDownOutlined } from '@ant-design/icons';
+import Moment from 'react-moment';
 
 import AnomalyChart from "components/Anomalys/AnomalyChart";
 import rootCauseAnalysisService from "services/rootCauseAnalysis";
 import RCALogs from "./rcaLogs"
+
+var moment = require("moment");
 
 
 export default function Anomaly(props) {
@@ -228,11 +231,13 @@ export default function Anomaly(props) {
 
 
   const enabledAnalyzeButton = !loading && [null, 'SUCCESS', 'ERROR'].includes(rcaData.status)
+  const anomalyTime = <Moment format="DD-MMM HH:mm">{rcaData.anomalyTime}</Moment>
+  const filterPart = rcaData.dimension ? <>where <span style={{background:"#eeeeee", padding: "0 4px", borderRadius: "4px"}}>{rcaData.dimension} = {rcaData.dimensionValue}</span>"</> : null;
 
   return (<div className="">
             <div className="text-xl"><strong>Root Cause Analysis</strong></div>
             <div className="text-base mb-2">
-              Analysis of <b>{rcaData.measure}</b> where <span style={{background:"#eeeeee", padding: "0 4px", borderRadius: "4px"}}>{rcaData.dimension} = {rcaData.dimensionValue}</span> on 01-Aug 
+              Analysis of <b>{rcaData.measure}</b> {filterPart} on {anomalyTime}
               <div>
                 {rcaData.measure} = {rcaData.value}
               </div>

@@ -34,7 +34,7 @@ def _anomalyDetectionForValue(
     """
     from anomaly.services import RootCauseAnalyses
 
-    anomalySerdimensionValviceResult = RootCauseAnalyses.createRCAAnomaly(
+    anomalyServiceResult = RootCauseAnalyses.createRCAAnomaly(
         anomalyId, dimension, dimensionVal, contriPercent, pd.DataFrame(dfDict)
     )
     return anomalyServiceResult
@@ -93,7 +93,7 @@ def _anomalyDetectionForDimension(anomalyId: int, dimension: str, data: list):
 
         anomaly.rootcauseanalysis.logs = {
             **anomaly.rootcauseanalysis.logs,
-            dimension: "Ananlyzed",
+            dimension: "Analyzed",
         }
         anomaly.rootcauseanalysis.save()
 
@@ -109,11 +109,22 @@ def _anomalyDetectionForDimension(anomalyId: int, dimension: str, data: list):
         # )
         # allTasksSucceeded = all([anomalyTask["success"] for anomalyTask in result])
     except Exception as ex:
-        # logs["log"] = json.dumps(
-        #     {"stackTrace": traceback.format_exc(), "message": str(ex)}
-        # )
-        # runStatusObj.status = ANOMALY_DETECTION_ERROR
-        pass
+
+        anomaly.rootcauseanalysis.logs = {
+            **anomaly.rootcauseanalysis.logs,
+            dimension: "Analysis Failed",
+            dimension + " Error Stack Trace": traceback.format_exc(),
+            dimension + " Error Message": str(ex),
+        }
+        anomaly.rootcauseanalysis.save()
+        return False
+
+    return True
+
+    # logs["log"] = json.dumps(
+    #     {"stackTrace": traceback.format_exc(), "message": str(ex)}
+    # )
+    # runStatusObj.status = ANOMALY_DETECTION_ERROR
     # else:
     #     runStatusObj.status = ANOMALY_DETECTION_SUCCESS
     # if not allTasksSucceeded:
@@ -151,7 +162,10 @@ def rootCauseAnalysisJob(anomalyId: int):
         dimensions = json.loads(anomaly.anomalyDefinition.dataset.dimensions)
         otherDimensions = [x for x in dimensions if x != dimension]
 
-        filteredDf = datasetDf[datasetDf[dimension] == anomaly.dimensionVal]
+        if dimension:
+            filteredDf = datasetDf[datasetDf[dimension] == anomaly.dimensionVal]
+        else:
+            filteredDf = datasetDf
         timestampColumn = anomaly.anomalyDefinition.dataset.timestampColumn
         metric = anomaly.anomalyDefinition.metric
 
@@ -183,24 +197,17 @@ def rootCauseAnalysisJob(anomalyId: int):
         # with allow_join_result():
         #     result = _detectionJobs.get()
 
-        # logs["numAnomaliesPulished"] = len(
-        #     [anomaly for anomaly in result if anomaly.get("published")]
-        # )
-        # logs["numAnomalySubtasks"] = len(_detectionJobs)
-        # logs["log"] = json.dumps(
-        #     {detection.id: detection.result for detection in _detectionJobs}
-        # )
-        # allTasksSucceeded = all([anomalyTask["success"] for anomalyTask in result])
-
         rootCauseAnalysis = RootCauseAnalysis.objects.get(anomaly=anomaly)
+        if all(results):
+            rootCauseAnalysis.status = RootCauseAnalysis.STATUS_SUCCESS
+        else:
+            rootCauseAnalysis.status = RootCauseAnalysis.STATUS_ERROR
     except Exception as ex:
-        logs["log"] = json.dumps(
-            {"stackTrace": traceback.format_exc(), "message": str(ex)}
-        )
+        rootCauseAnalysis.logs = {
+            **rootCauseAnalysis.logs,
+            "Error Stack Trace": traceback.format_exc(),
+            "Error Message": str(ex),
+        }
         rootCauseAnalysis.status = RootCauseAnalysis.STATUS_ERROR
-    else:
-        rootCauseAnalysis.status = RootCauseAnalysis.STATUS_SUCCESS
-    # if not allTasksSucceeded:
-    #     rootCauseAnalysis.status = RootCauseAnalysis.STATUS_ERROR
     rootCauseAnalysis.endTimestamp = dt.datetime.now()
     rootCauseAnalysis.save()
