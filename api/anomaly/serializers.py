@@ -2,7 +2,7 @@ import json
 import dateutil.parser as dp
 import datetime as dt
 from rest_framework import serializers
-from anomaly.models import Anomaly, AnomalyDefinition, Connection,ConnectionType, CustomSchedule as Schedule, Dataset, RunStatus, Setting
+from anomaly.models import Anomaly, AnomalyDefinition, Connection,ConnectionType, CustomSchedule as Schedule, Dataset, RunStatus, Setting, DetectionRuleType
 
 
 class ConnectionSerializer(serializers.ModelSerializer):
@@ -277,3 +277,22 @@ class SettingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Setting
         fields = ["name", "value"]
+
+class DetectionRuleTypeSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the model DetectionRuleType
+    """    
+    params = serializers.SerializerMethodField()
+
+    def get_params(self, obj):
+        paramList = []
+        for param in obj.detectionruleparam_set.all():
+            params = {}
+            params["id"] = param.id
+            params["name"] = param.name
+            paramList.append(params)
+        return paramList
+
+    class Meta:
+        model = DetectionRuleType
+        fields = ["id", "name", "description", "params"]

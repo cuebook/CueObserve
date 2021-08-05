@@ -2,7 +2,7 @@ import logging
 from typing import List
 from utils.apiResponse import ApiResponse
 from dbConnections import BigQuery
-from anomaly.models import AnomalyDefinition, Dataset, CustomSchedule as Schedule, RunStatus
+from anomaly.models import AnomalyDefinition, Dataset, CustomSchedule as Schedule, DetectionRule, RunStatus
 from anomaly.serializers import AnomalyDefinitionSerializer, RunStatusSerializer
 from django_celery_beat.models import PeriodicTask, PeriodicTasks, CrontabSchedule
 from ops.tasks import anomalyDetectionJob
@@ -76,7 +76,7 @@ class AnomalyDefinitions:
         return anomalyDefObjs
 
     @staticmethod
-    def addAnomalyDefinition(metric: str = None, dimension: str = None, highOrLow: str = None, top: int = 0, datasetId: int = 0):
+    def addAnomalyDefinition(metric: str = None, dimension: str = None, highOrLow: str = None, top: int = 0, datasetId: int = 0, detectionRuleTypeId: int = 1, detectionRuleParams: dict = {}):
         """
         This method is used to add anomaly to AnomalyDefinition table
         """
@@ -88,6 +88,7 @@ class AnomalyDefinitions:
             highOrLow=highOrLow,
             top=top
         )
+        detectionRule = DetectionRule.objects.create(detectionRuleType_id=detectionRuleTypeId, anomalyDefinition=anomalyObj)
         response.update(True, "Anomaly Definition created successfully !")
         return response
 

@@ -49,4 +49,6 @@ urlpatterns = [
     ),
     # Settings
     path("settings", views.SettingsView.as_view(), name="settings"),
+    # DetectionRules
+    path("detectionRuleTypes", views.DetectionRuleTypeView.as_view(), name="detectionRuleTypes"),
 ]

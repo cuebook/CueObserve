@@ -14,6 +14,7 @@ from anomaly.services import (
     ScheduleService,
     AnomalyDefJobServices,
     Settings,
+    DetectionRules
 )
 
 
@@ -169,8 +170,11 @@ class AnomalyDefView(APIView):
         highOrLow = request.data.get("highOrLow", None)
         top = int(request.data.get("top", 0))
         dimension = request.data.get("dimension", None)
+        dimension = request.data.get("dimension", None)
+        detectionRuleTypeId = request.data.get("detectionRuleTypeId", None)
+        detectionRuleParams = request.data.get("detectionRuleParams", None)
         res = AnomalyDefinitions.addAnomalyDefinition(
-            metric, dimension, highOrLow, top, datasetId
+            metric, dimension, highOrLow, top, datasetId, detectionRuleTypeId, detectionRuleParams
         )
         return Response(res.json())
 
@@ -320,4 +324,15 @@ class SettingsView(APIView):
         """post request"""
         data = request.data
         res = Settings.updateSettings(data)
+        return Response(res.json())
+
+
+class DetectionRuleTypeView(APIView):
+    """
+    Provides views on Detection Rule Types
+    """
+
+    def get(self, request):
+        """get request"""
+        res = DetectionRules.getDetectionRuleTypes()
         return Response(res.json())

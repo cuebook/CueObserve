@@ -129,3 +129,26 @@ class Setting(models.Model):
 
     name = models.TextField(null=True, blank=True)
     value = models.TextField(null=True, blank=True)
+
+class DetectionRuleType(models.Model):
+    name = models.CharField(max_length=200, db_index=True, unique=True)
+    description = models.TextField()
+
+    def __str__(self):
+        return self.name
+
+class DetectionRuleParam(models.Model):
+    name = models.CharField(max_length=200)
+    detectionRuleType = models.ForeignKey(DetectionRuleType, on_delete=models.CASCADE, db_index=True)
+
+    def __str__(self):
+        return self.detectionRuleType.name + "_" + self.name
+
+class DetectionRule(models.Model):
+    anomalyDefinition = models.OneToOneField(AnomalyDefinition, on_delete=models.CASCADE)
+    detectionRuleType = models.ForeignKey(DetectionRuleType, on_delete=models.CASCADE)
+
+class DetectionRuleParamValue(models.Model):
+    param = models.ForeignKey(DetectionRuleParam, on_delete=models.CASCADE)
+    detectionRule = models.ForeignKey(DetectionRule, on_delete=models.CASCADE)
+    value = models.TextField()
