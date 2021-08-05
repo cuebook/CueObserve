@@ -74,7 +74,7 @@ def anomalyDetectionJob(anomalyDef_id: int, manualRun: bool = False):
     if runStatusObj.status == ANOMALY_DETECTION_SUCCESS:
         if logs.get("numAnomaliesPulished", 0) > 0:
             message = f"{logs['numAnomaliesPulished']} anomalies published. \n"
-            topNtext = f" Top {anomalyDefinition.top}" if anomalyDefinition.top > 0 else ""
+            topNtext = f" Top {anomalyDefinition.value}" if int(anomalyDefinition.value) > 0 else ""
             message = message + f"Anomaly Definition: {anomalyDefinition.metric} {anomalyDefinition.dimension} {anomalyDefinition.highOrLow}{topNtext} \n"
             message = message + f"Dataset: {anomalyDefinition.dataset.name} | Granularity: {anomalyDefinition.dataset.granularity} \n \n"
             
