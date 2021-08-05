@@ -7,7 +7,13 @@ from django.template import Template, Context
 from celery import shared_task, group
 from celery.result import allow_join_result
 
-from anomaly.models import Anomaly, AnomalyDefinition, RunStatus, AnomalyCardTemplate
+from anomaly.models import (
+    Anomaly,
+    AnomalyDefinition,
+    RunStatus,
+    AnomalyCardTemplate,
+    RCAAnomaly,
+)
 from anomaly.serializers import AnomalySerializer
 from access.data import Data
 from access.utils import prepareAnomalyDataframes
@@ -47,6 +53,8 @@ def anomalyDetectionJob(anomalyDef_id: int, manualRun: bool = False):
     runType = "Manual" if manualRun else "Scheduled"
     anomalyDefinition = AnomalyDefinition.objects.get(id=anomalyDef_id)
     anomalyDefinition.anomaly_set.update(published=False)
+    RCAAnomaly.objects.filter(anomaly__in=anomalyDefinition.anomaly_set.all()).delete()
+
     runStatusObj = RunStatus.objects.create(
         anomalyDefinition=anomalyDefinition,
         status=ANOMALY_DETECTION_RUNNING,
@@ -63,18 +71,27 @@ def anomalyDetectionJob(anomalyDef_id: int, manualRun: bool = False):
             anomalyDefinition.dimension,
             anomalyDefinition.top,
         )
-        detectionJobs = group(
-            _anomalyDetectionSubTask.s(
+        # detectionJobs = group(
+        #     _anomalyDetectionSubTask.s(
+        #         anomalyDef_id,
+        #         obj["dimVal"],
+        #         obj["contriPercent"],
+        #         obj["df"].to_dict("records"),
+        #     )
+        #     for obj in dimValsData
+        # )
+        # _detectionJobs = detectionJobs.apply_async()
+        # with allow_join_result():
+        #     result = _detectionJobs.get()
+        result = [
+            _anomalyDetectionSubTask(
                 anomalyDef_id,
                 obj["dimVal"],
                 obj["contriPercent"],
                 obj["df"].to_dict("records"),
             )
             for obj in dimValsData
-        )
-        _detectionJobs = detectionJobs.apply_async()
-        with allow_join_result():
-            result = _detectionJobs.get()
+        ]
         Anomaly.objects.filter(
             id__in=[anomaly["anomalyId"] for anomaly in result if anomaly["success"]]
         ).update(latestRun=runStatusObj)

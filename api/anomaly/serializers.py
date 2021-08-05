@@ -2,7 +2,7 @@ import json
 import dateutil.parser as dp
 import datetime as dt
 from rest_framework import serializers
-from anomaly.models import Anomaly, AnomalyDefinition, Connection,ConnectionType, CustomSchedule as Schedule, Dataset, RunStatus, Setting
+from anomaly.models import Anomaly, AnomalyDefinition, Connection,ConnectionType, CustomSchedule as Schedule, Dataset, RunStatus, Setting, RCAAnomaly, RootCauseAnalysis
 
 
 class ConnectionSerializer(serializers.ModelSerializer):
@@ -277,3 +277,22 @@ class SettingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Setting
         fields = ["name", "value"]
+
+class RCAAnomalySerializer(serializers.ModelSerializer):
+    """
+    Serializer for the model RCAAnomaly
+    """
+
+    class Meta:
+        model = RCAAnomaly
+        fields = ["dimension", "dimensionValue", "data"]
+
+class RootCauseAnalysisSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the model RootCauseAnalysis
+    """
+
+    class Meta:
+        model = RootCauseAnalysis
+        fields = ["status", "logs", "startTimestamp", "endTimestamp"]
+

@@ -18,11 +18,11 @@ class RootCauseAnalysisService {
         })
     }
 
-    getAnomaly(anomalyId){
-        return apiService.post("anomaly/anomaly/" + anomalyId)
+    doRCA(anomalyId){
+        return apiService.post("anomaly/rca/" + anomalyId)
         .then(response => {
             if(response.success == true){
-                return response.data
+                return true
             } else {
                 message.error(response.message);
                 return null

@@ -140,6 +140,11 @@ class RootCauseAnalysis(models.Model):
     Model class to store data for root cause analysis
     """
 
+    STATUS_RECEIVED = "RECEIVED"
+    STATUS_RUNNING = "RUNNING"
+    STATUS_SUCCESS = "SUCCESS"
+    STATUS_ERROR = "ERROR"
+
     anomaly = models.OneToOneField(Anomaly, on_delete=models.CASCADE, db_index=True)
 
     startTimestamp = models.DateTimeField(auto_now_add=True)

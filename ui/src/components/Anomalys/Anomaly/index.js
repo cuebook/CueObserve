@@ -30,8 +30,11 @@ export default function Anomaly(props) {
       <p />
       <div className={style.anomalyText} dangerouslySetInnerHTML={{ __html: anomalyData.text }} />
       <div className={style.chartDiv}> <AnomalyChart data={anomalyData} /> </div>
-      < RootCauseAnalysis anomalyId={params.anomalyId} />
     </div>
+    </div>
+
+    <div className={`my-4 w-10/12 ${style.chartPanel}`}>
+      < RootCauseAnalysis anomalyId={params.anomalyId} title={anomalyData.title}/>
     </div>
   </>)
 

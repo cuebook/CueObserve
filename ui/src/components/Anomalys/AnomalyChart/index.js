@@ -56,7 +56,7 @@ export default function AnomalyChart(props) {
 
 
   const chart = (
-      <Chart scale={cols} autoFit padding={[10, 10, 25, 20]} height={ props.isMiniChart ? 150 : 400 }>
+      <Chart scale={cols} autoFit padding={[10, 10, 15, 20]} height={ props.isMiniChart ? 120 : 400 }>
         <Legend visible={false} />
         <Tooltip crosshairs={{ type: "line" }} />
         <View data={anomalyData.data.anomalyData.band}>

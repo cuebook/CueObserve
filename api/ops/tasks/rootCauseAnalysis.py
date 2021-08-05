@@ -16,20 +16,26 @@ from access.utils import prepareAnomalyDataframes
 # ANOMALY_DAILY_TEMPLATE = "Anomaly Daily Template"
 # ANOMALY_HOURLY_TEMPLATE = "Anomaly Hourly Template"
 
-RCA_RUNNING = "RUNNING"
-RCA_SUCCESS = "SUCCESS"
-RCA_ERROR = "ERROR"
-
 
 @shared_task
-def _anomalyDetectionForValue(anomalyId: int, dimension: str, dimVal: str, contriPercent: float, dfDict: list):
+def _anomalyDetectionForValue(
+    anomalyId: int,
+    dimension: str,
+    dimensionVal: str,
+    contriPercent: float,
+    dfDict: list,
+):
     """
     Internal anomaly detection subtask to be grouped by celery for each anomaly object
+    :param anomaly_id: id of anomaly object under analysis
+    :param dimension: dimension for which anomaly is being detected
+    :param dimensionVal: dimension value being analyzed
+    :para data: data for dimension
     """
     from anomaly.services import RootCauseAnalyses
 
-    anomalyServiceResult = RootCauseAnalyses.createRCAAnomaly(
-        anomalyId, dimension, dimVal, contriPercent, pd.DataFrame(dfDict)
+    anomalySerdimensionValviceResult = RootCauseAnalyses.createRCAAnomaly(
+        anomalyId, dimension, dimensionVal, contriPercent, pd.DataFrame(dfDict)
     )
     return anomalyServiceResult
 
@@ -38,8 +44,9 @@ def _anomalyDetectionForValue(anomalyId: int, dimension: str, dimVal: str, contr
 def _anomalyDetectionForDimension(anomalyId: int, dimension: str, data: list):
     """
     Method to find initiate anomaly detection for a given anomaly definition
-    :param dimension: 
-    :para 
+    :param anomaly_id: id of anomaly object under analysis
+    :param dimension: dimension for which anomaly is being detected
+    :para data: data for dimension
     """
 
     anomaly = Anomaly.objects.get(id=anomalyId)
@@ -53,6 +60,11 @@ def _anomalyDetectionForDimension(anomalyId: int, dimension: str, data: list):
             10,
         )
 
+        anomaly.rootcauseanalysis.logs = {
+            **anomaly.rootcauseanalysis.logs,
+            dimension: "Ananlyzing..",
+        }
+        anomaly.rootcauseanalysis.save()
 
         # detectionJobs = group(
         #     _anomalyDetectionForValue.s(
@@ -68,14 +80,23 @@ def _anomalyDetectionForDimension(anomalyId: int, dimension: str, data: list):
         # with allow_join_result():
         #     result = _detectionJobs.get()
 
-        [ _anomalyDetectionForValue(
+        [
+            _anomalyDetectionForValue(
                 anomalyId,
                 dimension,
                 obj["dimVal"],
                 obj["contriPercent"],
                 obj["df"].to_dict("records"),
             )
-            for obj in dimValsData ]
+            for obj in dimValsData
+        ]
+
+        anomaly.rootcauseanalysis.logs = {
+            **anomaly.rootcauseanalysis.logs,
+            dimension: "Ananlyzed",
+        }
+        anomaly.rootcauseanalysis.save()
+
         # Anomaly.objects.filter(
         #     id__in=[anomaly["anomalyId"] for anomaly in result if anomaly["success"]]
         # ).update(latestRun=runStatusObj)
@@ -106,15 +127,23 @@ def _anomalyDetectionForDimension(anomalyId: int, dimension: str, data: list):
 def rootCauseAnalysisJob(anomalyId: int):
     """
     Method to do root cause analysis for a given anomaly
-    :param anomaly_id: Id of anomaly.anomaly model's object
+    :param anomaly_id: id of anomaly object under analysis
     """
 
     from anomaly.services.slack import SlackAlert
 
     anomaly = Anomaly.objects.get(id=anomalyId)
-    # Todo remove already existing rca data
+    rootCauseAnalysis, _ = RootCauseAnalysis.objects.get_or_create(anomaly=anomaly)
+    rootCauseAnalysis.startTimestamp = dt.datetime.now()
+    rootCauseAnalysis.endTimestamp = None
+    rootCauseAnalysis.logs = {}
+    rootCauseAnalysis.status = RootCauseAnalysis.STATUS_RUNNING
+    rootCauseAnalysis.save()
+
+    # Remove already existing rca data
+    anomaly.rcaanomaly_set.all().delete()
+
     # Todo fetch related data
-    logs = {}
     try:
         datasetDf = Data.fetchDatasetDataframe(anomaly.anomalyDefinition.dataset)
 
@@ -126,14 +155,20 @@ def rootCauseAnalysisJob(anomalyId: int):
         timestampColumn = anomaly.anomalyDefinition.dataset.timestampColumn
         metric = anomaly.anomalyDefinition.metric
 
+        rootCauseAnalysis.logs = {
+            **rootCauseAnalysis.logs,
+            "Analyzing Dimensions": ", ".join(otherDimensions),
+        }
+        rootCauseAnalysis.save()
+
         results = [
             _anomalyDetectionForDimension(
-                anomalyId, dim, filteredDf[[timestampColumn, metric, dim]].to_dict("records")
+                anomalyId,
+                dim,
+                filteredDf[[timestampColumn, metric, dim]].to_dict("records"),
             )
             for dim in otherDimensions
         ]
-
-
 
         # detectionJobs = group(
         #     _anomalyDetectionForDimension.s(
@@ -157,22 +192,15 @@ def rootCauseAnalysisJob(anomalyId: int):
         # )
         # allTasksSucceeded = all([anomalyTask["success"] for anomalyTask in result])
 
-        "We'll get the measure & filter from there\
-        Get all other dimesion other than that \
-        & for each get top values & parallely run AD and store in redis"
-        rootCauseAnalysis, _ = RootCauseAnalysis.objects.get_or_create(anomaly=anomaly )
-        rootCauseAnalysis.status=RCA_RUNNING
-        rootCauseAnalysis.save()
-
+        rootCauseAnalysis = RootCauseAnalysis.objects.get(anomaly=anomaly)
     except Exception as ex:
         logs["log"] = json.dumps(
             {"stackTrace": traceback.format_exc(), "message": str(ex)}
         )
-        rootCauseAnalysis.status = RCA_ERROR
+        rootCauseAnalysis.status = RootCauseAnalysis.STATUS_ERROR
     else:
-        rootCauseAnalysis.status = RCA_SUCCESS
+        rootCauseAnalysis.status = RootCauseAnalysis.STATUS_SUCCESS
     # if not allTasksSucceeded:
-    #     rootCauseAnalysis.status = RCA_ERROR
-    rootCauseAnalysis.logs = logs
+    #     rootCauseAnalysis.status = RootCauseAnalysis.STATUS_ERROR
     rootCauseAnalysis.endTimestamp = dt.datetime.now()
     rootCauseAnalysis.save()

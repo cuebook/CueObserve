@@ -1,18 +1,28 @@
 import React, { useState, useEffect, useRef } from "react";
 import style from "./style.module.scss";
 import { useParams, useHistory } from 'react-router-dom';
-import { Checkbox, Table, Icon } from "antd";
+import { Table, Button } from "antd";
 import { CaretUpOutlined, CaretDownOutlined } from '@ant-design/icons';
 
 import AnomalyChart from "components/Anomalys/AnomalyChart";
 import rootCauseAnalysisService from "services/rootCauseAnalysis";
+import RCALogs from "./rcaLogs"
 
 
 export default function Anomaly(props) {
   const [ rcaData, setRCAData ] = useState(null);
+  const [ loading, setLoading ] = useState(false);
+  let refreshWorkflowRunsInterval
 
   useEffect(() => {
-    getRCA();
+    if (!rcaData){
+      getRCA();
+    }
+
+    return () => {
+      clearInterval(refreshWorkflowRunsInterval);
+    };
+
   }, []);
 
 
@@ -20,6 +30,25 @@ export default function Anomaly(props) {
     const data = await rootCauseAnalysisService.getRCA(props.anomalyId)
     if (data) {
       setRCAData(data);
+      if (!refreshWorkflowRunsInterval && ["RECEIVED", "RUNNING"].includes(data.status)){
+        refreshWorkflowRunsInterval = setInterval(() => {
+             getRCA()
+           }, 3000);
+      }
+
+      if (["SUCCESS", "ERROR"].includes(data.status)){
+        clearInterval(refreshWorkflowRunsInterval);
+      }
+
+    }
+  }
+
+  const doRCA = async () => {
+    setLoading(true)
+    const data = await rootCauseAnalysisService.doRCA(props.anomalyId)
+    if (data){
+      setLoading(false)
+      getRCA()
     }
   }
 
@@ -29,17 +58,17 @@ export default function Anomaly(props) {
 
   const groupDataOnDimension = data => {
     let dimensionData = {}
-    let dimensionContribution = {}
+    let dimensionMetricSummed = {}
     data.forEach(row => {
       if (!dimensionData[row.dimension]){
         dimensionData[row.dimension] = []
-        dimensionContribution[row.dimension] = 0
+        dimensionMetricSummed[row.dimension] = 0
       }
       dimensionData[row.dimension].push(row)
-      dimensionContribution[row.dimension] += row['data']['contribution']
+      dimensionMetricSummed[row.dimension] += row['data']['anomalyLatest']['value']
     })
 
-    let groupedData = Object.keys(dimensionData).map((dimension)=>[{dimension: dimension, dimensionContribution: dimensionContribution[dimension], rcaData: dimensionData[dimension]}])
+    let groupedData = Object.keys(dimensionData).map((dimension)=>[{dimension: dimension, dimensionMetricSummed: dimensionMetricSummed[dimension], rcaData: dimensionData[dimension]}])
 
     return [].concat.apply([], groupedData);
   }
@@ -51,13 +80,13 @@ export default function Anomaly(props) {
       title: "Anomalous Segment",
       dataIndex: "dimensionValue",
       key: "dimensionValue",
-      width: "42.86%",
+      width: "28.57%",
       render: (text, record) => {
         let highOrLowIcon = null;
         let dimensionValueName = text
         try {
           highOrLowIcon =
-            record.data.anomalyOnDate.highOrLow == "high" ? (
+            record.data.anomalyLatest.highOrLow == "high" ? (
               <CaretUpOutlined style={{ color: "green" }} />
             ) : (
               <CaretDownOutlined style={{ color: "red" }} />
@@ -76,35 +105,33 @@ export default function Anomaly(props) {
       dataIndex: "value",
       key: "value",
       align: "right",
-      width: "14.28%",
-      render: (text, record) => (
-        <div style={{ display: "grid" }}>
-          <div>{record.data.value}</div>
-          <div style={{ fontSize: "12px" }}>({record.data.contribution}%)</div>
-        </div>
-      )
+      width: "14.29%",
+      render: (text, record) => {
+        const percentage = record.data.anomalyLatest.value*100/rcaData.value
+        const roundedPercentage = (Math.round(percentage * 100) / 100).toFixed(2);
+
+        return (
+          <div style={{ display: "grid" }}>
+            <div>{record.data.anomalyLatest.value}</div>
+            <div style={{ fontSize: "12px" }}>({roundedPercentage}%)</div>
+          </div>
+        )
+      }
     },
     {
       title: "30-day Contribution",
       dataIndex: "data",
       key: "data",
       align: "center",
-      width: "42.86%",
+      width: "57.14%",
       render: (text, record) => {
         return (
-          <div style={{ paddingTop: "8px" }}>
+                <div className="">
                   <AnomalyChart
                     data={ {data: text} }
                     isMiniChart={true}
-                    // params={text}
-                    // isMiniChart={true}
-                    // disablePadding={true}
-                    // height={65}
-                    // key={record.filterText}
-                    // anomalySize={3.5}
-                    // lineColor="#178DF9BB"
                   />
-          </div>
+                </div>
         );
       }
     }
@@ -121,21 +148,15 @@ export default function Anomaly(props) {
     },
     {
       title: "Contribution of Anomalous Segments",
-      dataIndex: "dimensionContribution",
+      dataIndex: "dimensionMetricSummed",
       width: "12%",
       align: "right",
-      key: "dimensionContribution",
-      sorter: (a, b) => a.dimensionContribution - b.dimensionContribution,
+      key: "dimensionMetricSummed",
+      sorter: (a, b) => a.dimensionMetricSummed - b.dimensionMetricSummed,
       defaultSortOrder: "descend",
       render: (text, record) => {
-        return text + "%"
-        // let contribution = Math.round((text / rowTotal) * 10000) / 100;
-        // return (
-        //   <div style={{ display: "grid" }}>
-        //     <span>{text}</span>
-        //     <span style={{ fontSize: "12px" }}>({contribution}%)</span>
-        //   </div>
-        // );
+        const percentage = text*100/rcaData.value
+        return (Math.round(percentage * 100) / 100).toFixed(2) + "%";
       }
     },
     {
@@ -146,7 +167,7 @@ export default function Anomaly(props) {
           dataIndex: "rcaData",
           key: "rcaData",
           align: "center",
-          width: "30%",
+          width: "20%",
           render: (text, record) => {
             let table = (
               <div className="rcaTableSub">
@@ -154,7 +175,7 @@ export default function Anomaly(props) {
                   columns={subTableColumns}
                   dataSource={text}
                   pagination={false}
-                  scroll={{ y: "max-content" }}
+                  // scroll={{ y: "max-content" }}
                   // size="small"
                   showHeader={false}
                   key="rcaTableSub"
@@ -166,7 +187,7 @@ export default function Anomaly(props) {
             return {
               children: <a>{table}</a>,
               props: {
-                colSpan: 4
+                colSpan: 3
               }
             };
           }
@@ -191,7 +212,7 @@ export default function Anomaly(props) {
           dataIndex: "rcaData",
           key: "rcaData",
           align: "center",
-          width: "30%",
+          width: "40%",
           render: (text, record) => {
             return {
               children: null,
@@ -206,16 +227,34 @@ export default function Anomaly(props) {
   ];
 
 
-  return (<>
-    <h1>Root Cause Analysis</h1>
-            <Table
-              columns={tableColumns}
-              dataSource={groupedData}
-              pagination={false}
-              scroll={{ y: "1000px" }}
-              key="rcaTable"
-              // bordered={true}
-            />
-  </>)
+  const enabledAnalyzeButton = !loading && [null, 'SUCCESS', 'ERROR'].includes(rcaData.status)
+
+  return (<div className="">
+            <div className="text-xl"><strong>Root Cause Analysis</strong></div>
+            <div className="text-base mb-2">
+              Analysis of <b>{rcaData.measure}</b> where <span style={{background:"#eeeeee", padding: "0 4px", borderRadius: "4px"}}>{rcaData.dimension} = {rcaData.dimensionValue}</span> on 01-Aug 
+              <div>
+                {rcaData.measure} = {rcaData.value}
+              </div>
+            </div>
+
+            { <Button onClick={doRCA} disabled={!enabledAnalyzeButton} >Analyze</Button> }
+            { rcaData.status && rcaData.status != "RECEIVED" ? <>
+              <div className="my-2">
+                <RCALogs data={rcaData} />
+              </div> 
+              <div className="rcaTable">
+                <Table
+                  columns={tableColumns}
+                  dataSource={groupedData}
+                  pagination={false}
+                  // scroll={{ y: "1000px" }}
+                  key="rcaTable"
+                  width="100%"
+                  // bordered={true}
+                />
+              </div>
+            </> : null }
+  </div>)
 
 }
