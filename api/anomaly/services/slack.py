@@ -40,7 +40,7 @@ class SlackAlert:
         if response.status_code != 200:
             raise Exception(response.status_code, response.text)
 
-    def slackAnomalyAlert(url, title, message):
+    def slackAnomalyAlert(url, title, message, details):
             url = url
             # message = "A Sample Message"
             # title = "New Incoming Alert Message "
@@ -50,16 +50,23 @@ class SlackAlert:
                 "username": "CueObserveBot",
                 "icon_emoji": ":satellite:",
                 "channel" : "#cue-observe-anomaly",
-                "attachments": [
+                "blocks": [
                     {
-                        "color": "#9733EE",
-                        "fields": [
-                            {
-                                "title": title,
-                                "value": message,
-                                "short": "false",
-                            }
-                        ]
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": message
+                        }
+                    },
+                    {
+                        "type": "divider"
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": details
+                        }
                     }
                 ]
             }
@@ -70,7 +77,7 @@ class SlackAlert:
                 raise Exception(response.status_code, response.text)
 
 
-    def slackAlertHelper(title, message, name):
+    def slackAlertHelper(title, message, name, details=""):
         """
         Helper method for slackAlert
         """
@@ -80,7 +87,7 @@ class SlackAlert:
             # Anomaly Detection successfull 
             if name == "anomalyAlert":
                 url = setting.values()[0]["value"]
-                SlackAlert.slackAnomalyAlert(url, title, message)
+                SlackAlert.slackAnomalyAlert(url, title, message, details)
             # Anomaly Detection job failed
             if name == "appAlert":
                 url = setting.values()[1]["value"]
