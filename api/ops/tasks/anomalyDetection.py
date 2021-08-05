@@ -71,27 +71,18 @@ def anomalyDetectionJob(anomalyDef_id: int, manualRun: bool = False):
             anomalyDefinition.dimension,
             anomalyDefinition.top,
         )
-        # detectionJobs = group(
-        #     _anomalyDetectionSubTask.s(
-        #         anomalyDef_id,
-        #         obj["dimVal"],
-        #         obj["contriPercent"],
-        #         obj["df"].to_dict("records"),
-        #     )
-        #     for obj in dimValsData
-        # )
-        # _detectionJobs = detectionJobs.apply_async()
-        # with allow_join_result():
-        #     result = _detectionJobs.get()
-        result = [
-            _anomalyDetectionSubTask(
+        detectionJobs = group(
+            _anomalyDetectionSubTask.s(
                 anomalyDef_id,
                 obj["dimVal"],
                 obj["contriPercent"],
                 obj["df"].to_dict("records"),
             )
             for obj in dimValsData
-        ]
+        )
+        _detectionJobs = detectionJobs.apply_async()
+        with allow_join_result():
+            result = _detectionJobs.get()
         Anomaly.objects.filter(
             id__in=[anomaly["anomalyId"] for anomaly in result if anomaly["success"]]
         ).update(latestRun=runStatusObj)

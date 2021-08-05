@@ -32,12 +32,16 @@ def _anomalyDetectionForValue(
     :param dimensionVal: dimension value being analyzed
     :para data: data for dimension
     """
+
     from anomaly.services import RootCauseAnalyses
 
-    anomalyServiceResult = RootCauseAnalyses.createRCAAnomaly(
-        anomalyId, dimension, dimensionVal, contriPercent, pd.DataFrame(dfDict)
-    )
-    return anomalyServiceResult
+    try:
+        anomalyServiceResult = RootCauseAnalyses.createRCAAnomaly(
+            anomalyId, dimension, dimensionVal, contriPercent, pd.DataFrame(dfDict)
+        )
+        return anomalyServiceResult
+    except Exception as ex:
+        return False
 
 
 @shared_task
@@ -66,22 +70,8 @@ def _anomalyDetectionForDimension(anomalyId: int, dimension: str, data: list):
         }
         anomaly.rootcauseanalysis.save()
 
-        # detectionJobs = group(
-        #     _anomalyDetectionForValue.s(
-        #         anomalyId,
-        #         dimension,
-        #         obj["dimVal"],
-        #         obj["contriPercent"],
-        #         obj["df"].to_dict("records"),
-        #     )
-        #     for obj in dimValsData
-        # )
-        # _detectionJobs = detectionJobs.apply_async()
-        # with allow_join_result():
-        #     result = _detectionJobs.get()
-
-        [
-            _anomalyDetectionForValue(
+        detectionJobs = group(
+            _anomalyDetectionForValue.s(
                 anomalyId,
                 dimension,
                 obj["dimVal"],
@@ -89,25 +79,20 @@ def _anomalyDetectionForDimension(anomalyId: int, dimension: str, data: list):
                 obj["df"].to_dict("records"),
             )
             for obj in dimValsData
-        ]
+        )
+        _detectionJobs = detectionJobs.apply_async()
+        with allow_join_result():
+            results = _detectionJobs.get()
 
+        anomaly = Anomaly.objects.get(id=anomalyId)
         anomaly.rootcauseanalysis.logs = {
             **anomaly.rootcauseanalysis.logs,
             dimension: "Analyzed",
         }
         anomaly.rootcauseanalysis.save()
 
-        # Anomaly.objects.filter(
-        #     id__in=[anomaly["anomalyId"] for anomaly in result if anomaly["success"]]
-        # ).update(latestRun=runStatusObj)
-        # logs["numAnomaliesPulished"] = len(
-        #     [anomaly for anomaly in result if anomaly.get("published")]
-        # )
-        # logs["numAnomalySubtasks"] = len(_detectionJobs)
-        # logs["log"] = json.dumps(
-        #     {detection.id: detection.result for detection in _detectionJobs}
-        # )
-        # allTasksSucceeded = all([anomalyTask["success"] for anomalyTask in result])
+        if not all(results):
+            return False
     except Exception as ex:
 
         anomaly.rootcauseanalysis.logs = {
@@ -120,18 +105,6 @@ def _anomalyDetectionForDimension(anomalyId: int, dimension: str, data: list):
         return False
 
     return True
-
-    # logs["log"] = json.dumps(
-    #     {"stackTrace": traceback.format_exc(), "message": str(ex)}
-    # )
-    # runStatusObj.status = ANOMALY_DETECTION_ERROR
-    # else:
-    #     runStatusObj.status = ANOMALY_DETECTION_SUCCESS
-    # if not allTasksSucceeded:
-    #     runStatusObj.status = ANOMALY_DETECTION_ERROR
-    # runStatusObj.logs = logs
-    # runStatusObj.endTimestamp = dt.datetime.now()
-    # runStatusObj.save()
 
 
 @shared_task
@@ -183,19 +156,6 @@ def rootCauseAnalysisJob(anomalyId: int):
             )
             for dim in otherDimensions
         ]
-
-        # detectionJobs = group(
-        #     _anomalyDetectionForDimension.s(
-        #         anomalyDef_id,
-        #         obj["dimVal"],
-        #         obj["contriPercent"],
-        #         obj["df"].to_dict("records"),
-        #     )
-        #     for obj in dimValsData
-        # )
-        # _detectionJobs = detectionJobs.apply_async()
-        # with allow_join_result():
-        #     result = _detectionJobs.get()
 
         rootCauseAnalysis = RootCauseAnalysis.objects.get(anomaly=anomaly)
         if all(results):
