@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import style from "./style.module.scss";
 import { useParams, useHistory } from 'react-router-dom';
-import { Table, Button } from "antd";
+import { Table, Button, Spin } from "antd";
 import { CaretUpOutlined, CaretDownOutlined } from '@ant-design/icons';
 import Moment from 'react-moment';
 
@@ -56,7 +56,10 @@ export default function Anomaly(props) {
   }
 
   if (!rcaData){
-    return <p>Not yet</p>
+    return <div className={` ${style.loadingDiv}`}>
+          {" "}
+          <Spin />{" "}
+        </div>
   }
 
   const groupDataOnDimension = data => {

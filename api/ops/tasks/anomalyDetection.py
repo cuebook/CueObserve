@@ -69,8 +69,10 @@ def anomalyDetectionJob(anomalyDef_id: int, manualRun: bool = False):
             anomalyDefinition.dataset.timestampColumn,
             anomalyDefinition.metric,
             anomalyDefinition.dimension,
-            anomalyDefinition.top,
+            anomalyDefinition.operation,
+            int(anomalyDefinition.value),
         )
+
         detectionJobs = group(
             _anomalyDetectionSubTask.s(
                 anomalyDef_id,

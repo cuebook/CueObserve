@@ -61,7 +61,17 @@ def _anomalyDetectionForDimension(anomalyId: int, dimension: str, data: list):
             anomaly.anomalyDefinition.dataset.timestampColumn,
             anomaly.anomalyDefinition.metric,
             dimension,
-            10,
+            anomalyDefinition.operation,
+            int(anomalyDefinition.value),
+        )
+
+        dimValsData = prepareAnomalyDataframes(
+            datasetDf,
+            anomalyDefinition.dataset.timestampColumn,
+            anomalyDefinition.metric,
+            anomalyDefinition.dimension,
+            anomalyDefinition.operation,
+            int(anomalyDefinition.value),
         )
 
         anomaly.rootcauseanalysis.logs = {
