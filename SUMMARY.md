@@ -10,4 +10,5 @@
 * [Anomaly Detection](anomaly-detection.md)
 * [Data Sources](sources.md)
 * [Development](development.md)
+* [Settings](settings.md)
 
