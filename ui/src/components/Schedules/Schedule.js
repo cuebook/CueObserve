@@ -76,6 +76,13 @@ const [isViewConnectionDrawerVisible, setIsViewConnectionDrawerVisible] = useSta
       sorter:(a,b)=>{return a.schedule.localeCompare(b.schedule)},
     },
     {
+      title: "Assigned Anomaly Definition",
+      dataIndex: "assignedSchedule",
+      key: "assignedSchedule",
+      align:"center",
+      sorter:(a,b)=>  b.assignedSchedule - a.assignedSchedule,
+    },
+    {
       title: "",
       dataIndex: "",
       key: "",
@@ -102,7 +109,6 @@ const [isViewConnectionDrawerVisible, setIsViewConnectionDrawerVisible] = useSta
       )
     }
   ];
-
   return (
     <div>
         <div className={`d-flex flex-column justify-content-center text-right mb-2`}>

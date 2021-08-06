@@ -46,7 +46,7 @@ def anomalyDetectionJob(anomalyDef_id: int, manualRun: bool = False):
     allTasksSucceeded = False
     try:
         datasetDf = Data.fetchDatasetDataframe(anomalyDefinition.dataset)
-        dimValsData = prepareAnomalyDataframes(datasetDf, anomalyDefinition.dataset.timestampColumn, anomalyDefinition.metric, anomalyDefinition.dimension, anomalyDefinition.top)
+        dimValsData = prepareAnomalyDataframes(datasetDf, anomalyDefinition.dataset.timestampColumn, anomalyDefinition.metric, anomalyDefinition.dimension,anomalyDefinition.operation ,int(anomalyDefinition.value))
         detectionJobs = group(
             _anomalyDetectionSubTask.s(anomalyDef_id, obj["dimVal"], obj["contriPercent"], obj["df"].to_dict("records")) for obj in dimValsData
         )
@@ -74,7 +74,7 @@ def anomalyDetectionJob(anomalyDef_id: int, manualRun: bool = False):
     if runStatusObj.status == ANOMALY_DETECTION_SUCCESS:
         if logs.get("numAnomaliesPulished", 0) > 0:
             message = f"{logs['numAnomaliesPulished']} anomalies published. \n"
-            topNtext = f" Top {anomalyDefinition.top}" if anomalyDefinition.top > 0 else ""
+            topNtext = f" Top {anomalyDefinition.value}" if int(anomalyDefinition.value) > 0 else ""
             message = message + f"Anomaly Definition: {anomalyDefinition.metric} {anomalyDefinition.dimension} {anomalyDefinition.highOrLow}{topNtext} \n"
             message = message + f"Dataset: {anomalyDefinition.dataset.name} | Granularity: {anomalyDefinition.dataset.granularity} \n \n"
             

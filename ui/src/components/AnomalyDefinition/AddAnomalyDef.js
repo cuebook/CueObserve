@@ -6,7 +6,7 @@ import { Modal, Select, Spin, Switch, Button, Radio, message, Drawer } from "ant
 import datasetService from "services/datasets";
 import anomalyDefService from "services/anomalyDefinitions.js";
 import PercentageChange from "components/DetectionRuleParamSelector/PercentageChange";
-import  _ from "lodash";
+import  _, { last } from "lodash";
 
 const { Option } = Select;
 
@@ -73,7 +73,89 @@ function generateOptions(autoCueOptions) {
     }
   ]
 
-  allOptions.dimVal = [
+  allOptions.contribution = [
+    {
+      value:"Min % Contribution",
+      label:"Min % Contribution",
+      optionType:"Contribution",
+      color:"#ff6767"
+    }
+  ]
+
+  allOptions.minValue = [
+    {
+      value:"Min Value",
+      label:"Min Value",
+      optionType:"Value",
+      color:"#ff6767"
+    }
+  ]
+
+  allOptions.contributionValue = [
+    {
+      value:1 + "",
+      label: 1 + "",
+      optionType: "Min % Contribution",
+      color:"#ff6767"
+
+    },
+    {
+      value:2 + "",
+      label: 2 + "",
+      optionType: "Min % Contribution",
+      color:"#ff6767"
+
+    },
+    {
+      value:3 + "",
+      label: 3 + "",
+      optionType: "Min % Contribution",
+      color:"#ff6767"
+
+    },
+    {
+      value:4 + "",
+      label: 4 + "",
+      optionType: "Min % Contribution",
+      color:"#ff6767"
+
+    },
+    {
+      value:5 + "",
+      label: 5 + "",
+      optionType: "Min % Contribution",
+      color:"#ff6767"
+
+    }
+  ]
+
+  allOptions.minimumValue = [
+    {
+      value:0.1 + "",
+      label: 0.1 + "",
+      optionType: "Minimum Value",
+      color:"#ff6767"
+
+    },
+    {
+      value:1 + "",
+      label: 1 + "",
+      optionType: "Minimum Value",
+      color:"#ff6767"
+
+    },
+    {
+      value:1000 + "",
+      label: 1000 + "",
+      optionType: "Minimum Value",
+      color:"#ff6767"
+
+    }
+  ]
+  
+
+
+  allOptions.topVal = [
     {
       value:10 + "",
       label: 10 + "",
@@ -137,18 +219,42 @@ function getMetricHelpText(value, opts) {
 function getDimensionHelpText(value, opts) {
   if(opts){
     options = [];
-    options = [...options, ...allOptions.top];
+    options = [...options,...allOptions.top, ...allOptions.contribution, ...allOptions.minValue];
     return " [High/Low]";
   }
 }
 
 function getTopHelpText(value, opts) {
   options = []
-  options = [...options, ...allOptions.dimVal]
+  options = [...options, ...allOptions.topVal]
   return ""
 }
 
-function getDimValHelpText(value, opts) {
+function getTopValHelpText(value, opts) {
+  options = []
+  options = [...options, ...allOptions.highOrLow]
+  return ""
+}
+
+function getContributionHelpText(value, opts){
+  options = []
+  options = [...options, ...allOptions.contributionValue]
+  return ""
+}
+
+function getMinimumValHelpText(value, opts){
+  options = []
+  options = [...options, ...allOptions.minimumValue]
+  return ""
+
+}
+function getContributionValuesHelpText(value, opts){
+  options = []
+  options = [...options, ...allOptions.highOrLow]
+  return ""
+}
+
+function getMinimumValuesHelpText(value, opts){
   options = []
   options = [...options, ...allOptions.highOrLow]
   return ""
@@ -159,20 +265,28 @@ function getHelpText(selectedOption) {
     let length = selectedOption.length;
     let lastOption = selectedOption[length - 1];
     let text = "";
+    
     if (lastOption.__isNew__) {
       // when custom input by user
       // check in options of callback validation functions
           let newOption = lastOption;
           newOption.value = lastOption.value;
           newOption.label = lastOption.value + " ";
-          newOption.optionType = "Dimension Values"
+          if(tempOption.optionType === "Top"){
+            newOption.optionType = "Dimension Values"
+          }
+          else if (tempOption.optionType === "Contribution"){
+            newOption.optionType = "Min % Contribution"
+          }
+          else if (tempOption.optionType === "Value"){
+            newOption.optionType = "Minimum Value"
+          }
           newOption.color = "#ff6767"
           selectedOption.pop();
           selectedOption.push(newOption);
           lastOption = newOption
           tempOption = lastOption
       }
-
     switch (lastOption.optionType) {
       case "Measure":
         text = getMetricHelpText(lastOption.value, selectedOption);
@@ -182,32 +296,64 @@ function getHelpText(selectedOption) {
         options = [];
         break;
       case "Dimension":
-        if (lastOption.optionType === "Dimension" && tempOption.optionType === "Top"){
-         lastOption =  selectedOption.pop()
-         text = getMetricHelpText(lastOption.value, selectedOption);
-         tempOption = lastOption
-        }
-        else {
         text = getDimensionHelpText(lastOption.value, selectedOption);
-        let defaultOption1 = options.pop()  
-        selectedOption.push(defaultOption1)
-        lastOption = defaultOption1
-        text = getTopHelpText(lastOption.value, selectedOption)
-        let defaultOption2 = options.shift()
-        selectedOption.push(defaultOption2)
-        lastOption = defaultOption2
-        text = getDimValHelpText(lastOption.value, selectedOption)
-        }
+        tempOption = lastOption
         break;
       case "Top":
+        if (lastOption.optionType === "Top" && tempOption.optionType === "Dimension Values"){
+          text = getTopHelpText(lastOption.value, selectedOption)
+          tempOption = lastOption
+        }
+        else{
         text = getTopHelpText(lastOption.value, selectedOption)
+        let defaultOption1 = options.shift()  
+        selectedOption.push(defaultOption1)
+        lastOption = defaultOption1
+        text = getTopValHelpText(lastOption.value, selectedOption)
         tempOption = lastOption
+        }
         break;
       case "Dimension Values":
-        text = getDimValHelpText(lastOption.value, selectedOption)
+        text = getTopValHelpText(lastOption.value, selectedOption)
         tempOption = lastOption
         break;
+      case "Contribution":
+        if (lastOption.optionType === "Contribution" && tempOption.optionType === "Min % Contribution"){
+          text = getContributionHelpText((lastOption.value, selectedOption))
+          tempOption = lastOption
+        }
+        else{
+        text = getContributionHelpText(lastOption.value, selectedOption)
+        let defaultOption2 = options.shift()  
+        selectedOption.push(defaultOption2)
+        lastOption = defaultOption2
+        text = getContributionValuesHelpText(lastOption.value, selectedOption)
+        tempOption = lastOption
+      }
+        break;
+      case "Value":
+        if (lastOption.optionType === "Value" && tempOption.optionType === "Minimum Value"){
+          text = getMinimumValHelpText(lastOption.value, selectedOption)
+          tempOption = lastOption
+        }
+        else{
+        text = getMinimumValHelpText(lastOption.value, selectedOption)
+        let defaultOption3 = options.pop()  
+        selectedOption.push(defaultOption3)
+        lastOption = defaultOption3
+        text = getMinimumValuesHelpText(lastOption.value, selectedOption)
+        tempOption = lastOption
+      }
 
+        break;
+      case "Min % Contribution":
+        text = getContributionValuesHelpText(lastOption.value, selectedOption)
+        tempOption = lastOption
+        break
+      case "Minimum Value":
+        text = getMinimumValuesHelpText(lastOption.value, selectedOption)
+        tempOption = lastOption
+        break
     }
     return text;
   }
@@ -261,7 +407,7 @@ const handleDetectionRuleTypeChange = value => {
 
  const handleAddAnomaly = () => {
     if ( _.isNull(selectedOption ) ||  selectedOption.length < 1) {
-      message.error("At least Measure required to configure anomaly !");
+      message.error("At least Measure required to configure Anomaly Definition !");
       return;
     }
 
@@ -288,6 +434,8 @@ const handleDetectionRuleTypeChange = value => {
 
     let isDimension = false
     let topVal = null;
+    let operationOnDimension = null;
+    let operationValueOnDimension = null;
     selectedOption.forEach(item => {
       if (item.optionType === "High Or Low") {
         payload.highOrLow = item.value;
@@ -296,16 +444,41 @@ const handleDetectionRuleTypeChange = value => {
         payload.dimension = item.value;
         isDimension = true
       }
+      if (item.optionType === "Top"){
+        payload.operation = item.value
+        operationOnDimension = item.value
+      }
+      if (item.optionType === "Value"){
+        payload.operation = item.value
+        operationOnDimension = item.value
+      }
+      if (item.optionType === "Contribution"){
+        payload.operation = item.value
+        operationOnDimension = item.value
+      }
       if (item.optionType === "Dimension Values"){
-        payload.top = item.value
-        topVal = item.value
+        payload.operationValue = item.value
+        operationValueOnDimension = item.value
+      }
+      if (item.optionType === "Minimum Value"){
+        payload.operationValue = item.value
+        operationValueOnDimension = item.value
+      }
+      if (item.optionType === "Min % Contribution"){
+        payload.operationValue = item.value
+        operationValueOnDimension = item.value
       }
     });
 
-    if(isDimension && _.isNull(topVal)){
-      message.error("Please Enter Top Values");
+    if(isDimension && _.isNull(operationOnDimension)){
+      message.error("Please Enter Operation you want to perform on Dimension");
       return;
     }
+    else if (isDimension && !_.isNull(operationOnDimension) && _.isNull(operationValueOnDimension)){
+      message.error("Please Enter Values of operation you want to perform on Dimension");
+      return;
+    }
+
 
     payload.detectionRuleTypeId = detectionRuleTypeId
     payload.detectionRuleParams = detectionRuleParams
@@ -473,7 +646,7 @@ const handleDetectionRuleTypeChange = value => {
                   MultiValueContainer: multiValueContainer
                 }}
                 options={options}
-                placeholder="Measure [Dimension Top N] [High/Low] "
+                placeholder="Measure [Dimension Top N / Min % Contribution X / Min Value Y] [High/Low] "
               />
               </div>
               <div className="mb-6">

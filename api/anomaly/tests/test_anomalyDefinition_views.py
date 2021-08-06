@@ -30,7 +30,8 @@ def test_anomalyDefinition(client, mocker):
         "measure": "Quantity",
         "dimension": "Category",
         "highOrLow":"",
-        "top":"10"
+        "operation":"Top",
+        "value":"10"
         
     }
     response = client.post(path, data=data, content_type="application/json")
@@ -76,10 +77,10 @@ def test_anomalyDefinition(client, mocker):
         "measure": "ReturnEntries",
         "dimension": "Brandcode",
         "highOrLow":"high",
-        "top":"10"
+        "operation":"Top",
+        "value":"10"
         
     }
-
     response = client.post(path, data=data, content_type="application/json")
     assert response.status_code == 200
     assert response.data['success'] 

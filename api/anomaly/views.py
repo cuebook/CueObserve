@@ -168,13 +168,14 @@ class AnomalyDefView(APIView):
         datasetId = int(request.data.get("datasetId", 0))
         metric = request.data.get("measure", None)
         highOrLow = request.data.get("highOrLow", None)
-        top = int(request.data.get("top", 0))
+        operation = request.data.get("operation", None)
+        value = request.data.get("operationValue", 0)
         dimension = request.data.get("dimension", None)
         dimension = request.data.get("dimension", None)
         detectionRuleTypeId = request.data.get("detectionRuleTypeId", None)
         detectionRuleParams = request.data.get("detectionRuleParams", None)
         res = AnomalyDefinitions.addAnomalyDefinition(
-            metric, dimension, highOrLow, top, datasetId, detectionRuleTypeId, detectionRuleParams
+            metric, dimension, operation, highOrLow, value, datasetId, detectionRuleTypeId, detectionRuleParams
         )
         return Response(res.json())
 
