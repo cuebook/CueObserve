@@ -120,7 +120,7 @@ At the moment, we have test case only for backend although test cases for UI are
 
 #### Backend
 
-Backend test environment is light and doesn't depend on services like redis, celery and celery-beat, they are mocked instead. Backend for API and services is tested using `Pytest`.\([https://docs.pytest.org/en/6.2.x/](https://docs.pytest.org/en/6.2.x/)\).
+Backend test environment is light and doesn't depend on services like redis, celery and celery-beat, they are mocked instead. Backend for API and services is tested using `Pytest`\([https://docs.pytest.org/en/6.2.x/](https://docs.pytest.org/en/6.2.x/)\).
 
  To run test case 
 
