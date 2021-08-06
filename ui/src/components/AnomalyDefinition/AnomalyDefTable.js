@@ -214,7 +214,7 @@ const searchInAnomalyDef = (val) =>{
                 <div style={{fontSize:14}}>
                  <span style={{color: "#4B0082"}}> {record.anomalyDef.metric}</span>
                   <span style={{color: "#12b1ff"}}> {record.anomalyDef.dimension ? record.anomalyDef.dimension : null}</span>
-                  <span style={{color: "#ff6767"}}> {record.anomalyDef.top > 0 ? "Top " + record.anomalyDef.top : null}</span>
+                  <span style={{color: "#ff6767"}}> {record.anomalyDef.value > 0 ? record.anomalyDef.operation +" " + record.anomalyDef.value : null}</span>
                   <span style={{color: "#02c1a3"}}> {record.anomalyDef.highOrLow}</span>
                   </div>
 

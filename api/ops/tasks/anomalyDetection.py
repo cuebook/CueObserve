@@ -112,9 +112,14 @@ def anomalyDetectionJob(anomalyDef_id: int, manualRun: bool = False):
     if runStatusObj.status == ANOMALY_DETECTION_SUCCESS:
         if logs.get("numAnomaliesPulished", 0) > 0:
             message = f"{logs['numAnomaliesPulished']} anomalies published. \n"
+            topNtext = (
+                f" Top {anomalyDefinition.value}"
+                if int(anomalyDefinition.value) > 0
+                else ""
+            )
             message = (
                 message
-                + f"Anomaly Definition: {anomalyDefinition.metric} {anomalyDefinition.dimension} {anomalyDefinition.highOrLow} \n"
+                + f"Anomaly Definition: {anomalyDefinition.metric} {anomalyDefinition.dimension} {anomalyDefinition.highOrLow}{topNtext} \n"
             )
             message = (
                 message
@@ -133,19 +138,16 @@ def anomalyDetectionJob(anomalyDef_id: int, manualRun: bool = False):
             cardTemplate = AnomalyCardTemplate.objects.get(templateName=templateName)
             data.update(data["data"]["anomalyLatest"])
 
-            message = (
-                message
-                + html2text.html2text(
-                    Template(cardTemplate.title).render(Context(data))
-                )
+            details = (
+                html2text.html2text(Template(cardTemplate.title).render(Context(data)))
                 + "\n"
             )
-            message = message + html2text.html2text(
+            details = details + html2text.html2text(
                 Template(cardTemplate.bodyText).render(Context(data))
             )
 
             name = "anomalyAlert"
-            SlackAlert.slackAlertHelper(title, message, name)
+            SlackAlert.slackAlertHelper(title, message, name, details=details)
 
     if runStatusObj.status == ANOMALY_DETECTION_ERROR:
         message = (

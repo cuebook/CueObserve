@@ -46,7 +46,8 @@ class AnomalyDefinitions:
             Q(metric__icontains=searchQuery) | 
             Q(highOrLow__icontains=searchQuery) | 
             Q(dimension__icontains=searchQuery)| 
-            Q(top__icontains=searchQuery))
+            Q(value__icontains=searchQuery) |
+            Q(operation__icontains=searchQuery)) 
 
     @staticmethod
     def sortOnAnomalyDefinition(anomalyDefObjs: List[AnomalyDefinition], sorter):
@@ -64,7 +65,7 @@ class AnomalyDefinitions:
             anomalyDefObjs = anomalyDefObjs.order_by(sortingPrefix + "dataset__granularity")
 
         if columnToSort == "anomalyDef":
-            anomalyDefObjs = anomalyDefObjs.order_by(sortingPrefix + "top")
+            anomalyDefObjs = anomalyDefObjs.order_by(sortingPrefix + "metric")
 
         if columnToSort == "lastRun" :
             anomalyDefObjs = anomalyDefObjs.annotate(latestRun=Max('runstatus__startTimestamp')).order_by(sortingPrefix + 'latestRun')
@@ -76,7 +77,7 @@ class AnomalyDefinitions:
         return anomalyDefObjs
 
     @staticmethod
-    def addAnomalyDefinition(metric: str = None, dimension: str = None, highOrLow: str = None, top: int = 0, datasetId: int = 0):
+    def addAnomalyDefinition(metric: str = None, dimension: str = None, operation: str=None ,highOrLow: str = None, value: int = 0, datasetId: int = 0):
         """
         This method is used to add anomaly to AnomalyDefinition table
         """
@@ -86,7 +87,8 @@ class AnomalyDefinitions:
             metric=metric,
             dimension=dimension,
             highOrLow=highOrLow,
-            top=top
+            value=value,
+            operation=operation
         )
         response.update(True, "Anomaly Definition created successfully !")
         return response
