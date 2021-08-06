@@ -114,3 +114,17 @@ To run the image, currently exposed on port 3000
 docker run -dp 3000:3000 cuebook/cueobserve
 ```
 
+### Testing
+
+At the moment, we have test case only for backend although test cases for UI are in our roadmap. 
+
+#### Backend
+
+Backend test environment is light and doesn't depend on services like redis, celery and celery-beat, they are mocked instead. Backend for API and services is tested using `Pytest`.\([https://docs.pytest.org/en/6.2.x/](https://docs.pytest.org/en/6.2.x/)\).
+
+ To run test case 
+
+```text
+pytest
+```
+
