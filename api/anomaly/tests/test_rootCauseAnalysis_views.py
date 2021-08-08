@@ -224,7 +224,23 @@ def test_rootCauseAnalysis(client, mocker):
 
 
 
+@pytest.mark.django_db(transaction=True)
+def test_calculateRCA(client, mocker):
 
+    mockRCAJob = mocker.patch(
+        "ops.tasks.rootCauseAnalysis.rootCauseAnalysisJob.delay",
+        new=mock.MagicMock(
+            autospec=True, return_value=True
+        ),
+    )
+    mockRCAJob.start()
 
+    anomalyDefinition = mixer.blend("anomaly.anomalyDefinition", periodicTask=None)
+    anomaly = mixer.blend("anomaly.anomaly", anomalyDefinition=anomalyDefinition) 
+    path = reverse("rca", kwargs={"anomalyId": anomaly.id})
+    response = client.post(path)
 
+    assert response.status_code == 200
+    assert response.data['success']
 
+    mockRCAJob.stop()
