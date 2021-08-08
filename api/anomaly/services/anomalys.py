@@ -166,6 +166,7 @@ class Anomalys:
         anomalyObj, _ = Anomaly.objects.get_or_create(
             anomalyDefinition=anomalyDef, dimensionVal=dimVal, published=False
         )
+
         output = {"dimVal": dimVal}
         try:
             if dataFrameEmpty(df):

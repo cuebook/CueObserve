@@ -44,6 +44,28 @@ def _anomalyDetectionForValue(
         return False
 
 
+def _parallelizeAnomalyDetection(anomalyId: int, dimension: str, dimValsData: list):
+    """
+    Run anomaly detection in parallel in celery
+    :param dimValsData: Data for anomaly detection
+    """
+
+    detectionJobs = group(
+        anomalyDetectionForValue.s(
+            anomalyId,
+            dimension,
+            obj["dimVal"],
+            obj["contriPercent"],
+            obj["df"].to_dict("records"),
+        )
+        for obj in dimValsData
+    )
+    _detectionJobs = detectionJobs.apply_async()
+    with allow_join_result():
+        results = _detectionJobs.get()
+    return results
+
+
 @shared_task
 def _anomalyDetectionForDimension(anomalyId: int, dimension: str, data: list):
     """
@@ -61,17 +83,8 @@ def _anomalyDetectionForDimension(anomalyId: int, dimension: str, data: list):
             anomaly.anomalyDefinition.dataset.timestampColumn,
             anomaly.anomalyDefinition.metric,
             dimension,
-            anomalyDefinition.operation,
-            int(anomalyDefinition.value),
-        )
-
-        dimValsData = prepareAnomalyDataframes(
-            datasetDf,
-            anomalyDefinition.dataset.timestampColumn,
-            anomalyDefinition.metric,
-            anomalyDefinition.dimension,
-            anomalyDefinition.operation,
-            int(anomalyDefinition.value),
+            anomaly.anomalyDefinition.operation,
+            int(anomaly.anomalyDefinition.value),
         )
 
         anomaly.rootcauseanalysis.logs = {
@@ -80,19 +93,7 @@ def _anomalyDetectionForDimension(anomalyId: int, dimension: str, data: list):
         }
         anomaly.rootcauseanalysis.save()
 
-        detectionJobs = group(
-            _anomalyDetectionForValue.s(
-                anomalyId,
-                dimension,
-                obj["dimVal"],
-                obj["contriPercent"],
-                obj["df"].to_dict("records"),
-            )
-            for obj in dimValsData
-        )
-        _detectionJobs = detectionJobs.apply_async()
-        with allow_join_result():
-            results = _detectionJobs.get()
+        results = _parallelizeAnomalyDetection(anomalyId, dimension, dimValsData)
 
         anomaly = Anomaly.objects.get(id=anomalyId)
         anomaly.rootcauseanalysis.logs = {

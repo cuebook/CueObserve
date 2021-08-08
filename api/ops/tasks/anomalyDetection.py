@@ -85,9 +85,11 @@ def anomalyDetectionJob(anomalyDef_id: int, manualRun: bool = False):
         _detectionJobs = detectionJobs.apply_async()
         with allow_join_result():
             result = _detectionJobs.get()
+
         Anomaly.objects.filter(
             id__in=[anomaly["anomalyId"] for anomaly in result if anomaly["success"]]
         ).update(latestRun=runStatusObj)
+
         logs["numAnomaliesPulished"] = len(
             [anomaly for anomaly in result if anomaly.get("published")]
         )
