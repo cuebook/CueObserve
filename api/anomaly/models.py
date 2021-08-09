@@ -80,6 +80,7 @@ class AnomalyDefinition(models.Model):
         null=True,
     )
 
+
 class RunStatus(models.Model):
     """
     Model class to store logs and statuses of NotebookJob runs
@@ -94,6 +95,7 @@ class RunStatus(models.Model):
     runType = models.CharField(max_length=20, blank=True, null=True)  # Manual/Scheduled
     logs = models.JSONField(default=dict)
 
+
 class Anomaly(models.Model):
     anomalyDefinition = models.ForeignKey(
         AnomalyDefinition, on_delete=models.CASCADE, db_index=True
@@ -101,7 +103,9 @@ class Anomaly(models.Model):
     dimensionVal = models.TextField(null=True, blank=True)
     published = models.BooleanField(default=False)
     data = models.JSONField(default=dict)
-    latestRun = models.ForeignKey(RunStatus, on_delete=models.SET_NULL, null=True, default=None)
+    latestRun = models.ForeignKey(
+        RunStatus, on_delete=models.SET_NULL, null=True, default=None
+    )
 
 
 class AnomalyCardTemplate(models.Model):
@@ -130,3 +134,33 @@ class Setting(models.Model):
 
     name = models.TextField(null=True, blank=True)
     value = models.TextField(null=True, blank=True)
+
+
+class RootCauseAnalysis(models.Model):
+    """
+    Model class to store data for root cause analysis
+    """
+
+    STATUS_RECEIVED = "RECEIVED"
+    STATUS_RUNNING = "RUNNING"
+    STATUS_SUCCESS = "SUCCESS"
+    STATUS_ERROR = "ERROR"
+
+    anomaly = models.OneToOneField(Anomaly, on_delete=models.CASCADE, db_index=True)
+
+    startTimestamp = models.DateTimeField(auto_now_add=True)
+    endTimestamp = models.DateTimeField(null=True, default=None)
+    status = models.CharField(max_length=20)
+    logs = models.JSONField(default=dict)
+
+
+class RCAAnomaly(models.Model):
+    """
+    Model class to store data for anomaly calculated for RCA
+    """
+
+    anomaly = models.ForeignKey(Anomaly, on_delete=models.CASCADE, db_index=True)
+    dimension = models.CharField(max_length=500)
+    dimensionValue = models.TextField(null=True, blank=True)
+    anomalyDate = models.DateTimeField(auto_now_add=True)
+    data = models.JSONField(default=dict)
