@@ -51,7 +51,7 @@ def _parallelizeAnomalyDetection(anomalyId: int, dimension: str, dimValsData: li
     """
 
     detectionJobs = group(
-        anomalyDetectionForValue.s(
+        _anomalyDetectionForValue.s(
             anomalyId,
             dimension,
             obj["dimVal"],
