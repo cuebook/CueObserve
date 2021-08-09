@@ -8,7 +8,7 @@ As the first step in the anomaly detection process, CueObserve executes the data
 
 ### Generate sub dataframes
 
-Next CueObserve creates new dataframes on which the actual anomaly detection process will run. During this process, CueObserve finds top dimension values and creates sub-dataframes by filtering on the dimension. During the filtering, CueObserve calculates the percentage contribution of each dimension value to the total metric. This filtering process is done only if a dimension is specified in the anomaly definition.
+Next CueObserve creates new dataframes on which the actual anomaly detection process will run. During this process, CueObserve finds dimension values and creates sub-dataframes by filtering on the dimension. This filtering process is done only if a dimension is specified in the anomaly definition.
 
 ### Transform sub dataframe
 

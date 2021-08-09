@@ -1,130 +1,163 @@
 ---
-description: Commands for installation and running services for development
+description: >-
+  If you plan to work on CueObserve code and make changes, this documentation
+  will give you a high level overview of the components used and how to modify
+  them.
 ---
 
 # Development
 
-### UI 
+### Overview
 
-CueObserve's UI is `javascript` based. It's built using reactjs, a JavaScript library for building user interfaces. The code for UI can be found in `ui/` directory.
+CueObserve has 5 basic components:
 
-#### Setup & Start UI server
+1. Frontend single page application written on [ReactJS](https://reactjs.org/).
+2. Backend based on [Django](https://www.djangoproject.com/) \(python framework\), which is responsible for the communication with the frontend application via REST APIs.
+3. [Celery](https://docs.celeryproject.org/) to execute the tasks asynchronously. Tasks like anomaly detection are handled by Celery.
+4. [Celery beat](https://docs.celeryproject.org/en/stable/userguide/periodic-tasks.html) scheduler to trigger the scheduled tasks.
+5. [Redis](https://redis.io/documentation) to handle the task queue of Celery.
 
-Prerequisite: node v12 
+### Frontend Development 
 
-```text
+The code for frontend is in `/ui` directory. CueObserve uses `npm` as the package manager. 
+
+**Prerequisites:**
+
+1. Node &gt;= 12
+2. npm &gt;= 6
+
+```bash
 cd ui
 npm install    # install dependencies
 npm start      # start development server
 ```
 
-This starts UI server on [http://localhost:3000/](https://reactjs.org/)
+This starts the frontend server on [http://localhost:3000/](https://reactjs.org/)
 
-### Backend 
+### Backend Development
 
-CueObserve's backend is `python3.7` based. It incorporates Django, a high-level Python Web framework .  Celery is used for running tasks like Anomaly Detection, scheduled or ran manually, which can be time consuming and run out of the request-response cycle. Celery Beat is used as a scheduler and Redis is a requirement for celery. The code for backend can be found in `api/` directory.
+The code for the backend is in `/api` directory. As mentioned in the overview it is based on Django framework. 
 
-Prerequisite: `python3.7`
+**Prerequisite:** 
 
-Note: Before running any command in `api` directory ensure you have python3.7 as `source`, as below:
+1. Python 3.7
+2. PostgreSQL Server running locally or on server \(Optional\)
 
-#### Backend Setup
+#### Setup Virtual Environment & Install Dependencies
 
-```text
+Setting up a virtual environment is necessary to have your python libraries for this project stored separately so that there is no conflict with other projects. 
+
+```bash
 cd api
-python3.7 -m virtualenv myenv       # make python3.7 virtual environment
-source myenv/bin/activate           # activate virtual environment
+python3 -m virtualenv myenv         # Create Python3 virtual environment
+source myenv/bin/activate           # Activate virtual environment
 
-pip install -r requirements.txt     # install dependencies
-
-# Installations for celery 
-pip install watchdog
-pip install pyyaml
-pip install argh
-
-python manage.py migrate
-python manage.py loaddata seeddata/*.json
+pip install -r requirements.txt     # Install project dependencies
 ```
 
-#### Start Backend Server
+#### Configure environment variables
 
-```text
-python manage.py runserver
-```
+The environment variables required to run the backend server can be found in `api/.env.dev`. The file looks like below:
 
-This starts the server on [http://localhost:8000/](https://reactjs.org/). 
+```bash
+export ENVIRONMENT=dev
 
-#### Install & Run Redis 
-
-Install and run redis-server \([https://redis.io/topics/quickstart](https://redis.io/topics/quickstart)\) or using docker
-
-```text
-docker run -dp 6379:6379 redis    # run redis
-```
-
-#### Start Celery Beat 
-
-Celery Beat is a scheduler. Read more at [https://docs.celeryproject.org/en/stable/userguide/periodic-tasks.html](https://docs.celeryproject.org/en/stable/userguide/periodic-tasks.html#:~:text=celery%20beat%20is%20a%20scheduler,entries%20in%20a%20SQL%20database.)
-
-```text
-celery -A app beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler --detach         # run celery beat
-```
-
-#### Start Celery 
-
-Celery is a task queue implementation for Python web applications used to asynchronously execute work outside the HTTP request-response cycle. Read more at [https://docs.celeryproject.org/en/stable/](https://docs.celeryproject.org/en/stable/)
-
-```text
-watchmedo auto-restart -- celery -A app worker -l info       # run celery => 5.0
-```
-
-### Optional
-
-#### Using Postgres as application db
-
-SQLite is the default storage database for CueObserve. However, if you want to use Postgres instead, do the following:
-
-Create a `.env.dev` file with given variables:
-
-```text
-export POSTGRES_DB_SCHEMA=cueobserve
-export POSTGRES_DB_USERNAME=postgres
-export POSTGRES_DB_PASSWORD=postgres
-export POSTGRES_DB_HOST=localhost
+## DB SETTINGS 
+export POSTGRES_DB_HOST="localhost"
+export POSTGRES_DB_USERNAME="postgres"
+export POSTGRES_DB_PASSWORD="postgres"
+export POSTGRES_DB_SCHEMA="cue_observe"
 export POSTGRES_DB_PORT=5432
 ```
 
-And then source these variables before running backend commands
+Change the values based on your running PostgreSQL instance. If you do not wish to use PostgreSQL as your database for development, comment lines 4-8 and CueObserve will create a SQLite database file at the location `api/db/db.sqlite3`. 
+
+After changing the values, source the file to initialize all the environment variables. 
 
 ```text
 source .env.dev
 ```
 
-### Docker
+Then run the following commands to migrate the schema to your database and load static data required by CueObserve:
 
-To build the docker image, run following command in main directory
-
-```text
-docker build -t cuebook/cueobserve .
+```bash
+python manage.py migrate                     # Migrate db schema
+python manage.py loaddata seeddata/*.json    # Load seed data in database
 ```
 
-To run the image, currently exposed on port 3000
+After the above steps are completed successfully, we can start our backend server by running:
 
 ```text
-docker run -dp 3000:3000 cuebook/cueobserve
+python manage.py runserver
+```
+
+This starts the backend server on [http://localhost:8000/](https://reactjs.org/). 
+
+#### Celery Development 
+
+CueObserve uses Celery for executing asynchronous  tasks like anomaly detection. There are three components needed to run an asynchronous task, i.e. Redis, Celery and Celery Beat. Redis is used as the message queue by Celery, so before starting Celery services, Redis server should be running. Celery Beat is used as the scheduler and is responsible to trigger the scheduled tasks. Celery workers are used to execute the tasks. 
+
+**Starting Redis Server**
+
+Redis server can be easily started by its official docker image.
+
+```bash
+docker run -dp 6379:6379 redis    # Run redis docker on port 6379
+```
+
+#### Start Celery Beat
+
+To start celery beat service, activate the virtual environment created for the backend server and then source the .env.dev file to export all required environment variables.
+
+```bash
+cd api
+source myenv/bin/activate           # Activate virtual environment
+source .env.dev                     # Export environment variables.
+celery -A app beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler --detach         # Run celery beat service
+```
+
+#### Start Celery 
+
+To start the celery service, its same as backend or celery beat, first activate the virual env created and then source .env.dev file to export all required environment variables. Celery service doesn't reloads on code changes so we have to install some additional libraries to make it happen. 
+
+```text
+cd api
+source myenv/bin/activate           # Activate virtual environment
+source .env.dev                     # Export environment variables
+
+pip install watchdog pyyaml argh    # Additional libraries to reload celery on code changes
+watchmedo auto-restart -- celery -A app worker -l info       # Run celery
+```
+
+After these three services are running, you can trigger a task or wait for a scheduled task to run. 
+
+### Building Docker Image
+
+To build the docker image, run the following command in root directory:
+
+```text
+docker build -t <YOUR_TAG_NAME> .
+```
+
+To run the built image exposed on port 3000:
+
+```text
+docker run -dp 3000:3000 <YOUR_TAG_NAME>
 ```
 
 ### Testing
 
-At the moment, we have test case only for backend although test cases for UI are in our roadmap. 
+At the moment, we have test cases only for the backend service, test cases for UI are in our roadmap. 
 
-#### Backend
+Backend test environment is light and doesn't depend on services like Redis, Celery or Celery-Beat, they are mocked instead. Backend for API and services is tested using [PyTest](https://docs.pytest.org/en/6.2.x/).
 
-Backend test environment is light and doesn't depend on services like redis, celery and celery-beat, they are mocked instead. Backend for API and services is tested using `Pytest`\([https://docs.pytest.org/en/6.2.x/](https://docs.pytest.org/en/6.2.x/)\).
-
- To run test case 
+ To run the test cases virtual environment should be activated and then source .env.dev file to export all required environment variables. 
 
 ```text
-pytest
+cd api
+source myenv/bin/activate           # Activate virtual environment
+source .env.dev                     # Export environment variables
+
+pytest                              # Run tests
 ```
 
