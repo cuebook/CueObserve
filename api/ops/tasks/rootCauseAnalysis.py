@@ -49,7 +49,6 @@ def _parallelizeAnomalyDetection(anomalyId: int, dimension: str, dimValsData: li
     Run anomaly detection in parallel in celery
     :param dimValsData: Data for anomaly detection
     """
-
     detectionJobs = group(
         _anomalyDetectionForValue.s(
             anomalyId,
@@ -74,17 +73,25 @@ def _anomalyDetectionForDimension(anomalyId: int, dimension: str, data: list):
     :param dimension: dimension for which anomaly is being detected
     :para data: data for dimension
     """
+    DEFAULT_OPERATION = "Min % Contribution"
+    DEFAULT_OPERATION_VALUE = 1
 
     anomaly = Anomaly.objects.get(id=anomalyId)
     try:
         df = pd.DataFrame(data=data)
+
+        operation = anomaly.anomalyDefinition.operation
+        operationValue = int(anomaly.anomalyDefinition.value)
+        operation = operation if operation else DEFAULT_OPERATION
+        operationValue = operationValue if operation else DEFAULT_OPERATION_VALUE
+
         dimValsData = prepareAnomalyDataframes(
             df,
             anomaly.anomalyDefinition.dataset.timestampColumn,
             anomaly.anomalyDefinition.metric,
             dimension,
-            anomaly.anomalyDefinition.operation,
-            int(anomaly.anomalyDefinition.value),
+            operation,
+            operationValue,
         )
 
         anomaly.rootcauseanalysis.logs = {
