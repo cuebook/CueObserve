@@ -80,6 +80,23 @@ class AnomalyDefinition(models.Model):
         null=True,
     )
 
+    def getAnomalyTemplateName(self):
+        templateDict = {
+            "day": {
+                "Prophet": "Anomaly Daily Template Prophet",
+                "Percentage Change": "Anomaly Daily Template Percentage Change",
+                "Lifetime": "Anomaly Daily Template Lifetime",
+            },
+            "hour": {
+                "Prophet": "Anomaly Hourly Template Prophet",        
+                "Percentage Change": "Anomaly Hourly Template Percentage Change",
+                "Lifetime": "Anomaly Hourly Template Lifetime",
+            }
+        }
+
+        detectionRuleType = self.detectionrule.detectionRuleType.name if hasattr(self, "detectionrule") else "Prophet"
+        
+        return templateDict[self.dataset.granularity][detectionRuleType]
 
 class RunStatus(models.Model):
     """
@@ -135,6 +152,28 @@ class Setting(models.Model):
     name = models.TextField(null=True, blank=True)
     value = models.TextField(null=True, blank=True)
 
+class DetectionRuleType(models.Model):
+    name = models.CharField(max_length=200, db_index=True, unique=True)
+    description = models.TextField()
+
+    def __str__(self):
+        return self.name
+
+class DetectionRuleParam(models.Model):
+    name = models.CharField(max_length=200)
+    detectionRuleType = models.ForeignKey(DetectionRuleType, on_delete=models.CASCADE, db_index=True)
+
+    def __str__(self):
+        return self.detectionRuleType.name + "_" + self.name
+
+class DetectionRule(models.Model):
+    anomalyDefinition = models.OneToOneField(AnomalyDefinition, on_delete=models.CASCADE)
+    detectionRuleType = models.ForeignKey(DetectionRuleType, on_delete=models.CASCADE)
+
+class DetectionRuleParamValue(models.Model):
+    param = models.ForeignKey(DetectionRuleParam, on_delete=models.CASCADE)
+    detectionRule = models.ForeignKey(DetectionRule, on_delete=models.CASCADE)
+    value = models.TextField()
 
 class RootCauseAnalysis(models.Model):
     """

@@ -68,6 +68,21 @@ class AnomalyDefService {
         else
             return null
     }
+    async getDetectionRuleTypes(){
+        return apiService.get("anomaly/detectionRuleTypes")
+        .then(response => {
+            if(response.success == true){
+                return response.data
+            } else {
+                message.error(response.message);
+                return null
+            }
+        })
+        .catch(response => {
+            message.error(response.message)
+            return null
+        })
+    }
 
 }
 let anomalyDefService = new AnomalyDefService();

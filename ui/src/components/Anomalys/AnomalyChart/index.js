@@ -54,12 +54,7 @@ export default function AnomalyChart(props) {
     }
   };
 
-
-  const chart = (
-      <Chart scale={cols} autoFit padding={[10, 10, 15, 20]} height={ props.isMiniChart ? 120 : 400 }>
-        <Legend visible={false} />
-        <Tooltip crosshairs={{ type: "line" }} />
-        <View data={anomalyData.data.anomalyData.band}>
+  const bandView = anomalyData.data.anomalyData.band ? (<View data={anomalyData.data.anomalyData.band}>
           <Geom
             type="area"
             position="ds*y"
@@ -67,75 +62,86 @@ export default function AnomalyChart(props) {
             style={{ fillOpacity: 0.15 }}
             color={"#777"}
           />
-        </View>
-        <View data={anomalyData.data.anomalyData.actual}>
-          <Axis name="ds" />
-          <Axis name="y" />
-          <Geom
-            type="point"
-            position="ds*y"
-            size={
-              "anomaly"
-            }
-            opacity={[
-              "anomaly",
-              anomaly => {
-                if (anomaly === 1) return 0;
-                return 0.5;
-              }
-            ]}
-            color= "#ff1100"
-            shape="circle"
-            tooltip={false}
-            style={{ stroke: "#fff", lineWidth: 1, fillOpacity: 0.5 }}
-            select={[
-              true,
-              {
-                mode: "single",
-                style: {
-                  fill: "black",
-                  opacity: "0.3"
-                },
-                cancelable: true,
-                animate: true
-              }
-            ]}
-            active={[
-              true,
-              {
-                highlight: true,
-                style: {
-                  cursor: "crosshair"
-                }
-              }
-            ]}
-            active={[
-              true,
-              {
-                highlight: true,
-                style: {
-                  cursor: "crosshair"
-                }
-              }
-            ]}
-          />
-          <Geom
-            type="line"
-            position={"ds*y"}
-            size={2}
-          />
-        </View>
-        <View data={anomalyData.data.anomalyData.predicted}>
-          <Geom
-            type="line"
-            position={"ds*y"}
-            size={2}
-            style={{ lineDash: [4, 4] }}
-          />
-        </View>
-        </Chart>
+        </View>) : null
+  
+  const predictedView = anomalyData.data.anomalyData.predicted ? (<View data={anomalyData.data.anomalyData.predicted}>
+    <Geom
+      type="line"
+      position={"ds*y"}
+      size={2}
+      style={{ lineDash: [4, 4] }}
+    />
+  </View>) : null
 
-    );
+
+  const chart = (
+    <div className={style.chartDiv}>
+      <Chart scale={cols} autoFit padding={[10, 10, 25, 20]} height={400}>
+      <Legend visible={false} />
+        <Tooltip crosshairs={{ type: "line" }} />
+          {bandView}
+          <View data={anomalyData.data.anomalyData.actual}>
+            <Axis name="ds" />
+            <Axis name="y" />
+            <Geom
+              type="point"
+              position="ds*y"
+              size={
+                "anomaly"
+              }
+              opacity={[
+                "anomaly",
+                anomaly => {
+                  if (anomaly === 1) return 0;
+                  return 0.5;
+                }
+              ]}
+              color= "#ff1100"
+              shape="circle"
+              tooltip={false}
+              style={{ stroke: "#fff", lineWidth: 1, fillOpacity: 0.5 }}
+              select={[
+                true,
+                {
+                  mode: "single",
+                  style: {
+                    fill: "black",
+                    opacity: "0.3"
+                  },
+                  cancelable: true,
+                  animate: true
+                }
+              ]}
+              active={[
+                true,
+                {
+                  highlight: true,
+                  style: {
+                    cursor: "crosshair"
+                  }
+                }
+              ]}
+              active={[
+                true,
+                {
+                  highlight: true,
+                  style: {
+                    cursor: "crosshair"
+                  }
+                }
+              ]}
+            />
+            <Geom
+              type="line"
+              position={"ds*y"}
+              size={2}
+            />
+          </View>
+          {predictedView}
+        </Chart>
+      </div>
+
+    )
 
   return (<> { chart } </>)
 }

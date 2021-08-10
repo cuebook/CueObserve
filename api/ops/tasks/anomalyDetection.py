@@ -1,164 +1,79 @@
-import json
 import traceback
-import datetime as dt
-import pandas as pd
-import html2text
-from django.template import Template, Context
-from celery import shared_task, group
-from celery.result import allow_join_result
+import dateutil.parser as dp
+import pandas as pd, datetime as dt, json
 
-from anomaly.models import (
-    Anomaly,
-    AnomalyDefinition,
-    RunStatus,
-    AnomalyCardTemplate,
-    RCAAnomaly,
-)
-from anomaly.serializers import AnomalySerializer
-from access.data import Data
-from access.utils import prepareAnomalyDataframes
+from .detectionTypes.prophet import prophetDetect
+from .detectionTypes.percentageChange import percentChangeDetect
+from .detectionTypes.lifetime import lifetimeDetect
 
-ANOMALY_DAILY_TEMPLATE = "Anomaly Daily Template"
-ANOMALY_HOURLY_TEMPLATE = "Anomaly Hourly Template"
-
-ANOMALY_DETECTION_RUNNING = "RUNNING"
-ANOMALY_DETECTION_SUCCESS = "SUCCESS"
-ANOMALY_DETECTION_ERROR = "ERROR"
+from anomaly.models import Anomaly
 
 
-@shared_task
-def _anomalyDetectionSubTask(anomalyDef_id, dimVal, contriPercent, dfDict):
+def dataFrameEmpty(df):
+    """Checks whether dataFrame has enough data for prophet"""
+    if df is None:
+        return True
+    if df.empty:
+        return True
+    if df.shape[0] < 20:
+        return True
+    return False
+
+
+def detect(df, granularity, detectionRuleType, anomalyDef):
     """
-    Internal anomaly detection subtask to be grouped by celery for each anomaly object
+    Method to detect anomaly depending on the detection rule type
     """
-    from anomaly.services import Anomalys
+    if detectionRuleType == "Prophet":
+        return prophetDetect(df, granularity)
+    elif detectionRuleType == "Percentage Change":
+        threshold = float(anomalyDef.detectionrule.detectionruleparamvalue_set.get(param__name="threshold").value)
+        return percentChangeDetect(df, granularity, threshold)
+    elif detectionRuleType == "Lifetime":
+        highOrLow = anomalyDef.detectionrule.detectionruleparamvalue_set.get(param__name="highOrLow").value
+        return lifetimeDetect(df, granularity, highOrLow)
 
-    anomalyDefinition = AnomalyDefinition.objects.get(id=anomalyDef_id)
-    anomalyServiceResult = Anomalys.createAnomaly(
-        anomalyDefinition, dimVal, contriPercent, pd.DataFrame(dfDict)
-    )
-    return anomalyServiceResult
 
 
-@shared_task
-def anomalyDetectionJob(anomalyDef_id: int, manualRun: bool = False):
+def anomalyService(anomalyDef, dimVal, contriPercent, df):
     """
-    Method to find initiate anomaly detection for a given anomaly definition
-    :param anomalyDef_id: ID of the anomaly definition
-    :param manualRun: Boolean determining whether task was manually initiated
+    Method to conduct the anomaly detection process
     """
-
-    from anomaly.services.slack import SlackAlert
-
-    runType = "Manual" if manualRun else "Scheduled"
-    anomalyDefinition = AnomalyDefinition.objects.get(id=anomalyDef_id)
-    anomalyDefinition.anomaly_set.update(published=False)
-    RCAAnomaly.objects.filter(anomaly__in=anomalyDefinition.anomaly_set.all()).delete()
-
-    runStatusObj = RunStatus.objects.create(
-        anomalyDefinition=anomalyDefinition,
-        status=ANOMALY_DETECTION_RUNNING,
-        runType=runType,
-    )
-    logs = {}
-    allTasksSucceeded = False
+    anomalyObj, _ = Anomaly.objects.get_or_create(anomalyDefinition=anomalyDef, dimensionVal=dimVal, published=False)
+    output = {"dimVal": dimVal}
     try:
-        datasetDf = Data.fetchDatasetDataframe(anomalyDefinition.dataset)
-        dimValsData = prepareAnomalyDataframes(
-            datasetDf,
-            anomalyDefinition.dataset.timestampColumn,
-            anomalyDefinition.metric,
-            anomalyDefinition.dimension,
-            anomalyDefinition.operation,
-            int(anomalyDefinition.value),
-        )
-
-        detectionJobs = group(
-            _anomalyDetectionSubTask.s(
-                anomalyDef_id,
-                obj["dimVal"],
-                obj["contriPercent"],
-                obj["df"].to_dict("records"),
-            )
-            for obj in dimValsData
-        )
-        _detectionJobs = detectionJobs.apply_async()
-        with allow_join_result():
-            result = _detectionJobs.get()
-
-        Anomaly.objects.filter(
-            id__in=[anomaly["anomalyId"] for anomaly in result if anomaly["success"]]
-        ).update(latestRun=runStatusObj)
-
-        logs["numAnomaliesPulished"] = len(
-            [anomaly for anomaly in result if anomaly.get("published")]
-        )
-        logs["numAnomalySubtasks"] = len(_detectionJobs)
-        logs["log"] = json.dumps(
-            {detection.id: detection.result for detection in _detectionJobs}
-        )
-        allTasksSucceeded = all([anomalyTask["success"] for anomalyTask in result])
+        if dataFrameEmpty(df):
+            output["error"] = json.dumps({"message": "Insufficient data in dataframe."})
+            output["success"] = False
+            return output
+        granularity = anomalyDef.dataset.granularity
+        detectionRuleType = anomalyDef.detectionrule.detectionRuleType.name if hasattr(anomalyDef, "detectionrule") else "Prophet"
+        result = detect(df, granularity, detectionRuleType, anomalyDef)
+        result["contribution"] = contriPercent
+        toPublish= False
+        if result["anomalyLatest"]:
+            result["anomalyLatest"]["contribution"] = contriPercent
+            timeThreshold = 3600 * 24 * 5 if granularity == "day" else 3600 * 24
+            toPublish = dt.datetime.now().timestamp() - dp.parse(result["anomalyLatest"]["anomalyTimeISO"]).timestamp() <= timeThreshold
+            if anomalyDef.highOrLow:
+                toPublish = toPublish and anomalyDef.highOrLow.lower() == result["anomalyLatest"]["highOrLow"]
+        anomalyObj.data = result
+        anomalyObj.published = toPublish
+        anomalyObj.save()
+        output["published"] = toPublish
+        output["anomalyId"] = anomalyObj.id
+        output["success"] = True
     except Exception as ex:
-        logs["log"] = json.dumps(
-            {"stackTrace": traceback.format_exc(), "message": str(ex)}
-        )
-        runStatusObj.status = ANOMALY_DETECTION_ERROR
-    else:
-        runStatusObj.status = ANOMALY_DETECTION_SUCCESS
-    if not allTasksSucceeded:
-        runStatusObj.status = ANOMALY_DETECTION_ERROR
-    runStatusObj.logs = logs
-    runStatusObj.endTimestamp = dt.datetime.now()
-    runStatusObj.save()
+        output["error"] = json.dumps({"message": str(ex), "stackTrace": traceback.format_exc()})
+        output["success"] = False
 
-    # Slack alerts
-    title = "CueObserve Alerts"
-    if runStatusObj.status == ANOMALY_DETECTION_SUCCESS:
-        if logs.get("numAnomaliesPulished", 0) > 0:
-            message = f"{logs['numAnomaliesPulished']} anomalies published. \n"
-            topNtext = (
-                f" Top {anomalyDefinition.value}"
-                if int(anomalyDefinition.value) > 0
-                else ""
-            )
-            message = (
-                message
-                + f"Anomaly Definition: {anomalyDefinition.metric} {anomalyDefinition.dimension} {anomalyDefinition.highOrLow}{topNtext} \n"
-            )
-            message = (
-                message
-                + f"Dataset: {anomalyDefinition.dataset.name} | Granularity: {anomalyDefinition.dataset.granularity} \n \n"
-            )
+    
+    return output
 
-            highestContriAnomaly = anomalyDefinition.anomaly_set.order_by(
-                "data__contribution"
-            ).last()
-            data = AnomalySerializer(highestContriAnomaly).data
-            templateName = (
-                ANOMALY_DAILY_TEMPLATE
-                if anomalyDefinition.dataset.granularity == "day"
-                else ANOMALY_HOURLY_TEMPLATE
-            )
-            cardTemplate = AnomalyCardTemplate.objects.get(templateName=templateName)
-            data.update(data["data"]["anomalyLatest"])
 
-            details = (
-                html2text.html2text(Template(cardTemplate.title).render(Context(data)))
-                + "\n"
-            )
-            details = details + html2text.html2text(
-                Template(cardTemplate.bodyText).render(Context(data))
-            )
 
-            name = "anomalyAlert"
-            SlackAlert.slackAlertHelper(title, message, name, details=details)
+    
+    
 
-    if runStatusObj.status == ANOMALY_DETECTION_ERROR:
-        message = (
-            "Anomaly Detection Job failed on AnomalyDefintion id : "
-            + str(anomalyDef_id)
-            + "\n"
-        )
-        message = message + str(logs["log"])
-        name = "appAlert"
-        SlackAlert.slackAlertHelper(title, message, name)
+
+

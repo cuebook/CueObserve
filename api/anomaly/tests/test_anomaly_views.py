@@ -13,6 +13,7 @@ from anomaly.models import AnomalyDefinition, Anomaly
 def test_anomalys(client, mocker):
     schedule = mixer.blend("anomaly.customSchedule", name="Test Schedule")
     connection = mixer.blend("anomaly.connection")
+    detectionRuleType = mixer.blend("anomaly.DetectionRuleType", id=1, name="Prophet")
     dataset = mixer.blend("anomaly.dataset", granularity='day', name="DB1")
 
     path = reverse("addAnomalyDef")
