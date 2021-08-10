@@ -1,0 +1,18 @@
+[
+    {
+      "model": "anomaly.detectionruleparam",
+      "pk": 2,
+      "fields": {
+        "name": "threshold",
+        "detectionRuleType": 2
+      }
+    },
+    {
+      "model": "anomaly.detectionruleparam",
+      "pk": 3,
+      "fields": {
+        "name": "highOrLow",
+        "detectionRuleType": 3
+      }
+    }
+]

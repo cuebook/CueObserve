@@ -2,7 +2,7 @@ import logging
 from typing import List
 from utils.apiResponse import ApiResponse
 from dbConnections import BigQuery
-from anomaly.models import AnomalyDefinition, Dataset, CustomSchedule as Schedule, DetectionRule, RunStatus
+from anomaly.models import AnomalyDefinition, Dataset, CustomSchedule as Schedule, DetectionRule, DetectionRuleParam, DetectionRuleParamValue, RunStatus
 from anomaly.serializers import AnomalyDefinitionSerializer, RunStatusSerializer
 from django_celery_beat.models import PeriodicTask, PeriodicTasks, CrontabSchedule
 from ops.tasks import anomalyDetectionJob
@@ -91,6 +91,14 @@ class AnomalyDefinitions:
             operation=operation
         )
         detectionRule = DetectionRule.objects.create(detectionRuleType_id=detectionRuleTypeId, anomalyDefinition=anomalyObj)
+        detectionParams = []
+        for param in detectionRuleParams.keys():
+            detectionRuleParamObj = DetectionRuleParam.objects.filter(name=param).first()
+            if detectionRuleParamObj:
+                detectionParams.append(
+                    DetectionRuleParamValue(param=detectionRuleParamObj, detectionRule=detectionRule, value=str(detectionRuleParams[param]))
+                )
+        DetectionRuleParamValue.objects.bulk_create(detectionParams)
         response.update(True, "Anomaly Definition created successfully !")
         return response
 

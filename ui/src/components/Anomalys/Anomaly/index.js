@@ -72,13 +72,7 @@ export default function Anomaly(props) {
     }
   };
 
-
-  const chart = (
-    <div className={style.chartDiv}>
-      <Chart scale={cols} autoFit padding={[10, 10, 25, 20]} height={400}>
-      <Legend visible={false} />
-        <Tooltip crosshairs={{ type: "line" }} />
-        <View data={anomalyData.data.anomalyData.band}>
+  const bandView = anomalyData.data.anomalyData.band ? (<View data={anomalyData.data.anomalyData.band}>
           <Geom
             type="area"
             position="ds*y"
@@ -86,7 +80,24 @@ export default function Anomaly(props) {
             style={{ fillOpacity: 0.15 }}
             color={"#777"}
           />
-        </View>
+        </View>) : null
+  
+  const predictedView = anomalyData.data.anomalyData.predicted ? (<View data={anomalyData.data.anomalyData.predicted}>
+    <Geom
+      type="line"
+      position={"ds*y"}
+      size={2}
+      style={{ lineDash: [4, 4] }}
+    />
+  </View>) : null
+
+
+  const chart = (
+    <div className={style.chartDiv}>
+      <Chart scale={cols} autoFit padding={[10, 10, 25, 20]} height={400}>
+      <Legend visible={false} />
+        <Tooltip crosshairs={{ type: "line" }} />
+          {bandView}
           <View data={anomalyData.data.anomalyData.actual}>
             <Axis name="ds" />
             <Axis name="y" />
@@ -144,18 +155,11 @@ export default function Anomaly(props) {
               size={2}
             />
           </View>
-            <View data={anomalyData.data.anomalyData.predicted}>
-              <Geom
-                type="line"
-                position={"ds*y"}
-                size={2}
-                style={{ lineDash: [4, 4] }}
-              />
-            </View>
+          {predictedView}
         </Chart>
       </div>
 
-    );
+    )
 
   return (<>
     <div className="flex">

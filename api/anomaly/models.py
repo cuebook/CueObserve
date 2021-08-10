@@ -80,6 +80,24 @@ class AnomalyDefinition(models.Model):
         null=True,
     )
 
+    def getAnomalyTemplateName(self):
+        templateDict = {
+            "day": {
+                "Prophet": "Anomaly Daily Template Prophet",
+                "Percentage Change": "Anomaly Daily Template Percentage Change",
+                "Lifetime": "Anomaly Daily Template Lifetime",
+            },
+            "hour": {
+                "Prophet": "Anomaly Hourly Template Prophet",        
+                "Percentage Change": "Anomaly Hourly Template Percentage Change",
+                "Lifetime": "Anomaly Hourly Template Lifetime",
+            }
+        }
+
+        detectionRuleType = self.detectionrule.detectionRuleType.name if hasattr(self, "detectionrule") else "Prophet"
+        
+        return templateDict[self.dataset.granularity][detectionRuleType]
+
 class RunStatus(models.Model):
     """
     Model class to store logs and statuses of NotebookJob runs

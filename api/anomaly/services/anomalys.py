@@ -5,8 +5,6 @@ from anomaly.models import Anomaly, AnomalyCardTemplate
 from anomaly.serializers import AnomalySerializer
 from django.db.models import Q
 
-ANOMALY_DAILY_TEMPLATE = "Anomaly Daily Template"
-ANOMALY_HOURLY_TEMPLATE= "Anomaly Hourly Template"
 
 class Anomalys:
     """
@@ -44,7 +42,7 @@ class Anomalys:
 
         data = AnomalySerializer(anomalyObj).data
 
-        templateName = ANOMALY_DAILY_TEMPLATE if anomalyObj.anomalyDefinition.dataset.granularity == "day" else ANOMALY_HOURLY_TEMPLATE
+        templateName = anomalyObj.anomalyDefinition.getAnomalyTemplateName()
         cardTemplate = AnomalyCardTemplate.objects.get(templateName=templateName)
         data.update(data["data"]["anomalyLatest"])
 

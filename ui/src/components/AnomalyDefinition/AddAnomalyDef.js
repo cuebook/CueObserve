@@ -6,6 +6,7 @@ import { Modal, Select, Spin, Switch, Button, Radio, message, Drawer } from "ant
 import datasetService from "services/datasets";
 import anomalyDefService from "services/anomalyDefinitions.js";
 import PercentageChange from "components/DetectionRuleParamSelector/PercentageChange";
+import Lifetime from "components/DetectionRuleParamSelector/Lifetime";
 import  _, { last } from "lodash";
 
 const { Option } = Select;
@@ -582,13 +583,19 @@ const handleDetectionRuleTypeChange = value => {
     ));
 
     let paramSelector = null
+    let descriptionText = null
 
     if(detectionRuleTypeId)
     {
       let detectionRuleType = allDetectionRuleTypes.find(detRuleType => detRuleType.id == detectionRuleTypeId)
+      descriptionText = detectionRuleType.description
       if(detectionRuleType.name == "Percentage Change")
       {
         paramSelector = <PercentageChange submitParams={setDetectionRuleParams} />
+      }
+      if(detectionRuleType.name == "Lifetime")
+      {
+        paramSelector = <Lifetime submitParams={setDetectionRuleParams} />
       }
     }
 
@@ -665,6 +672,7 @@ const handleDetectionRuleTypeChange = value => {
                 >
                   {detectionRuleTypeOptions}
                 </Select>
+                <span style={{opacity: 0.6, paddingLeft: 5}}>{descriptionText}</span>
               </div>
               {paramSelector}
             <div className="mb-6">

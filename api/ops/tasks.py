@@ -14,9 +14,6 @@ from access.utils import prepareAnomalyDataframes
 from ops.anomalyDetection import anomalyService
 from anomaly.services.slack import SlackAlert
 
-ANOMALY_DAILY_TEMPLATE = "Anomaly Daily Template"
-ANOMALY_HOURLY_TEMPLATE= "Anomaly Hourly Template"
-
 ANOMALY_DETECTION_RUNNING = "RUNNING"
 ANOMALY_DETECTION_SUCCESS = "SUCCESS"
 ANOMALY_DETECTION_ERROR = "ERROR"
@@ -28,6 +25,7 @@ def _anomalyDetectionSubTask(anomalyDef_id, dimVal, contriPercent, dfDict):
     """
     anomalyDefinition = AnomalyDefinition.objects.get(id=anomalyDef_id)
     anomalyServiceResult = anomalyService(anomalyDefinition, dimVal, contriPercent, pd.DataFrame(dfDict))
+    print(anomalyServiceResult)
     return anomalyServiceResult
 
 
@@ -56,6 +54,7 @@ def anomalyDetectionJob(anomalyDef_id: int, manualRun: bool = False):
         Anomaly.objects.filter(id__in=[anomaly["anomalyId"] for anomaly in result if anomaly["success"]]).update(latestRun=runStatusObj)
         logs["numAnomaliesPulished"] = len([anomaly for anomaly in result if anomaly.get("published")])
         logs["numAnomalySubtasks"] = len(_detectionJobs)
+        print(_detectionJobs)
         logs["log"] = json.dumps({detection.id: detection.result for detection in _detectionJobs})
         allTasksSucceeded = all([anomalyTask["success"] for anomalyTask in result])
     except Exception as ex:
@@ -80,7 +79,7 @@ def anomalyDetectionJob(anomalyDef_id: int, manualRun: bool = False):
             
             highestContriAnomaly = anomalyDefinition.anomaly_set.order_by("data__contribution").last()
             data = AnomalySerializer(highestContriAnomaly).data
-            templateName = ANOMALY_DAILY_TEMPLATE if anomalyDefinition.dataset.granularity == "day" else ANOMALY_HOURLY_TEMPLATE
+            templateName = anomalyDefinition.getAnomalyTemplateName()
             cardTemplate = AnomalyCardTemplate.objects.get(templateName=templateName)
             data.update(data["data"]["anomalyLatest"])
             
