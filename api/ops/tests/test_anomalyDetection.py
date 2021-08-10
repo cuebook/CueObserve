@@ -1,7 +1,7 @@
 import pytest
 import unittest
 from unittest import mock
-from anomaly.services import Anomalys
+from ops.tasks.anomalyDetection import anomalyService
 from anomaly.models import Anomaly
 from pandas import Timestamp
 from decimal import Decimal
@@ -67,7 +67,9 @@ def test_createAnomalyService(client, mocker):
     dts = mixer.blend("anomaly.Dataset", granularity="day")
     adf = mixer.blend("anomaly.AnomalyDefinition", dataset=dts, periodicTask=None)
 
-    Anomalys.createAnomaly(adf, None, 20, df=df)
+    
+
+    anomalyService(adf, None, 20, df=df)
 
     
     assert Anomaly.objects.count() == 1
