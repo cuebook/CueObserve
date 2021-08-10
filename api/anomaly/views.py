@@ -172,8 +172,8 @@ class AnomalyDefView(APIView):
         value = request.data.get("operationValue", 0)
         dimension = request.data.get("dimension", None)
         dimension = request.data.get("dimension", None)
-        detectionRuleTypeId = request.data.get("detectionRuleTypeId", None)
-        detectionRuleParams = request.data.get("detectionRuleParams", None)
+        detectionRuleTypeId = request.data.get("detectionRuleTypeId", 1)
+        detectionRuleParams = request.data.get("detectionRuleParams", {})
         res = AnomalyDefinitions.addAnomalyDefinition(
             metric, dimension, operation, highOrLow, value, datasetId, detectionRuleTypeId, detectionRuleParams
         )
