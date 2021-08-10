@@ -6,7 +6,6 @@ from .detectionTypes.prophet import prophetDetect
 from .detectionTypes.percentageChange import percentChangeDetect
 from .detectionTypes.lifetime import lifetimeDetect
 
-from anomaly.models import Anomaly
 
 def dataFrameEmpty(df):
     """Checks whether dataFrame has enough data for prophet"""

@@ -9,7 +9,7 @@ class ApiService {
           // Production Settings
          this.host = "";
          this.base_url = this.host + basePath + "/api/";
-    }  
+    }
   }
   
   async get(endpoint) {
