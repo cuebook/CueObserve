@@ -14,6 +14,14 @@ def prepareAnomalyDataframes(datasetDf, timestampCol, metricCol, dimensionCol=No
     """
     Utility function to prepare anomaly dataframes by grouping on dimension
     """
+    if datasetDf is None:
+        raise Exception("Empty dataframe received, forgoing anomaly detection")
+    try:
+        datasetDf[metricCol] = pd.to_numeric(datasetDf[metricCol])
+        datasetDf[metricCol] = datasetDf[metricCol].fillna(0)
+    except Exception as ex:
+        raise Exception(f"Metric column containing non numeric data: {ex}")
+
     dimValsData = []
     if dimensionCol:
         if operation == "Top":
@@ -23,6 +31,8 @@ def prepareAnomalyDataframes(datasetDf, timestampCol, metricCol, dimensionCol=No
 
         elif operation == "Min Value":
             dimValsData = minValueOnDimensionalValues(datasetDf, timestampCol, metricCol, dimensionCol, value)
+        else:
+            dimValsData = topNDimensionalValues(datasetDf, timestampCol, metricCol, dimensionCol, 10)
     else:
         tempDf = datasetDf[[timestampCol, metricCol]]
         dimValsData.append({"dimVal": None, "contriPercent": 100.0, "df": aggregateDf(tempDf, timestampCol)})
@@ -33,7 +43,6 @@ def topNDimensionalValues(datasetDf, timestampCol, metricCol, dimensionCol=None,
     """
     Utility function to prepare anomaly dataframes by grouping on dimension for Top N dimensional values
     """
-    datasetDf[metricCol] = pd.to_numeric(datasetDf[metricCol])
     dimValsData = []
     datasetDf = datasetDf[[timestampCol, dimensionCol, metricCol]]
     topValsDf = datasetDf[[dimensionCol, metricCol]].groupby(dimensionCol).sum().sort_values(metricCol, ascending=False)
@@ -50,7 +59,6 @@ def contributionOnDimensionalValues(datasetDf, timestampCol, metricCol, dimensio
     """
     Utility function to prepare anomaly dataframes by grouping on dimension for dimensional values
     """
-    datasetDf[metricCol] = pd.to_numeric(datasetDf[metricCol])
     dimValsData = []
     datasetDf = datasetDf[[timestampCol, dimensionCol, metricCol]]
     topValsDf = datasetDf[[dimensionCol, metricCol]].groupby(dimensionCol).sum().sort_values(metricCol, ascending=False)
@@ -68,8 +76,6 @@ def minValueOnDimensionalValues(datasetDf, timestampCol, metricCol, dimensionCol
     """
     Utility function to prepare anomaly dataframes by grouping on dimension for dimensional values
     """
-
-    datasetDf[metricCol] = pd.to_numeric(datasetDf[metricCol])
     dimValsData = []
     datasetDf = datasetDf[[timestampCol, dimensionCol, metricCol]]
     topValsDf = datasetDf[[dimensionCol, metricCol]].groupby(dimensionCol).sum().sort_values(metricCol, ascending=False)

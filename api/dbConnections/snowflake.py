@@ -1,5 +1,5 @@
 import logging
-# import snowflake.connector  # pylint: disable=E0611, E0401
+import snowflake.connector  # pylint: disable=E0611, E0401
 import pandas as pd
 from dbConnections.utils import limitSql
 
