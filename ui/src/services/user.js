@@ -32,7 +32,7 @@ class UserService {
           .then(function(res) {
             if (res.success) return res;
             else {
-              return false;
+              return res;
             }
           })
           .catch(error => {

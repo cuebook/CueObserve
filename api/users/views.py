@@ -1,4 +1,5 @@
 
+import os
 import json
 import json as simplejson
 from rest_framework.decorators import api_view
@@ -32,6 +33,7 @@ class UnsafeSessionAuthentication(SessionAuthentication):
 class Account(APIView):
     """Account authentication"""
 
+    auth_required=True if os.environ.get("IS_AUTHENTICATION_REQUIRED") == "True" else False
     authentication_classes = (UnsafeSessionAuthentication,)
     @staticmethod
     def parse_user(user):
@@ -47,13 +49,19 @@ class Account(APIView):
     def get(self, request):
         """Checks existing session, etc"""
         print("request", request)
-        if request.user.is_authenticated:
-            user = Account.parse_user(request.user)
-            Users.objects.filter(pk=request.user.pk)
-            return Response({"data": user, "success": True})
+        if self.auth_required:
+            if request.user.is_authenticated and self.auth_required:
+                user = Account.parse_user(request.user)
+                Users.objects.filter(pk=request.user.pk)
+                return Response({"data": user, "success": True, "isAuthenticationRequired": self.auth_required})
+            else:
+                # the login is a  GET request, so just show the user the login form.
+                return Response({"message": "Please log in", "success": False, "isAuthenticationRequired": self.auth_required }, status=401)
         else:
-            # the login is a  GET request, so just show the user the login form.
-            return Response({"message": "Please log in", "success": False}, status=401)
+                return Response({"message": "Authentication not required", "success": True, "isAuthenticationRequired": self.auth_required})
+
+
+
 
     def post(self, request):
             """For new login"""

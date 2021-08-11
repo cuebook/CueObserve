@@ -5,7 +5,7 @@ from django.utils.timezone import now
 from django.contrib.auth import logout
 from django.shortcuts import redirect
 from django.conf import settings
-
+import os
 
 class DisableCsrfCheck(MiddlewareMixin):
     """
@@ -42,6 +42,10 @@ class LoginRequiredMiddleware:
                 return
         except:
             pass
+        auth_required=True if os.environ.get("IS_AUTHENTICATION_REQUIRED") == "True" else False
+
+        if(not auth_required):
+            return 
 
         if getattr(view_func, "login_exempt", False):
             return

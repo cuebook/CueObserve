@@ -27,7 +27,8 @@ export default function Admin() {
   const [ isLoggedIn, setIsLoggedIn] = useState(false)
   const [ user, setUser] = useState({})
   const [loader, setLoader] = useState(false)
-  
+  const [ isAuthRequired, setIsAuthRequired ] = useState(false)
+   
   useEffect(() => {
     if (!isLoggedIn) {
       getUser();
@@ -36,13 +37,26 @@ export default function Admin() {
 
   const getUser = async() =>{
     const response = await userServices.currentAccount();
-    if (response && response.success){
-      setUser(response.data)
+    console.log("response", response)
+    if (response &&  response.success && response.isAuthenticationRequired){
       setIsLoggedIn(true)
+      setIsAuthRequired(true)
       window.location.href="/#/anomalies"
     }
+    else if(response && !response.success && response.isAuthenticationRequired){
+        setIsAuthRequired(true)
+        setLoader(true)
+
+    }
+    else if (response && !response.success && !response.isAuthenticationRequired){
+        setIsLoggedIn(true)
+        setIsAuthRequired(true)
+    }
     else {
-      setLoader(true)
+      // setLoader(true)
+      setIsAuthRequired(true)
+      setIsLoggedIn(true)
+
     }
   }
 
@@ -66,7 +80,7 @@ const getLogOut =async () =>{
   }
   return (
     <>
-    { (isLoggedIn && user)  ?
+    { ( isAuthRequired && isLoggedIn )  ?
       <GlobalContextProvider>
         <Sidebar Logout={logout} />
         <ReactNotification />
@@ -91,7 +105,7 @@ const getLogOut =async () =>{
       </GlobalContextProvider>
       : 
       <div>
-        {loader ?
+        {loader && isAuthRequired ?
           <Switch>
             <Route path="/account/login"   component={()=>(<Login loggedIn={loggedIn}/>)} />
             <Redirect from="/" to="/account/login" />
