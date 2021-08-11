@@ -96,7 +96,7 @@ def _anomalyDetectionForDimension(anomalyId: int, dimension: str, data: list):
 
         anomaly.rootcauseanalysis.logs = {
             **anomaly.rootcauseanalysis.logs,
-            dimension: "Ananlyzing..",
+            dimension: "Analyzing..",
         }
         anomaly.rootcauseanalysis.save()
 
@@ -109,7 +109,7 @@ def _anomalyDetectionForDimension(anomalyId: int, dimension: str, data: list):
         }
         anomaly.rootcauseanalysis.save()
 
-        if not all(results):
+        if not all([x["success"] for x in results]):
             return False
     except Exception as ex:
 
@@ -161,7 +161,7 @@ def rootCauseAnalysisJob(anomalyId: int):
         metric = anomaly.anomalyDefinition.metric
 
         rootCauseAnalysis.logs = {
-            **rootCauseAnalysis.logs,
+            # **rootCauseAnalysis.logs,
             "Analyzing Dimensions": ", ".join(otherDimensions),
         }
         rootCauseAnalysis.save()

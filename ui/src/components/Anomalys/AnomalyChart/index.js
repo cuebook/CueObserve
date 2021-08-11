@@ -56,7 +56,18 @@ export default function AnomalyChart(props) {
 
 
   const chart = (
-      <Chart scale={cols} autoFit padding={[10, 10, 15, 20]} height={ props.isMiniChart ? 120 : 400 }>
+      <Chart scale={cols} autoFit padding={ props.isMiniChart ? [5, 5, 5, 5] : [10, 10, 15, 20]} height={ props.isMiniChart ? 80 : 400 }>
+        { props.isMiniChart ? 
+          <>
+            <Axis name="ds" visible={false} />
+            <Axis name="y" grid={null} line={null} visible={false} />
+          </>
+          :
+          <>
+            <Axis name="ds" />
+            <Axis name="y" />
+          </>
+        }
         <Legend visible={false} />
         <Tooltip crosshairs={{ type: "line" }} />
         <View data={anomalyData.data.anomalyData.band}>
@@ -69,19 +80,21 @@ export default function AnomalyChart(props) {
           />
         </View>
         <View data={anomalyData.data.anomalyData.actual}>
-          <Axis name="ds" />
-          <Axis name="y" />
           <Geom
             type="point"
             position="ds*y"
-            size={
-              "anomaly"
-            }
             opacity={[
               "anomaly",
               anomaly => {
                 if (anomaly === 1) return 0;
                 return 0.5;
+              }
+            ]}
+            size={[
+              "anomaly",
+              anomaly => {
+                if (anomaly === 1) return 0;
+                return anomaly;
               }
             ]}
             color= "#ff1100"
@@ -122,7 +135,7 @@ export default function AnomalyChart(props) {
           <Geom
             type="line"
             position={"ds*y"}
-            size={2}
+            size={props.isMiniChart ? 1.4 : 2}
           />
         </View>
         <View data={anomalyData.data.anomalyData.predicted}>
@@ -133,7 +146,7 @@ export default function AnomalyChart(props) {
             style={{ lineDash: [4, 4] }}
           />
         </View>
-        </Chart>
+      </Chart>
 
     );
 
