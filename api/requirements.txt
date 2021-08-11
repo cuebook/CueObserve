@@ -1,3 +1,4 @@
+django-allauth==0.41.0
 amqp==5.0.6
 asgiref==3.4.0
 astroid==2.5.6
