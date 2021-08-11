@@ -15,7 +15,7 @@ GROUP BY 1, 2, 3
 ORDER BY 1
 ```
 
-## Redshift
+## RedShift
 
 ```sql
 SELECT
