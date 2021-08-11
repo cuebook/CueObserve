@@ -8,7 +8,7 @@ from ops.tasks import rootCauseAnalysisJob
 
 from anomaly.models import RootCauseAnalysis, RCAAnomaly, Anomaly
 from anomaly.serializers import RootCauseAnalysisSerializer, RCAAnomalySerializer
-from ops.anomalyDetection import detect, dataFrameEmpty
+from ops.tasks.anomalyDetection import detect, dataFrameEmpty
 
 
 class RootCauseAnalyses:
@@ -90,13 +90,14 @@ class RootCauseAnalyses:
             if dataFrameEmpty(df):
                 return output
             granularity = anomaly.anomalyDefinition.dataset.granularity
-            result = detect(df, granularity)
+            result = detect(df, granularity, "Prophet", anomaly.anomalyDefinition)
 
             del result["anomalyData"]["predicted"]
             # removing anomalous point other than last one
             anomalyTimeISO = anomaly.data["anomalyLatest"]["anomalyTimeISO"]
             if (
                 not "anomalyLatest" in result
+                or not result["anomalyLatest"]
                 or result["anomalyLatest"]["anomalyTimeISO"] != anomalyTimeISO
             ):
                 return output

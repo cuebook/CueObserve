@@ -8,11 +8,6 @@ from django.db.models import Q
 from anomaly.models import Anomaly, AnomalyCardTemplate
 from anomaly.serializers import AnomalySerializer
 
-from ops.anomalyDetection import detect, dataFrameEmpty
-
-
-ANOMALY_DAILY_TEMPLATE = "Anomaly Daily Template"
-ANOMALY_HOURLY_TEMPLATE = "Anomaly Hourly Template"
 
 
 class Anomalys:
@@ -61,11 +56,7 @@ class Anomalys:
 
         data = AnomalySerializer(anomalyObj).data
 
-        templateName = (
-            ANOMALY_DAILY_TEMPLATE
-            if anomalyObj.anomalyDefinition.dataset.granularity == "day"
-            else ANOMALY_HOURLY_TEMPLATE
-        )
+        templateName = anomalyObj.anomalyDefinition.getAnomalyTemplateName()
         cardTemplate = AnomalyCardTemplate.objects.get(templateName=templateName)
         data.update(data["data"]["anomalyLatest"])
 
@@ -153,50 +144,3 @@ class Anomalys:
 
         return anomaliesObj
 
-    @staticmethod
-    def createAnomaly(anomalyDef, dimVal: str, contriPercent: float, df):
-        """
-        Method to conduct the anomaly detection process
-        :param anomalyDef: object of model anomaly.anomalyDefinition
-        :param dimVal: dimension value
-        :param contriPercent: percentage contribution of given dimension values
-        :param df: dataframe with atleast timestamp & metric
-        :returns :
-        """
-        anomalyObj, _ = Anomaly.objects.get_or_create(
-            anomalyDefinition=anomalyDef, dimensionVal=dimVal, published=False
-        )
-
-        output = {"dimVal": dimVal}
-        try:
-            if dataFrameEmpty(df):
-                return
-            granularity = anomalyDef.dataset.granularity
-            result = detect(df, granularity)
-            result["contribution"] = contriPercent
-            result["anomalyLatest"]["contribution"] = contriPercent
-            timeThreshold = 3600 * 24 * 5 if granularity == "day" else 3600 * 24
-            toPublish = (
-                dt.datetime.now().timestamp()
-                - dp.parse(result["anomalyLatest"]["anomalyTimeISO"]).timestamp()
-                <= timeThreshold
-            )
-            if anomalyDef.highOrLow:
-                toPublish = (
-                    toPublish
-                    and anomalyDef.highOrLow.lower()
-                    == result["anomalyLatest"]["highOrLow"]
-                )
-            anomalyObj.data = result
-            anomalyObj.published = toPublish
-            anomalyObj.save()
-            output["published"] = toPublish
-            output["anomalyId"] = anomalyObj.id
-            output["success"] = True
-        except Exception as ex:
-            output["error"] = json.dumps(
-                {"message": str(ex), "stackTrace": traceback.format_exc()}
-            )
-            output["success"] = False
-
-        return output

@@ -22,6 +22,7 @@ def test_anomalyDefinition(client, mocker):
 
     # Create anomaly
     connection = mixer.blend("anomaly.connection")
+    detectionRuleType = mixer.blend("anomaly.DetectionRuleType", id=1, name="Prophet")
     dataset = mixer.blend("anomaly.dataset", granularity='day')
 
     path = reverse("addAnomalyDef")

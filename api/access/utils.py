@@ -18,6 +18,14 @@ def prepareAnomalyDataframes(
     """
     Utility function to prepare anomaly dataframes by grouping on dimension
     """
+    if datasetDf is None:
+        raise Exception("Empty dataframe received, forgoing anomaly detection")
+    try:
+        datasetDf[metricCol] = pd.to_numeric(datasetDf[metricCol])
+        datasetDf[metricCol] = datasetDf[metricCol].fillna(0)
+    except Exception as ex:
+        raise Exception(f"Metric column containing non numeric data: {ex}")
+
     dimValsData = []
     if dimensionCol:
         if operation == "Top":
@@ -30,9 +38,9 @@ def prepareAnomalyDataframes(
             )
 
         elif operation == "Min Value":
-            dimValsData = minValueOnDimensionalValues(
-                datasetDf, timestampCol, metricCol, dimensionCol, value
-            )
+            dimValsData = minValueOnDimensionalValues(datasetDf, timestampCol, metricCol, dimensionCol, value)
+        else:
+            dimValsData = topNDimensionalValues(datasetDf, timestampCol, metricCol, dimensionCol, 10)
     else:
         tempDf = datasetDf[[timestampCol, metricCol]]
         dimValsData.append(
@@ -52,7 +60,6 @@ def topNDimensionalValues(
     """
     Utility function to prepare anomaly dataframes by grouping on dimension for Top N dimensional values
     """
-    datasetDf[metricCol] = pd.to_numeric(datasetDf[metricCol])
     dimValsData = []
     datasetDf = datasetDf[[timestampCol, dimensionCol, metricCol]]
     topValsDf = (
@@ -83,7 +90,6 @@ def contributionOnDimensionalValues(
     """
     Utility function to prepare anomaly dataframes by grouping on dimension for dimensional values
     """
-    datasetDf[metricCol] = pd.to_numeric(datasetDf[metricCol])
     dimValsData = []
     datasetDf = datasetDf[[timestampCol, dimensionCol, metricCol]]
     topValsDf = (
@@ -115,8 +121,6 @@ def minValueOnDimensionalValues(
     """
     Utility function to prepare anomaly dataframes by grouping on dimension for dimensional values
     """
-
-    datasetDf[metricCol] = pd.to_numeric(datasetDf[metricCol])
     dimValsData = []
     datasetDf = datasetDf[[timestampCol, dimensionCol, metricCol]]
     topValsDf = (
