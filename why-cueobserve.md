@@ -1,12 +1,12 @@
 # Why CueObserve
 
-CueObserve helps you automate the monitoring of business metrics. It helps you know when and where a metric isn't right, so that you can take action quickly.
+CueObserve helps you automate monitoring of business metrics. It helps you know when and where a metric isn't right, so that you can take action quickly.
 
 ## Monitoring Business metrics is different from monitoring System metrics
 
 System metrics are typically monitored in real-time. The metrics are collected as timeseries data streams. To identify potential production issues, anomaly detection is also real-time.
 
-On the other hand, Business metrics are monitored on a daily, weekly, or monthly basis. The data for business metrics resides in SQL databases and data warehouses. Instead of real-time anomaly detection, you need anomaly detection with variable granularity. This granularity depends on the metric and the user who's monitoring it.
+On the other hand, Business metrics are monitored on a daily, weekly or monthly basis. The data for business metrics resides in SQL databases and data warehouses. Instead of real-time anomaly detection, you need anomaly detection with variable granularity. This granularity depends on the metric and the user who's monitoring it.
 
 To understand more, read our posts - [What is an anomaly?](https://cuebook.ai/blog/anomaly/) and [Anomaly detection: business vs. technical metrics](https://cuebook.ai/blog/anomaly-detection-business-metrics-vs-technical-metrics/).
 
