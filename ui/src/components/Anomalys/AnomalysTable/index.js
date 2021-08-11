@@ -79,10 +79,10 @@ export default function AnomalysTable(props) {
     history.push('/anomaly/' + anomaly.id)
   }
 
-const getOnlyPublishedAnomalys = (event) => {
-  setPublishedOnly(event)
-  getAnomalys(event, currentPage)
-}
+  const getOnlyPublishedAnomalys = (event) => {
+    setPublishedOnly(event)
+    getAnomalys(event, currentPage)
+  }
   const handleTableChange = (event, filter, sorter) => {
     setCurrentPage(event.current)
     setSorter({"columnKey":sorter.columnKey, "order":sorter.order})
@@ -202,7 +202,7 @@ const getOnlyPublishedAnomalys = (event) => {
       </div>
       <Table
         onRow={(record) => ({
-          onClick: () => viewAnomaly(record),
+          onClick: () => viewAnomaly(record)
         })}
         rowClassName={style.row}
         rowKey={"id"}

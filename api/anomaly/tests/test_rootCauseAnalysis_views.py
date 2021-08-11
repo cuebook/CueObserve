@@ -204,9 +204,9 @@ def test_rootCauseAnalysis(client, mocker):
     response = client.get(path)
 
     assert response.status_code == 200
-    assert response.data['success'] 
     assert response.data['data'] == {
          'anomalyContribution': 5.71,
+         'granularity': 'hour',
          'anomalyTime': '2021-08-07T13:00:00',
          'dimension': 'BrandCode',
          'dimensionValue': 'XBRZ',
@@ -217,7 +217,7 @@ def test_rootCauseAnalysis(client, mocker):
          'measure': 'Returns',
          'rcaAnomalies': response.data['data']['rcaAnomalies'],
          'startTimestamp': response.data['data']['startTimestamp'],
-         'status': 'ERROR',
+         'status': 'SUCCESS',
          'value': 2.0}
 
     assert list(response.data['data']['rcaAnomalies'][0].keys()) == ['dimension', 'dimensionValue', 'data']
