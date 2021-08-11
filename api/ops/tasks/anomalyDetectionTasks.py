@@ -30,8 +30,6 @@ def _anomalyDetectionSubTask(anomalyDef_id, dimVal, contriPercent, dfDict):
     """
     Internal anomaly detection subtask to be grouped by celery for each anomaly object
     """
-    from anomaly.services import Anomalys
-
     anomalyDefinition = AnomalyDefinition.objects.get(id=anomalyDef_id)
     anomalyServiceResult = anomalyService(
         anomalyDefinition, dimVal, contriPercent, pd.DataFrame(dfDict)

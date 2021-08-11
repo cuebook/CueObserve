@@ -346,6 +346,7 @@ class DetectionRuleTypeView(APIView):
     def get(self, request):
         """get request"""
         res = DetectionRules.getDetectionRuleTypes()
+        return Response(res.json())
 
 class RCAView(APIView):
     """
