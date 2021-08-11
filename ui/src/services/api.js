@@ -1,12 +1,15 @@
 class ApiService {
   constructor(basePath){
-    // Development Settings
-    // this.host = "http://localhost:8000";
-    // this.base_url = this.host + basePath + "/api/";
-
-    // Production Settings
-    this.host = "";
-    this.base_url = this.host + basePath + "/api/";
+    if(process.env.NODE_ENV === "development"){
+          // Development Settings
+         this.host = "http://localhost:8000";
+         this.base_url = this.host + basePath + "/api/";
+    }
+    else{
+          // Production Settings
+         this.host = "";
+         this.base_url = this.host + basePath + "/api/";
+    }
   }
   
   async get(endpoint) {

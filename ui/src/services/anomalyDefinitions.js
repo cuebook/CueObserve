@@ -3,8 +3,8 @@ import { message } from "antd"
 
 class AnomalyDefService {
 
-    async getAnomalyDefs(){
-        const response = await apiService.get("anomaly/anomalyDefs")
+    async getAnomalyDefs(offset, limit, searchText, sorter){
+        const response = await apiService.get("anomaly/anomalyDefs"+"?offset="+offset+"&limit="+limit+"&searchText="+searchText+"&sorter="+JSON.stringify(sorter))
         return response
     }
     async addAnomalyDef(payload){
@@ -60,6 +60,28 @@ class AnomalyDefService {
             return response.data
         else
             return null
+    }
+    async getRunStatusAnomalies(runStatusId){
+        const response = await apiService.get("anomaly/runStatusAnomalies/" + runStatusId)
+        if(response.success == true)
+            return response.data
+        else
+            return null
+    }
+    async getDetectionRuleTypes(){
+        return apiService.get("anomaly/detectionRuleTypes")
+        .then(response => {
+            if(response.success == true){
+                return response.data
+            } else {
+                message.error(response.message);
+                return null
+            }
+        })
+        .catch(response => {
+            message.error(response.message)
+            return null
+        })
     }
 
 }

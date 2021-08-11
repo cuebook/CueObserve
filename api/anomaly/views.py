@@ -13,6 +13,9 @@ from anomaly.services import (
     Anomalys,
     ScheduleService,
     AnomalyDefJobServices,
+    Settings,
+    DetectionRules,
+    RootCauseAnalyses,
 )
 
 
@@ -21,9 +24,21 @@ class AnomalysView(APIView):
     Provides views on datasets(many)
     """
 
+    publishedOnly = False
+
     def get(self, request):
         """get request"""
-        res = Anomalys.getAnomalys()
+        offset = int(request.GET.get("offset", 0))
+        limit = int(request.GET.get("limit", 50))
+        searchQuery = request.GET.get("searchText", "")
+        sorter = json.loads(request.GET.get("sorter", "{}"))
+        res = Anomalys.getAnomalys(
+            publishedOnly=self.publishedOnly,
+            offset=offset,
+            limit=limit,
+            searchQuery=searchQuery,
+            sorter=sorter,
+        )
         return Response(res.json())
 
 
@@ -149,17 +164,27 @@ class AnomalyDefView(APIView):
     """
 
     def get(self, request):
-        res = AnomalyDefinitions.getAllAnomalyDefinition()
+        offset = int(request.GET.get("offset", 0))
+        limit = int(request.GET.get("limit", 50))
+        searchQuery = request.GET.get("searchText", "")
+        sorter = json.loads(request.GET.get("sorter", "{}"))
+        res = AnomalyDefinitions.getAllAnomalyDefinition(
+            offset=offset, limit=limit, searchQuery=searchQuery, sorter=sorter
+        )
         return Response(res.json())
 
     def post(self, request):
         datasetId = int(request.data.get("datasetId", 0))
         metric = request.data.get("measure", None)
         highOrLow = request.data.get("highOrLow", None)
-        top = int(request.data.get("top", 0))
+        operation = request.data.get("operation", None)
+        value = request.data.get("operationValue", 0)
         dimension = request.data.get("dimension", None)
+        dimension = request.data.get("dimension", None)
+        detectionRuleTypeId = request.data.get("detectionRuleTypeId", 1)
+        detectionRuleParams = request.data.get("detectionRuleParams", {})
         res = AnomalyDefinitions.addAnomalyDefinition(
-            metric, dimension, highOrLow, top, datasetId
+            metric, dimension, operation, highOrLow, value, datasetId, detectionRuleTypeId, detectionRuleParams
         )
         return Response(res.json())
 
@@ -261,6 +286,18 @@ def runAnomalyDef(request: HttpRequest, anomalyDefId: int) -> Response:
     res = AnomalyDefinitions.runAnomalyDetection(anomalyDefId)
     return Response(res.json())
 
+
+@api_view(["GET"])
+def runStatusAnomalies(request: HttpRequest, runStatusId: int) -> Response:
+    """
+    Method for fetch anomalies of a RunStatus and their urls
+    :param request: HttpRequest
+    :param anomalyDefId: ID of the anomaly definition
+    """
+    res = AnomalyDefinitions.runStatusAnomalies(runStatusId)
+    return Response(res.json())
+
+
 @api_view(["GET"])
 def getDetectionRuns(request: HttpRequest, anomalyDefId: int) -> Response:
     """
@@ -272,6 +309,7 @@ def getDetectionRuns(request: HttpRequest, anomalyDefId: int) -> Response:
     res = AnomalyDefinitions.getDetectionRuns(anomalyDefId, offset)
     return Response(res.json())
 
+
 @api_view(["GET"])
 def isTaskRunning(request: HttpRequest, anomalyDefId: int) -> Response:
     """
@@ -281,3 +319,46 @@ def isTaskRunning(request: HttpRequest, anomalyDefId: int) -> Response:
     """
     res = AnomalyDefinitions.isTaskRunning(anomalyDefId)
     return Response(res.json())
+
+
+class SettingsView(APIView):
+    """
+    Provides views on settings
+    """
+
+    def get(self, request):
+        """get request"""
+        res = Settings.getSettings()
+        return Response(res.json())
+
+    def post(self, request):
+        """post request"""
+        data = request.data
+        res = Settings.updateSettings(data)
+        return Response(res.json())
+
+
+class DetectionRuleTypeView(APIView):
+    """
+    Provides views on Detection Rule Types
+    """
+
+    def get(self, request):
+        """get request"""
+        res = DetectionRules.getDetectionRuleTypes()
+        return Response(res.json())
+
+class RCAView(APIView):
+    """
+    Provides views on RCA (Root Cause Analysis)
+    """
+
+    def get(self, request, anomalyId: int):
+        """get rca"""
+        res = RootCauseAnalyses.getRCA(anomalyId)
+        return Response(res.json())
+
+    def post(self, request, anomalyId: int):
+        """make RCA request"""
+        res = RootCauseAnalyses.calculateRCA(anomalyId)
+        return Response(res.json())

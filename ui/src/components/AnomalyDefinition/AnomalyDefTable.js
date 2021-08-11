@@ -1,14 +1,16 @@
 
-import React, { useState, useEffect } from "react";
-import { Table, Button, Popconfirm, Input, message, Tooltip, Drawer } from "antd";
+import React, { useState, useEffect, useRef } from "react";
+import { Table, Button, Popconfirm, Input, message, Tooltip, Drawer, Modal } from "antd";
 import AddAnomalyDef from "./AddAnomalyDef.js"
 import EditAnomalyDef from "./EditAnomalyDef.js"
 import RunStatus from "./RunStatus.js";
+import RunStatusAnomalies from "./RunStatusAnomalies.js";
 import { EditOutlined, DeleteOutlined, PlayCircleOutlined, CloseOutlined, EyeOutlined } from '@ant-design/icons';
 import anomalyDefService from "services/anomalyDefinitions.js"
 import scheduleService from "services/schedules"
 import SelectSchedule from "components/Schedule/SelectSchedule"
 import style from "./style.module.scss";
+// import { search } from "services/general.js"
 
 
 const { Search } = Input;
@@ -35,17 +37,30 @@ export default function Connection() {
   const [selectedAnomalyDef, setSelectedAnomalyDef] = useState();
   const [runStatusAnomalyDef, setRunStatusAnomalyDef] = useState();
   const [isRunStatusDrawerVisible, setIsRunStatusDrawerVisible] = useState(false);
-
+  const [searchText, setSearchText] = useState("");
+  const [latestAnomaliesRunStatusId, setLatestAnomaliesRunStatusId] = useState();
+  const [latestAnomaliesModalVisibile, setLatestAnomaliesModalVisibile] = useState(false);
+  const [limit] = useState(50)
+  const [total, setTotal] = useState(0) 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [sorter, setSorter] = useState({})
+  const currentPageRef = useRef(currentPage);
+  currentPageRef.current = currentPage;
+  const sorterRef = useRef(sorter);
+  sorterRef.current = sorter;
+  const searchTextRef = useRef(searchText);
+  searchTextRef.current = searchText;
   useEffect(() => {
     if (!data) {
         fetchData();
     }
   }, []);
 
-  const fetchData = async () => {
-    const response = await anomalyDefService.getAnomalyDefs();
-    if(response){
-      setData(response.data)
+  const fetchData = async (currentPage = currentPageRef.current, searchText = searchTextRef.current, sorter = sorterRef.current) => {
+    const response = await anomalyDefService.getAnomalyDefs((currentPage -1)*limit, limit, searchText, sorter);
+    if(response && response.data){
+      setData(response.data.anomalyDefinition)
+      setTotal(response.data.count)
     }
   }
 
@@ -75,6 +90,15 @@ const runAnomalyDef = async (anomalyDef) => {
   const response = await anomalyDefService.runAnomalyDef(anomalyDef.id)
   isTaskRunning[anomalyDef.id] = setInterval(() => checkIsRunning(anomalyDef.id), 5000);
   fetchData()
+}
+
+const openLatestAnomalies = (runStatusId) => {
+  setLatestAnomaliesRunStatusId(runStatusId)
+  setLatestAnomaliesModalVisibile(true)
+}
+
+const closeLatestAnomalies = () => {
+  setLatestAnomaliesModalVisibile(false)
 }
 
 const openRunStatus = (anomalyDef) => {
@@ -137,22 +161,31 @@ const unassignSchedule = async (anomalyDefId) => {
     message.error(response.message)
   }
 }
+const handleTableChange = (event, filter, sorter) => {
+  setCurrentPage(event.current)
+  setSorter({"columnKey":sorter.columnKey, "order":sorter.order})
+  fetchData(event.current, searchText,{"columnKey":sorter.columnKey, "order":sorter.order})
+}
 
 
 
-
+const searchInAnomalyDef = (val) =>{
+  setSearchText(val)
+  setCurrentPage(1)
+  fetchData(1, val, sorter)
+}
 
   const columns = [    
       {
         title: "Dataset",
-        dataIndex: "dataset",
+        dataIndex: "datasetName",
         key: "datasetName",
-        sorter:(a, b) =>   a.dataset.name.localeCompare(b.dataset.name),
+        sorter:(a, b) =>   {},
 
         render: (text, record) => {
           return (
             <div>
-              {record.dataset.name}
+              {record.datasetName}
             </div>
           )
         }
@@ -160,13 +193,13 @@ const unassignSchedule = async (anomalyDefId) => {
       },
       {
         title: "Granularity",
-        dataIndex: "granularity",
+        dataIndex: "datasetGranularity",
         key: "granularity",
-        sorter:(a, b) => a && a.dataset.granularity &&  a.dataset.granularity.localeCompare(b.dataset.granularity),
+        sorter:(a, b) => {},
         render: (text, record) => {
           return (
             <div>
-              {granularity[record.dataset.granularity]}
+              {granularity[record.datasetGranularity]}
             </div>
           )
         }
@@ -175,13 +208,13 @@ const unassignSchedule = async (anomalyDefId) => {
         title: "Anomaly Definition",
         dataIndex: "anomalyDef",
         key: "anomalyDef",
-        sorter:(a, b) => parseInt(a.anomalyDef.top) - parseInt(b.anomalyDef.top),
+        sorter:(a, b) => {},
         render:(text, record) => {
           return (         
                 <div style={{fontSize:14}}>
                  <span style={{color: "#4B0082"}}> {record.anomalyDef.metric}</span>
                   <span style={{color: "#12b1ff"}}> {record.anomalyDef.dimension ? record.anomalyDef.dimension : null}</span>
-                  <span style={{color: "#ff6767"}}> {record.anomalyDef.top > 0 ? "Top " + record.anomalyDef.top : null}</span>
+                  <span style={{color: "#ff6767"}}> {record.anomalyDef.value > 0 ? record.anomalyDef.operation +" " + record.anomalyDef.value : null}</span>
                   <span style={{color: "#02c1a3"}}> {record.anomalyDef.highOrLow}</span>
                   </div>
 
@@ -194,6 +227,7 @@ const unassignSchedule = async (anomalyDefId) => {
         title: "Schedule",
         dataIndex: "schedule",
         key: "schedule",
+        // sorter:(a, b) =>  {}, Will implement in future if needed
         render: (schedule, record) => {
           if(schedule && selectedAnomalyDef != record.id){
             return (
@@ -227,18 +261,30 @@ const unassignSchedule = async (anomalyDefId) => {
         title: "Last Run",
         dataIndex: "lastRun",
         key: "lastRun",
+        sorter: (a, b) =>{},
 
       },
       {
         title: "Last Run Status",
         dataIndex: "lastRunStatus",
         key: "lastRunStatus",
+        sorter: (a, b) => {},
 
       },
       {
         title: "Last Run Anomalies",
-        dataIndex: "lastRunAnomaly",
-        key: "lastRunAnomaly",
+        dataIndex: "lastRunAnomalies",
+        key: "lastRunAnomalies",
+        // sorter: (a, b) => {}, Will implement in future if needed
+        render: (text, record) => {
+          return (
+            <span>
+              <a className={style.linkText} onClick={()=> openLatestAnomalies(record.lastRunAnomalies.runStatusId)}>
+              { record.lastRunAnomalies && record.lastRunAnomalies.numAnomaliesPulished} {record.lastRunAnomalies && record.lastRunAnomalies.numAnomalySubtasks?("("+record.lastRunAnomalies.numAnomalySubtasks+")"):""} 
+              </a>
+            </span>
+          );
+        }
 
       },
       {
@@ -276,6 +322,14 @@ const unassignSchedule = async (anomalyDefId) => {
     return (
       <div>
         <div className={`d-flex flex-column justify-content-center text-right mb-2`}>
+
+        <Search
+                style={{ margin: "0 0 10px 0" , width:350, float: "left"}}
+                placeholder="Search"
+                enterButton="Search"
+                onSearch={e=>searchInAnomalyDef(e)}
+                className="mr-2"
+              />
         <Button
             type="primary"
             onClick={() => addingAnomaly(true)}
@@ -289,11 +343,15 @@ const unassignSchedule = async (anomalyDefId) => {
             scroll={{ x: "100%" }}
             columns={columns}
             dataSource={data}
-            size={"small"}
+            onChange={handleTableChange}
             pagination={{
-              pageSize:20,
-              total:  data ? data.length : 20
+
+              showSizeChanger: false,
+              current: currentPage,
+              pageSize : limit,
+              total : data ? total : 50
             }}
+            size={"small"}
             
         />
         {
@@ -331,6 +389,16 @@ const unassignSchedule = async (anomalyDefId) => {
             null
           }
       </Drawer>
+      <Modal 
+          title="Last Run Anomalies"
+          visible={latestAnomaliesModalVisibile}
+          onCancel={closeLatestAnomalies}
+          onOk={closeLatestAnomalies}
+        >
+          {
+            latestAnomaliesModalVisibile ? <RunStatusAnomalies runStatusId={latestAnomaliesRunStatusId} /> : null
+          }
+        </Modal>
       </div>
     );
   }

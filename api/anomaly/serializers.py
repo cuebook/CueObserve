@@ -2,7 +2,7 @@ import json
 import dateutil.parser as dp
 import datetime as dt
 from rest_framework import serializers
-from anomaly.models import Anomaly, Dataset, Connection, ConnectionType, AnomalyDefinition, CustomSchedule as Schedule, RunStatus
+from anomaly.models import Anomaly, AnomalyDefinition, Connection,ConnectionType, CustomSchedule as Schedule, Dataset, RunStatus, Setting, RCAAnomaly, RootCauseAnalysis, DetectionRuleType
 
 
 class ConnectionSerializer(serializers.ModelSerializer):
@@ -90,6 +90,12 @@ class DatasetsSerializer(serializers.ModelSerializer):
     """
     connection = ConnectionSerializer()
     anomalyDefinitionCount = serializers.SerializerMethodField()
+    connectionName = serializers.SerializerMethodField()
+    def get_connectionName(self, obj):
+        """
+        Gets connection name
+        """
+        return obj.connection.name
 
     def get_anomalyDefinitionCount(self, obj):
         """
@@ -99,7 +105,7 @@ class DatasetsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Dataset
-        fields = ['id', 'name', 'granularity', 'connection', 'anomalyDefinitionCount']
+        fields = ['id', 'name', 'granularity', 'connection', 'anomalyDefinitionCount',"connectionName"]
 
 
 class DatasetSerializer(serializers.ModelSerializer):
@@ -133,11 +139,26 @@ class AnomalyDefinitionSerializer(serializers.ModelSerializer):
     """
     Serializes data related to anomlay Definition
     """
-    dataset = DatasetSerializer()
     anomalyDef = serializers.SerializerMethodField()
     schedule = serializers.SerializerMethodField()
     lastRun = serializers.SerializerMethodField()
     lastRunStatus = serializers.SerializerMethodField()
+    lastRunAnomalies = serializers.SerializerMethodField()
+    datasetName = serializers.SerializerMethodField()
+    datasetGranularity = serializers.SerializerMethodField()
+    
+    def get_datasetName(self, obj):
+        """
+        Gets name of dataset
+        """
+        return obj.dataset.name
+
+    def get_datasetGranularity(self, obj):
+        """
+        Gets granularity of dataset
+        """
+        return obj.dataset.granularity
+
 
     def get_anomalyDef(self, obj):
         params = {}
@@ -145,7 +166,8 @@ class AnomalyDefinitionSerializer(serializers.ModelSerializer):
         params["metric"] = obj.metric
         params["dimension"] = obj.dimension
         params["highOrLow"] = obj.highOrLow
-        params["top"] = obj.top
+        params["operation"] = obj.operation
+        params["value"] = obj.value
         return params
 
     def get_schedule(self, obj):
@@ -164,11 +186,18 @@ class AnomalyDefinitionSerializer(serializers.ModelSerializer):
         runStatus = obj.runstatus_set.last()
         if runStatus:
             return runStatus.status
+    
+    def get_lastRunAnomalies(self, obj):
+        runStatus = obj.runstatus_set.last()
+        if runStatus:
+            runStatusObj = runStatus.logs
+            runStatusObj["runStatusId"] = runStatus.id
+            return runStatusObj
 
     
     class Meta:
         model = AnomalyDefinition
-        fields = ["id",  "anomalyDef", "dataset", "schedule", "lastRun", "lastRunStatus"]
+        fields = ["id",  "anomalyDef", "schedule", "lastRun", "lastRunStatus", "lastRunAnomalies", "datasetName", "datasetGranularity"]
 
 class AnomalySerializer(serializers.ModelSerializer):
     """
@@ -178,7 +207,6 @@ class AnomalySerializer(serializers.ModelSerializer):
     granularity = serializers.SerializerMethodField()
     metric = serializers.SerializerMethodField()
     dimension = serializers.SerializerMethodField()
-    anomalyTimeStr = serializers.SerializerMethodField()
 
     def get_datasetName(self, obj):
         return obj.anomalyDefinition.dataset.name
@@ -192,21 +220,9 @@ class AnomalySerializer(serializers.ModelSerializer):
     def get_dimension(self, obj):
         return obj.anomalyDefinition.dimension
 
-    def get_anomalyTimeStr(self, obj):
-        anomalyTs = dp.parse(obj.data["anomalyLatest"]["anomalyTimeISO"])
-        gran = obj.anomalyDefinition.dataset.granularity
-        if gran == "day":
-            delta = (dt.datetime.now() - anomalyTs).days
-            if delta <= 1:
-                return "Yesterday"
-            return f"{delta} days ago"
-        elif gran == "hour":
-            delta = int((dt.datetime.now() - anomalyTs).total_seconds() / 3600)
-            return f"{delta} hours ago"
-
     class Meta:
         model = Anomaly
-        fields = ["id", "datasetName", "published", "dimension", "dimensionVal", "granularity", "metric", "anomalyTimeStr", "data"]
+        fields = ["id", "datasetName", "published", "dimension", "dimensionVal", "granularity", "metric", "data"]
 
 class ScheduleSerializer(serializers.ModelSerializer):
     """
@@ -215,6 +231,7 @@ class ScheduleSerializer(serializers.ModelSerializer):
     schedule = serializers.SerializerMethodField()
     crontab = serializers.SerializerMethodField()
     timezone = serializers.SerializerMethodField()
+    assignedSchedule = serializers.SerializerMethodField()
 
     def get_schedule(self, obj):
         """
@@ -237,9 +254,14 @@ class ScheduleSerializer(serializers.ModelSerializer):
             self.cronexp(obj.cronSchedule.day_of_week)
         )
 
+    def get_assignedSchedule(self, obj):
+        """ Gets count of schedule assigned to Anomaly Definition"""
+        cronId = Schedule.objects.get(id=obj.id).cronSchedule_id
+        count = AnomalyDefinition.objects.filter(periodicTask__crontab_id=cronId).count()
+        return count
     class Meta:
         model = Schedule
-        fields = ["id", "schedule","name","timezone","crontab"]
+        fields = ["id", "schedule","name","timezone","crontab", "assignedSchedule"]
 
 class RunStatusSerializer(serializers.ModelSerializer):
     """
@@ -254,3 +276,49 @@ class RunStatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = RunStatus
         fields = ["id", "anomalyDefId", "startTimestamp", "endTimestamp", "status", "runType", "logs"]
+
+class SettingSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the model Setting
+    """
+    class Meta:
+        model = Setting
+        fields = ["name", "value"]
+
+class DetectionRuleTypeSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the model DetectionRuleType
+    """    
+    params = serializers.SerializerMethodField()
+
+    def get_params(self, obj):
+        paramList = []
+        for param in obj.detectionruleparam_set.all():
+            params = {}
+            params["id"] = param.id
+            params["name"] = param.name
+            paramList.append(params)
+        return paramList
+
+    class Meta:
+        model = DetectionRuleType
+        fields = ["id", "name", "description", "params"]
+
+class RCAAnomalySerializer(serializers.ModelSerializer):
+    """
+    Serializer for the model RCAAnomaly
+    """
+
+    class Meta:
+        model = RCAAnomaly
+        fields = ["dimension", "dimensionValue", "data"]
+
+class RootCauseAnalysisSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the model RootCauseAnalysis
+    """
+
+    class Meta:
+        model = RootCauseAnalysis
+        fields = ["status", "logs", "startTimestamp", "endTimestamp"]
+

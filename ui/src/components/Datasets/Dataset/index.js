@@ -69,7 +69,6 @@ export default function Dataset(props) {
       setDatasetColumnType(tempColumnTypes)
       let columns = data.metrics.concat(data.dimensions).concat([data.timestampColumn])
       setDatasetColumns(columns)
-      console.log(columns)
     } 
   }
 

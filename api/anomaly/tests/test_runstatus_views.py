@@ -31,3 +31,14 @@ def test_runstatus(client, mocker):
     response = client.get(path)
     assert response.status_code == 200
     assert not response.data["data"]["isRunning"]
+
+    path = reverse("runStatusAnomalies", kwargs={"runStatusId": runStatus.id})
+    response = client.get(path)
+    assert response.status_code == 200
+    assert response.data["data"] == []
+
+    anomaly = mixer.blend("anomaly.Anomaly", latestRun=runStatus, anomalyDefinition=anomalyDef, dimensionVal="Lko")
+
+    response = client.get(path)
+    assert response.status_code == 200
+    assert response.data["data"] == [{"dimensionVal": "Lko", "id": anomaly.id, "published": False}]

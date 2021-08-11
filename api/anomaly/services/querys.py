@@ -17,5 +17,5 @@ class Querys:
             data = dataframe.to_dict("records")
             res.update(True, "Successfully retrieved data", data)
         except Exception as ex:
-            pass
+            res.update(False, "Error in retrieving data")
         return res

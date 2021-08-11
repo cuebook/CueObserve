@@ -1,14 +1,20 @@
 <p align="center">
+  <a href="https://cueobserve.cuebook.ai" target="_blank">
+    <img alt="CueObserve Logo" width="300" src="docs/images/cueObserve.png">
+  </a>
+</p>
+<p align="center">
+  <a href="https://codeclimate.com/github/cuebook/CueObserve/maintainability"><img src="https://api.codeclimate.com/v1/badges/a70e071b59d5dbc38846/maintainability" /></a>
+  <a href="https://codeclimate.com/github/cuebook/CueObserve/test_coverage"><img src="https://api.codeclimate.com/v1/badges/a70e071b59d5dbc38846/test_coverage" /></a>
   <a href="https://github.com/cuebook/cueobserve/actions/workflows/pr_checks.yml">
-    <img src="https://github.com/cuebook/cuelake/actions/workflows/pr_checks.yml/badge.svg" alt="Test Coverage">
+    <img src="https://github.com/cuebook/cueobserve/actions/workflows/pr_checks.yml/badge.svg" alt="Test Coverage">
   </a>
   <a href="https://github.com/cuebook/cueobserve/blob/main/LICENSE.md">
-    <img src="https://img.shields.io/github/license/cuebook/cuelake" alt="License">
+    <img src="https://img.shields.io/github/license/cuebook/cueobserve" alt="License">
   </a>
 </p>
 <br>
 
-# CueObserve
 With CueObserve, you can run anomaly detection on data in your SQL data warehouses and databases.
 
 ![CueObserve](docs/images/Overview.gif)
@@ -17,7 +23,7 @@ With CueObserve, you can run anomaly detection on data in your SQL data warehous
 Install via Docker
 
 ```
-docker run -p 3000:80 cuebook/cueobserve
+docker run -p 3000:3000 cuebook/cueobserve
 ```
 Now visit [http://localhost:3000](http://localhost:3000) in your browser. 
 
@@ -33,7 +39,7 @@ You then define one or more anomaly detection jobs on the dataset.
 ![Anomaly Definition](docs/images/AnomalyDefinitions.png)
 
 When an anomaly detection job runs, CueObserve does the following:
-1. Executes the SQL GROUP BY query on your datawarehouse and stores the result as a Pandas dataframe.
+1. Executes the SQL GROUP BY query on your data warehouse and stores the result as a Pandas dataframe.
 2. Generates one or more timeseries from the dataframe, as defined in your anomaly detection job.
 3. Generates a forecast for each timeseries using [Prophet](https://github.com/facebook/prophet).
 4. Creates a visual card for each timeseries. Marks the card as an anomaly if the last data point is anomalous.
@@ -42,8 +48,8 @@ When an anomaly detection job runs, CueObserve does the following:
 - Automated SQL to timeseries transformation.
 - Run anomaly detection on the aggregate metric or break it down by any dimension.
 - In-built Scheduler. CueObserve uses Celery as the executor and celery-beat as the scheduler.
-- Slack alerts when anomalies are detected. (coming soon)
-- Monitoring. Slack alert when a job fails. CueObserve maintains detailed logs. (coming soon)
+- Slack alerts when anomalies are detected.
+- Monitoring. Slack alert when a job fails. CueObserve maintains detailed logs.
 
 ### Limitations
 - Currently supports Prophet for timeseries forecasting.

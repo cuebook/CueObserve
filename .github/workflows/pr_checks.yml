@@ -8,9 +8,6 @@ on:
 
 jobs:
   Pylint:
-    needs: 
-      pull_request: 
-        :branches: [ main ] 
     runs-on: ubuntu-latest
 
     steps:
@@ -20,10 +17,14 @@ jobs:
     - name: Check if code is in sync with main branch
       run: |
         echo ${{ github.base_ref }}
-        echo ${{github.event.pull_request.head.ref}}
-        git fetch
-        git rev-list --left-right --count origin/main...origin/${{github.event.pull_request.head.ref}}
-        if [[ "$(git rev-list --left-right --count origin/main...origin/${{github.event.pull_request.head.ref}} | cut -f1)" > 0 ]]; then exit 1; fi
+        if [ -n ${{github.event.pull_request}} ]; then
+          echo "Skipping check if code is in sync with main branch"
+        else
+          echo ${{github.event.pull_request.head.ref}}
+          git fetch
+          git rev-list --left-right --count origin/main...origin/${{github.event.pull_request.head.ref}}
+          if [[ "$(git rev-list --left-right --count origin/main...origin/${{github.event.pull_request.head.ref}} | cut -f1)" > 0 ]]; then exit 1; fi
+        fi
         
     - name: Set up Python 3.7
       uses: actions/setup-python@v1
@@ -58,7 +59,7 @@ jobs:
           for file in $x; do
             file=$(echo $file | cut -d ':' -f 1)
             echo "Running Pylint on: "$file;
-            python ./lint.py --path $file --threshold 8
+            python ./lint.py --path ../$file --threshold 8
             ret=$?
             if [ $ret -ne 0 ]; then
                 echo " ----------------------------- Pylint failed for file: "$file

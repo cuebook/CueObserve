@@ -1,7 +1,7 @@
 import pytest
 import unittest
 from unittest import mock
-from ops.anomalyDetection import anomalyService
+from ops.tasks.anomalyDetection import anomalyService
 from anomaly.models import Anomaly
 from pandas import Timestamp
 from decimal import Decimal
@@ -9,7 +9,7 @@ from mixer.backend.django import mixer
 import pandas as pd
 
 @pytest.mark.django_db(transaction=True)
-def test_anomalyService(client, mocker):
+def test_createAnomalyService(client, mocker):
     fakedata = [{'ds': Timestamp('2021-06-01 00:00:00+0000', tz='UTC'),
         'y': Decimal('1.000000000')},
         {'ds': Timestamp('2021-06-02 00:00:00+0000', tz='UTC'),
@@ -66,6 +66,8 @@ def test_anomalyService(client, mocker):
     df["y"] = pd.to_numeric(df["y"])
     dts = mixer.blend("anomaly.Dataset", granularity="day")
     adf = mixer.blend("anomaly.AnomalyDefinition", dataset=dts, periodicTask=None)
+
+    
 
     anomalyService(adf, None, 20, df=df)
 

@@ -2,10 +2,11 @@ import logging
 from typing import List
 from utils.apiResponse import ApiResponse
 from dbConnections import BigQuery
-from anomaly.models import AnomalyDefinition, Dataset, CustomSchedule as Schedule, RunStatus
+from anomaly.models import AnomalyDefinition, Dataset, CustomSchedule as Schedule, DetectionRule, DetectionRuleParam, DetectionRuleParamValue, RunStatus
 from anomaly.serializers import AnomalyDefinitionSerializer, RunStatusSerializer
 from django_celery_beat.models import PeriodicTask, PeriodicTasks, CrontabSchedule
 from ops.tasks import anomalyDetectionJob
+from django.db.models import Q, Max
 
 CELERY_TASK_NAME = "ops.tasks.anomalyDetectionJob"
 RUN_STATUS_LIMIT = 10
@@ -13,20 +14,70 @@ RUN_STATUS_LIMIT = 10
 class AnomalyDefinitions:
 
     @staticmethod
-    def getAllAnomalyDefinition():
+    def getAllAnomalyDefinition(offset: int=0, limit: int=50, searchQuery: str=None, sorter: dict={}):
         """
         This method is used to get all anomlayObj
         """
-
         response = ApiResponse("Error in getting Anomaly Definition !")
-        anomalyDef = AnomalyDefinition.objects.all().order_by("-id")
-        anomalyDefSerializer = AnomalyDefinitionSerializer(anomalyDef, many=True)
-        response.update(True, "AnomalyDefinitions retrived successfully !", anomalyDefSerializer.data)
+        anomalyDefObjs = AnomalyDefinition.objects.all().order_by("-id")
+        count =  anomalyDefObjs.count()
+
+        if searchQuery:
+            anomalyDefObjs = AnomalyDefinitions.searchOnAnomalyDefinition(anomalyDefObjs, searchQuery)
+            count = anomalyDefObjs.count()
+        if sorter.get("order", False):
+            anomalyDefObjs = AnomalyDefinitions.sortOnAnomalyDefinition(anomalyDefObjs, sorter)
+        anomalyDefObjs = anomalyDefObjs[offset:offset+limit]
+        anomalyDefData = AnomalyDefinitionSerializer(anomalyDefObjs, many=True).data
+        data={"anomalyDefinition":anomalyDefData, "count":count}
+        
+        response.update(True, "AnomalyDefinitions retrived successfully !", data)
 
         return response
 
     @staticmethod
-    def addAnomalyDefinition(metric: str = None, dimension: str = None, highOrLow: str = None, top: int = 0, datasetId: int = 0):
+    def searchOnAnomalyDefinition(anomalyDefObjs, searchQuery):
+        """
+        Search on AnomalyDefinition 
+        """
+        return anomalyDefObjs.filter(
+            Q(dataset__name__icontains=searchQuery) |
+            Q(dataset__granularity__icontains=searchQuery) | 
+            Q(metric__icontains=searchQuery) | 
+            Q(highOrLow__icontains=searchQuery) | 
+            Q(dimension__icontains=searchQuery)| 
+            Q(value__icontains=searchQuery) |
+            Q(operation__icontains=searchQuery)) 
+
+    @staticmethod
+    def sortOnAnomalyDefinition(anomalyDefObjs: List[AnomalyDefinition], sorter):
+        """
+        Sort Anomaly Definition on given user column
+        """
+        columnToSort = sorter.get("columnKey", "")
+        order = sorter.get("order", "")
+        sortingPrefix = "" if order=="ascend" else "-"
+
+        if columnToSort == "datasetName":
+            anomalyDefObjs = anomalyDefObjs.order_by(sortingPrefix + "dataset__name")
+
+        if columnToSort == "granularity":
+            anomalyDefObjs = anomalyDefObjs.order_by(sortingPrefix + "dataset__granularity")
+
+        if columnToSort == "anomalyDef":
+            anomalyDefObjs = anomalyDefObjs.order_by(sortingPrefix + "metric")
+
+        if columnToSort == "lastRun" :
+            anomalyDefObjs = anomalyDefObjs.annotate(latestRun=Max('runstatus__startTimestamp')).order_by(sortingPrefix + 'latestRun')
+            return anomalyDefObjs
+
+        if columnToSort == "lastRunStatus":
+            anomalyDefObjs = anomalyDefObjs.annotate(latestRun=Max('runstatus__status')).order_by(sortingPrefix + 'latestRun')
+        
+        return anomalyDefObjs
+
+    @staticmethod
+    def addAnomalyDefinition(metric: str = None, dimension: str = None, operation: str=None, highOrLow: str = None, value: int = 0, datasetId: int = 0, detectionRuleTypeId: int = 1, detectionRuleParams: dict = {}):
         """
         This method is used to add anomaly to AnomalyDefinition table
         """
@@ -36,8 +87,18 @@ class AnomalyDefinitions:
             metric=metric,
             dimension=dimension,
             highOrLow=highOrLow,
-            top=top
+            value=value,
+            operation=operation
         )
+        detectionRule = DetectionRule.objects.create(detectionRuleType_id=detectionRuleTypeId, anomalyDefinition=anomalyObj)
+        detectionParams = []
+        for param in detectionRuleParams.keys():
+            detectionRuleParamObj = DetectionRuleParam.objects.filter(name=param).first()
+            if detectionRuleParamObj:
+                detectionParams.append(
+                    DetectionRuleParamValue(param=detectionRuleParamObj, detectionRule=detectionRule, value=str(detectionRuleParams[param]))
+                )
+        DetectionRuleParamValue.objects.bulk_create(detectionParams)
         response.update(True, "Anomaly Definition created successfully !")
         return response
 
@@ -92,7 +153,7 @@ class AnomalyDefinitions:
         return res
 
     @staticmethod
-    def isTaskRunning(anomalyDefId: int,):
+    def isTaskRunning(anomalyDefId: int):
         """
         Service to check whether a task is running for anomaly definition
         :param anomalyDefId: ID of the Anomaly Definition
@@ -103,6 +164,18 @@ class AnomalyDefinitions:
         if lastRunStatus:
             taskRunning = lastRunStatus.status == "RUNNING"
         res.update(True, "Task Running status checked.", {"isRunning": taskRunning})
+        return res
+    
+    @staticmethod
+    def runStatusAnomalies(runStatusId: int):
+        """
+        Service to fetch anomalies of a RunStatus and their metadata
+        :param anomalyDefId: ID of the Anomaly Definition
+        """
+        res = ApiResponse()
+        runStatus = RunStatus.objects.get(id=runStatusId)
+        anomaliesData = list(runStatus.anomaly_set.all().values("dimensionVal", "id", "published"))
+        res.update(True, "Run status anomalies retrieved successfully", anomaliesData)
         return res
 
         

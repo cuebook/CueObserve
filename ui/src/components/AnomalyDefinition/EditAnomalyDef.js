@@ -33,20 +33,23 @@ function getSelectedOptions(anomalyDef){
             color: "#12b1ff",
             isFixed: true
           });
-          temp.push({
-            value: "Top",
-            label: "Top",
-            optionType: "Top",
-            color: "#ff6767",
-            isFixed: true
-          });
-          temp.push({
-            value: anomalyDef.top,
-            label: anomalyDef.top,
-            optionType: "Dimension Values",
-            color: "#ff6767",
-            isFixed: true
-          });
+          if(anomalyDef.operation){
+
+            temp.push({
+              value: anomalyDef.operation,
+              label: anomalyDef.operation,
+              optionType: "Top",
+              color: "#ff6767",
+              isFixed: true
+            });
+            temp.push({
+              value: anomalyDef.value,
+              label: anomalyDef.value,
+              optionType: "Dimension Values",
+              color: "#ff6767",
+              isFixed: true
+            });
+          }
           
     }
     if(anomalyDef.highOrLow){
@@ -155,7 +158,6 @@ function getHelpText(selectedOption) {
 }
 
 export default function EditAnomalyDef(props){
-  const [allDatasets, setAllDatasets] = useState([]);
   const [selectedOption, setSelectedOption] = useState([]);
   const [isFocused, setIsFocused] = useState(false);
   const [initialDataset, setInitialDataset] = useState([])
@@ -167,8 +169,8 @@ export default function EditAnomalyDef(props){
     if(props)
     {
         let anomalyDef = props.editAnomalyDef["anomalyDef"]
-        let dataset = props.editAnomalyDef["dataset"]
-        setInitialDataset(dataset["name"])
+        let datasetName = props.editAnomalyDef["datasetName"]
+        setInitialDataset(datasetName)
         let selected = getSelectedOptions(anomalyDef)
         setSelectedOption(selected)
         setAnomalyDefId(anomalyDef["id"])
@@ -187,12 +189,6 @@ export default function EditAnomalyDef(props){
     selectedOption.forEach(item => {
       if (item.optionType === "High Or Low") {
         payload.highOrLow = item.value;
-      }
-      if (item.optionType === "Dimension") {
-        payload.dimension = item.value;
-      }
-      if (item.optionType === "Dimension Values"){
-        payload.top = item.value
       }
     });
 
@@ -283,13 +279,12 @@ export default function EditAnomalyDef(props){
   const handleIsFocused = (val) => {
     setIsFocused(val)
   }
-
-    var datasetOption = [];
-    datasetOption = allDatasets && allDatasets.map(dataset => (
-      <Option value={dataset.id} key={dataset.id}>
-        {dataset.name}
-      </Option>
-    ));
+    // var datasetOption = [];
+    // datasetOption = allDatasets && allDatasets.map(dataset => (
+    //   <Option value={dataset.id} key={dataset.id}>
+    //     {dataset.name}
+    //   </Option>
+    // ));
 
     return (
       <div>
@@ -322,7 +317,7 @@ export default function EditAnomalyDef(props){
                       .indexOf(input.toLowerCase()) >= 0
                   }
                 >
-                  {datasetOption}
+                  {/* {datasetOption} */}
                 </Select>
               </div>
               <div className="mb-6">
@@ -350,7 +345,7 @@ export default function EditAnomalyDef(props){
                   MultiValueContainer: multiValueContainer
                 }}
                 options={options}
-                placeholder={`Measure [Dimension Top N] [High/Low] `}
+                placeholder={`Measure [Dimension] [Top N / Min % Contribution X / Min Value Y] [High/Low] `}
               />
 
             </div>
