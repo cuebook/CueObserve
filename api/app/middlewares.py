@@ -1,9 +1,7 @@
-import os
 from django.conf import settings
 from django.shortcuts import redirect
 from django.http import HttpResponseForbidden
 from django.contrib.auth import logout
-from django.utils.timezone import now
 from django.utils.deprecation import MiddlewareMixin
 from django.contrib.auth.decorators import login_required
 
@@ -43,9 +41,8 @@ class LoginRequiredMiddleware:
         except:
             pass
         authenticationRequired= True if settings.AUTHENTICATION_REQUIRED == "True" else False
-        if(not authenticationRequired):
+        if not authenticationRequired:
             return 
-
         if getattr(view_func, "login_exempt", False):
             return
 
