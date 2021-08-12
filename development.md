@@ -126,7 +126,7 @@ source myenv/bin/activate           # Activate virtual environment
 source .env.dev                     # Export environment variables
 
 pip install watchdog pyyaml argh    # Additional libraries to reload celery on code changes
-watchmedo auto-restart -- celery -A app worker -l info       # Run celery
+watchmedo auto-restart -- celery -A app worker -l info --purge      # Run celery
 ```
 
 After these three services are running, you can trigger a task or wait for a scheduled task to run. 
