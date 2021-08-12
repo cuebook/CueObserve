@@ -1,6 +1,6 @@
 /*eslint-disable*/
 import { Button, Switch } from "antd";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, Redirect } from "react-router-dom";
 import style from "./style.module.scss";
 import userService from "services/user"
@@ -10,6 +10,14 @@ import { LogoutOutlined } from '@ant-design/icons';
 
 export default function Sidebar(props) {
   const [isLoggedOut, setIsLoggedOut] = useState(false)
+  const [logoutEnable, setLogoutEnable] = useState(false)
+
+  useEffect(() => {
+    if (props) {
+      let temp = props.authRequire ? props.authRequire : false
+      setLogoutEnable(temp)
+    }
+  }, []);
 
   const signOut = () =>{
     props.Logout(true)
@@ -77,7 +85,6 @@ export default function Sidebar(props) {
       </li>
     )
   })
-
   return (
     <>
       <nav className={`md:left-0 
@@ -116,6 +123,7 @@ export default function Sidebar(props) {
               { menuElements }
             </ul>
           </div>
+          {logoutEnable ? 
           <Button
             type="secondary"
             onClick={signOut}
@@ -124,6 +132,7 @@ export default function Sidebar(props) {
               <i className={"fas fa-sign-out-alt mr-2 text-sm text-gray-400 "}></i>
             SIGN OUT
           </Button>
+          : ""} 
         </div>
       </nav>
     </>

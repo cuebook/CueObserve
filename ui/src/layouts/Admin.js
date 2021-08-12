@@ -25,9 +25,9 @@ import userServices from "services/user.js"
 
 export default function Admin() {
   const [ isLoggedIn, setIsLoggedIn] = useState(false)
-  const [ user, setUser] = useState({})
   const [loader, setLoader] = useState(false)
   const [ isAuthRequired, setIsAuthRequired ] = useState(false)
+  const [isLogout, setIsLogout] = useState(false)
    
   useEffect(() => {
     if (!isLoggedIn) {
@@ -37,13 +37,14 @@ export default function Admin() {
 
   const getUser = async() =>{
     const response = await userServices.currentAccount();
-    console.log("response", response)
     if (response &&  response.success && response.isAuthenticationRequired){
+      setIsLogout(true)
       setIsLoggedIn(true)
       setIsAuthRequired(true)
       window.location.href="/#/anomalies"
     }
     else if(response && !response.success && response.isAuthenticationRequired){
+        setIsLogout(true)
         setIsAuthRequired(true)
         setLoader(true)
 
@@ -52,25 +53,17 @@ export default function Admin() {
         setIsLoggedIn(true)
         setIsAuthRequired(true)
     }
-    else {
-      // setLoader(true)
-      setIsAuthRequired(true)
-      setIsLoggedIn(true)
-
+  }
+  const getLogOut =async () =>{
+    const response = await userServices.logout();
+    if(response){
+      setLoader(true)
+      setIsLoggedIn(false)
     }
   }
 
-const getLogOut =async () =>{
-  const response = await userServices.logout();
-  if(response){
-    setLoader(true)
-    setIsLoggedIn(false)
-  }
-}
-
   const loggedIn = (val) =>{
     setIsLoggedIn(val)
-
   }
   const logout = (val) =>{
     if(val){ //val will be either true or false
@@ -82,7 +75,7 @@ const getLogOut =async () =>{
     <>
     { ( isAuthRequired && isLoggedIn )  ?
       <GlobalContextProvider>
-        <Sidebar Logout={logout} />
+        <Sidebar Logout={logout} authRequire={isLogout}/>
         <ReactNotification />
         <div className="relative md:ml-64 bg-gray-200">
           <AdminNavbar />

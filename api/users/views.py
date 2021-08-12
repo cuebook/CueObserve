@@ -16,6 +16,7 @@ from django.views.decorators.csrf import csrf_exempt
 from app.middlewares import login_exempt
 from users.models import CustomUser as Users
 from django.utils.timezone import now
+from django.conf import settings
 
 # Create your views here.
 
@@ -33,7 +34,7 @@ class UnsafeSessionAuthentication(SessionAuthentication):
 class Account(APIView):
     """Account authentication"""
 
-    auth_required=True if os.environ.get("IS_AUTHENTICATION_REQUIRED") == "True" else False
+    auth_required= True if settings.AUTHENTICATION_REQUIRED == "True" else False
     authentication_classes = (UnsafeSessionAuthentication,)
     @staticmethod
     def parse_user(user):
@@ -50,7 +51,7 @@ class Account(APIView):
         """Checks existing session, etc"""
         print("request", request)
         if self.auth_required:
-            if request.user.is_authenticated and self.auth_required:
+            if request.user.is_authenticated :
                 user = Account.parse_user(request.user)
                 Users.objects.filter(pk=request.user.pk)
                 return Response({"data": user, "success": True, "isAuthenticationRequired": self.auth_required})
@@ -58,7 +59,7 @@ class Account(APIView):
                 # the login is a  GET request, so just show the user the login form.
                 return Response({"message": "Please log in", "success": False, "isAuthenticationRequired": self.auth_required }, status=401)
         else:
-                return Response({"message": "Authentication not required", "success": True, "isAuthenticationRequired": self.auth_required})
+                return Response({"message": "Authentication not required", "success": False, "isAuthenticationRequired": self.auth_required})
 
 
 

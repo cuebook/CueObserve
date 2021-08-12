@@ -42,8 +42,7 @@ class LoginRequiredMiddleware:
                 return
         except:
             pass
-        auth_required=True if os.environ.get("IS_AUTHENTICATION_REQUIRED") == "True" else False
-
+        auth_required= True if settings.AUTHENTICATION_REQUIRED == "True" else False
         if(not auth_required):
             return 
 
