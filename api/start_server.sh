@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # start-server.sh
-if [ -n "$DJANGO_SUPERUSER_USERNAME" ] && [ -n "$DJANGO_SUPERUSER_EMAIL" ] && [ -n "$DJANGO_SUPERUSER_PASSWORD" ] ; then
+if  [ -n "$DJANGO_SUPERUSER_EMAIL" ] && [ -n "$DJANGO_SUPERUSER_PASSWORD" ] ; then
     (python manage.py createsuperuser --noinput)
 fi
 redis-server &
