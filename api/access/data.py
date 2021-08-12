@@ -1,7 +1,14 @@
-from dbConnections import BigQuery, Druid, Redshift, Snowflake
+from dbConnections import (
+    BigQuery,
+    Druid,
+    Redshift,
+    Snowflake,
+    Druid,
+    MySQL,
+    Postgres,
+    MSSQL,
+)
 from anomaly.serializers import ConnectionDetailSerializer
-from dbConnections import Druid, MySQL
-from dbConnections.postgres import Postgres
 
 
 class Data:
@@ -20,7 +27,10 @@ class Data:
         if connectionType == "Postgres":
             params = connectionParams
             dataframe = Postgres.fetchDataframe(params, query, limit=limit)
-            
+        if connectionType == "MSSQL":
+            params = connectionParams
+            dataframe = MSSQL.fetchDataframe(params, query, limit=limit)
+
         if connectionType == "Redshift":
             params = connectionParams
             dataframe = Redshift.fetchDataframe(params, query, limit=limit)

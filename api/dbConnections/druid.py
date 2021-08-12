@@ -11,17 +11,13 @@ class Druid:
     """
     Class to support functionalities on Druid connection
     """
+
     def checkConnection(params):
         res = True
         try:
             host = params.get("host", "")
             port = params.get("port", 8888)
-            conn = connect(
-            host=host,
-            port=port,
-            path="/druid/v2/sql/",
-            scheme="http"
-            )
+            conn = connect(host=host, port=port, path="/druid/v2/sql/", scheme="http")
             curs = conn.cursor()
             dataframe = pd.read_sql("SELECT 1", conn, chunksize=None)
 
@@ -30,22 +26,17 @@ class Druid:
             res = False
         return res
 
-    def fetchDataframe(params: str, sql: str, limit: bool = False):
+    def fetchDataframe(params: dict, sql: str, limit: bool = False):
         dataframe = None
         try:
             host = params.get("host", "")
             port = params.get("port", 8888)
-            conn = connect(
-            host=host,
-            port=port,
-            path="/druid/v2/sql/",
-            scheme="http"
-            )
+            conn = connect(host=host, port=port, path="/druid/v2/sql/", scheme="http")
             if limit:
                 sql = limitSql(sql)
-            chunksize =  None
+            chunksize = None
             dataframe = pd.read_sql(sql, conn, chunksize=chunksize)
-            
+
         except Exception as ex:
             logger.error("Can't connect to db with this credentials %s", str(ex))
 

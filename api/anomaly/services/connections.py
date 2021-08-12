@@ -1,7 +1,7 @@
 import logging
 from typing import List
 from utils.apiResponse import ApiResponse
-from dbConnections import BigQuery, Redshift, Snowflake, Druid, MySQL, Postgres
+from dbConnections import BigQuery, Redshift, Snowflake, Druid, MySQL, Postgres, MSSQL
 from anomaly.models import (
     Connection,
     ConnectionParam,
@@ -77,6 +77,8 @@ class Connections:
             connectionResponse = MySQL.checkConnection(payload["params"])
         elif connectionName == "Postgres":
             connectionResponse = Postgres.checkConnection(payload["params"])
+        elif connectionName == "MSSQL":
+            connectionResponse = MSSQL.checkConnection(payload["params"])
         else:
             connectionResponse = True
 
