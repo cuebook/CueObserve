@@ -88,4 +88,4 @@ pydruid==0.6.2
 snowflake_connector_python==2.4.6
 sqlalchemy==1.4.20
 mysqlclient==2.0.3
-html2text== 2020.1.16
+html2text==2020.1.16

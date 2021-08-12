@@ -1,20 +1,7 @@
-import traceback
 import dateutil.parser as dp
 from dateutil.relativedelta import relativedelta
-import pandas as pd, datetime as dt, json
+import pandas as pd, datetime as dt
 from prophet import Prophet
-
-from anomaly.models import Anomaly
-
-def dataFrameEmpty(df):
-    """Checks whether dataFrame has enough data for prophet"""
-    if df is None:
-        return True
-    if df.empty:
-        return True
-    if df.shape[0] < 20:
-        return True
-    return False
 
 
 def isAnomaly(lowBand, highBand, value):
@@ -46,9 +33,9 @@ def checkLatestAnomaly(df):
             "anomalyTime": dp.parse(anomalyTime).timestamp() * 1000,
         }
 
-def detect(df, granularity):
+def prophetDetect(df, granularity):
     """
-    Method to perform anomaly detection on given dataframe
+    Method to perform anomaly detection on given dataframe using fbProphet
     """
     today = dt.datetime.now()
     df["ds"] = pd.to_datetime(df["ds"])
@@ -98,43 +85,3 @@ def detect(df, granularity):
         "anomalyLatest": anomalyLatest
     }
     return output
-
-
-
-def anomalyService(anomalyDef, dimVal, contriPercent, df):
-    """
-    Method to conduct the anomaly detection process
-    """
-    anomalyObj, _ = Anomaly.objects.get_or_create(anomalyDefinition=anomalyDef, dimensionVal=dimVal, published=False)
-    output = {"dimVal": dimVal}
-    try:
-        if dataFrameEmpty(df):
-            return
-        granularity = anomalyDef.dataset.granularity
-        result = detect(df, granularity)
-        result["contribution"] = contriPercent
-        result["anomalyLatest"]["contribution"] = contriPercent
-        timeThreshold = 3600 * 24 * 5 if granularity == "day" else 3600 * 24
-        toPublish = dt.datetime.now().timestamp() - dp.parse(result["anomalyLatest"]["anomalyTimeISO"]).timestamp() <= timeThreshold
-        if anomalyDef.highOrLow:
-            toPublish = toPublish and anomalyDef.highOrLow.lower() == result["anomalyLatest"]["highOrLow"]
-        anomalyObj.data = result
-        anomalyObj.published = toPublish
-        anomalyObj.save()
-        output["published"] = toPublish
-        output["anomalyId"] = anomalyObj.id
-        output["success"] = True
-    except Exception as ex:
-        output["error"] = json.dumps({"message": str(ex), "stackTrace": traceback.format_exc()})
-        output["success"] = False
-
-    
-    return output
-
-
-
-    
-    
-
-
-

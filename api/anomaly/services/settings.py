@@ -11,6 +11,8 @@ class Settings:
     Services for settings
     """
 
+    defaultSettings: list = [ANOMALY_ALERT_SLACK_URL, APP_ALERTS_SLACK_URL]
+
     @staticmethod
     def getSettings():
         """
@@ -19,7 +21,9 @@ class Settings:
         res = ApiResponse()
         try:
             Settings.__createDefaultSettings()
-            data = SettingSerializer(Setting.objects.all(), many=True).data
+            data = SettingSerializer(
+                Setting.objects.filter(name__in=Settings.defaultSettings), many=True
+            ).data
             res.update(True, "Successfully retrieved settings", data)
         except Exception as ex:
             res.update(False, "Error in retrieving settings")
@@ -30,27 +34,29 @@ class Settings:
         """
         Creates default settings with empty values if not existing
         """
-        defaultSettings: list = [ANOMALY_ALERT_SLACK_URL, APP_ALERTS_SLACK_URL]
-        if len(defaultSettings) == Setting.objects.filter(name__in=defaultSettings).count():
+        if (
+            len(Settings.defaultSettings)
+            == Setting.objects.filter(name__in=Settings.defaultSettings).count()
+        ):
             return
 
-        for name in defaultSettings:
+        for name in Settings.defaultSettings:
             Setting.objects.update_or_create(name=name, value="")
-
 
     @staticmethod
     def updateSettings(payload: dict):
         """
         Update Settings
-        :param payload: dict of name value pair 
+        :param payload: dict of name value pair
         """
         res = ApiResponse()
         try:
             for name, value in payload.items():
                 Setting.objects.filter(name=name).update(value=value)
-            res.update(True, "Successfully updated settings", )
+            res.update(
+                True,
+                "Successfully updated settings",
+            )
         except Exception as ex:
             res.update(False, "Error in updating settings")
         return res
-
-

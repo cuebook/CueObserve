@@ -15,7 +15,7 @@
 </p>
 <br>
 
-With CueObserve, you can run anomaly detection on data in your SQL data warehouses and databases.
+With CueObserve, you can run **timeseries anomaly detection** on data in your **SQL** data warehouses and databases. It currently supports Snowflake, BigQuery, Redshift, Druid, Postgres, and MySQL.
 
 ![CueObserve](docs/images/Overview.gif)
 
@@ -48,8 +48,8 @@ When an anomaly detection job runs, CueObserve does the following:
 - Automated SQL to timeseries transformation.
 - Run anomaly detection on the aggregate metric or break it down by any dimension.
 - In-built Scheduler. CueObserve uses Celery as the executor and celery-beat as the scheduler.
-- Slack alerts when anomalies are detected. (coming soon)
-- Monitoring. Slack alert when a job fails. CueObserve maintains detailed logs. (coming soon)
+- Slack alerts when anomalies are detected.
+- Monitoring. Slack alert when a job fails. CueObserve maintains detailed logs.
 
 ### Limitations
 - Currently supports Prophet for timeseries forecasting.
@@ -60,5 +60,5 @@ For general help using CueObserve, read the [documentation](https://cueobserve.c
 
 To report a bug or request a feature, open an [issue](https://github.com/cuebook/cueobserve/issues).
 
-# Contributing
+## Contributing
 We'd love contributions to CueObserve. Before you contribute, please first discuss the change you wish to make via an [issue](https://github.com/cuebook/cueobserve/issues) or a [discussion](https://github.com/cuebook/cueobserve/discussions). Contributors are expected to adhere to our [code of conduct](https://github.com/cuebook/cueobserve/blob/main/CODE_OF_CONDUCT.md).

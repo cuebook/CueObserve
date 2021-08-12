@@ -1,0 +1,26 @@
+[
+    {
+      "model": "anomaly.detectionruletype",
+      "pk": 1,
+      "fields": {
+        "name": "Prophet",
+        "description": "Calculates anomaly using fbprophet."
+      }
+    },
+    {
+      "model": "anomaly.detectionruletype",
+      "pk": 2,
+      "fields": {
+        "name": "Percentage Change",
+        "description": "Calculates anomaly on percentage change only."
+      }
+    },
+    {
+      "model": "anomaly.detectionruletype",
+      "pk": 3,
+      "fields": {
+        "name": "Lifetime",
+        "description": "Calculates anomaly on lifetime highest/lowest value."
+      }
+    }
+  ]

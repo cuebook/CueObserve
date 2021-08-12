@@ -6,3 +6,5 @@ from .anomalys import Anomalys
 from .schedules import ScheduleService
 from .settings import Settings
 from .slack import SlackAlert
+from .detectionRules import DetectionRules
+from .rootCauseAnalyses import RootCauseAnalyses

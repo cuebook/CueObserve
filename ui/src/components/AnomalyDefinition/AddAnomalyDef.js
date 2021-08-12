@@ -5,6 +5,8 @@ import CreatableSelect from "react-select/creatable";
 import { Modal, Select, Spin, Switch, Button, Radio, message, Drawer } from "antd";
 import datasetService from "services/datasets";
 import anomalyDefService from "services/anomalyDefinitions.js";
+import PercentageChange from "components/DetectionRuleParamSelector/PercentageChange";
+import Lifetime from "components/DetectionRuleParamSelector/Lifetime";
 import  _, { last } from "lodash";
 
 const { Option } = Select;
@@ -369,10 +371,14 @@ export default function AddAnomalyDef(props){
   const [datasetId, setDatasetId] = useState();
   const [selectedOption, setSelectedOption] = useState([]);
   const [isFocused, setIsFocused] = useState(false);
+  const [allDetectionRuleTypes, setAllDetectionRuleTypes] = useState([]);
+  const [detectionRuleTypeId, setDetectionRuleTypeId] = useState();
+  const [detectionRuleParams, setDetectionRuleParams] = useState({});
 
   useEffect(()=>{
     if (allDatasets.length == 0){
       getDatasets();
+      getDetectionRuleTypes();
     }
   }, []);
 
@@ -385,11 +391,43 @@ const getDataset = async (datasetId) => {
   const data = await datasetService.getDataset(datasetId)
     generateOptions(data) 
 }
+
+const getDetectionRuleTypes = async () => {
+  const data = await anomalyDefService.getDetectionRuleTypes()
+  setAllDetectionRuleTypes(data)
+  if(data.length > 0)
+  {
+    setDetectionRuleTypeId(data[0].id)
+  }
+}
+
+const handleDetectionRuleTypeChange = value => {
+  setDetectionRuleParams({})
+  setDetectionRuleTypeId(value)
+};
+
  const handleAddAnomaly = () => {
     if ( _.isNull(selectedOption ) ||  selectedOption.length < 1) {
       message.error("At least Measure required to configure Anomaly Definition !");
       return;
     }
+
+    let detectionRuleType = allDetectionRuleTypes.find(detRuleType => detRuleType.id == detectionRuleTypeId)
+    let paramsUpdated = true
+    detectionRuleType.params.forEach(param => {
+      if(!detectionRuleParams[param.name])
+      {
+        paramsUpdated = false
+      }
+    })
+
+    if(!paramsUpdated)
+    {
+      message.error("Update parameter values for detection rule");
+      return
+    }   
+
+
     var payload = {
       datasetId: datasetId,
       measure: selectedOption[0].value
@@ -442,6 +480,9 @@ const getDataset = async (datasetId) => {
       return;
     }
 
+
+    payload.detectionRuleTypeId = detectionRuleTypeId
+    payload.detectionRuleParams = detectionRuleParams
 
     getAddAnomaly(payload)
   };
@@ -534,6 +575,30 @@ const getDataset = async (datasetId) => {
       </Option>
     ));
 
+    var detectionRuleTypeOptions = [];
+    detectionRuleTypeOptions = allDetectionRuleTypes && allDetectionRuleTypes.map(detectionType => (
+      <Option value={detectionType.id} key={detectionType.id}>
+        {detectionType.name}
+      </Option>
+    ));
+
+    let paramSelector = null
+    let descriptionText = null
+
+    if(detectionRuleTypeId)
+    {
+      let detectionRuleType = allDetectionRuleTypes.find(detRuleType => detRuleType.id == detectionRuleTypeId)
+      descriptionText = detectionRuleType.description
+      if(detectionRuleType.name == "Percentage Change")
+      {
+        paramSelector = <PercentageChange submitParams={setDetectionRuleParams} />
+      }
+      if(detectionRuleType.name == "Lifetime")
+      {
+        paramSelector = <Lifetime submitParams={setDetectionRuleParams} />
+      }
+    }
+
     return (
       <div>
           <Drawer
@@ -591,6 +656,25 @@ const getDataset = async (datasetId) => {
                 placeholder="Measure [Dimension Top N / Min % Contribution X / Min Value Y] [High/Low] "
               />
               </div>
+              <div className="mb-6">
+                <Select
+                  className={`${style.selectEditor}`}
+                  showSearch
+                  placeholder="Create a detection rule"
+                  value={detectionRuleTypeId}
+                  optionFilterProp="children"
+                  onChange={handleDetectionRuleTypeChange}
+                  filterOption={(input, option) =>
+                    option.props.children
+                      .toLowerCase()
+                      .indexOf(input.toLowerCase()) >= 0
+                  }
+                >
+                  {detectionRuleTypeOptions}
+                </Select>
+                <span style={{opacity: 0.6, paddingLeft: 5}}>{descriptionText}</span>
+              </div>
+              {paramSelector}
             <div className="mb-6">
             <Button
               key="back"
