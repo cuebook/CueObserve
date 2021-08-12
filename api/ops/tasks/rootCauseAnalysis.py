@@ -82,8 +82,8 @@ def _anomalyDetectionForDimension(anomalyId: int, dimension: str, data: list):
 
         operation = anomaly.anomalyDefinition.operation
         operationValue = int(anomaly.anomalyDefinition.value)
-        operation = operation if operation else DEFAULT_OPERATION
         operationValue = operationValue if operation else DEFAULT_OPERATION_VALUE
+        operation = operation if operation else DEFAULT_OPERATION
 
         dimValsData = prepareAnomalyDataframes(
             df,
