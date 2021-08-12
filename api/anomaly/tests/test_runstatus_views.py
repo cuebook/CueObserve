@@ -5,12 +5,24 @@ from django.test import TestCase
 from django.urls import reverse
 from mixer.backend.django import mixer
 from anomaly.models import AnomalyDefinition
+from users.models import CustomUser
+
+@pytest.fixture()
+def setup_user(db):
+    """sets up a user to be used for login"""
+    user = CustomUser.objects.create_superuser("admin@domain.com", "admin")
+    user.status = "Active"
+    user.is_active = True
+    user.name = "Sachin"
+    user.save()
 
 @pytest.mark.django_db(transaction=True)
-def test_runstatus(client, mocker):
+def test_runstatus(setup_user, client, mocker):
     """
     Test cases for anomalyDefinition
     """
+    client.login(email="admin@domain.com", password="admin")
+
     anomalyDef = mixer.blend("anomaly.AnomalyDefinition", periodicTask=None)
     runStatus = mixer.blend("anomaly.RunStatus", anomalyDefinition=anomalyDef, status="RUNNING")
 

@@ -39,8 +39,8 @@ export default function Admin() {
     const response = await userServices.currentAccount();
     if (response &&  response.success && response.isAuthenticationRequired){
       setIsLogout(true)
-      setIsLoggedIn(true)
       setIsAuthRequired(true)
+      setIsLoggedIn(true)
       window.location.href="/#/anomalies"
     }
     else if(response && !response.success && response.isAuthenticationRequired){

@@ -9,9 +9,20 @@ from utils.apiResponse import ApiResponse
 
 from anomaly.models import Setting
 
-@pytest.mark.django_db(transaction=True)
-def test_setting(client, mocker):
+from users.models import CustomUser
 
+@pytest.fixture()
+def setup_user(db):
+    """sets up a user to be used for login"""
+    user = CustomUser.objects.create_superuser("admin@domain.com", "admin")
+    user.status = "Active"
+    user.is_active = True
+    user.name = "Sachin"
+    user.save()
+
+@pytest.mark.django_db(transaction=True)
+def test_setting(setup_user, client, mocker):
+    client.login(email="admin@domain.com", password="admin")
     # Create setting test
     path = reverse('settings')
     res = ApiResponse("Successfully tested setting")

@@ -8,12 +8,25 @@ from mixer.backend.django import mixer
 # from services.anomalys import Anomalys
 from anomaly.services.anomalys import Anomalys
 from anomaly.models import AnomalyDefinition, Anomaly
+from users.models import CustomUser
+from django.conf import settings
+auth_required= True if settings.AUTHENTICATION_REQUIRED == "True" else False
+
+@pytest.fixture()
+def setup_user(db):
+    """sets up a user to be used for login"""
+    user = CustomUser.objects.create_superuser("admin@domain.com", "admin")
+    user.status = "Active"
+    user.is_active = True
+    user.name = "Sachin"
+    user.save()
 
 @pytest.mark.django_db(transaction=True)
-def test_anomalys(client, mocker):
+def test_anomalys(setup_user ,client, mocker):
     schedule = mixer.blend("anomaly.customSchedule", name="Test Schedule")
     connection = mixer.blend("anomaly.connection")
     dataset = mixer.blend("anomaly.dataset", granularity='day', name="DB1")
+    client.login(email="admin@domain.com", password="admin")
 
     path = reverse("addAnomalyDef")
     data = {

@@ -4,9 +4,20 @@ from unittest import mock
 from django.test import TestCase
 from django.urls import reverse
 from mixer.backend.django import mixer
+from users.models import CustomUser
+
+@pytest.fixture()
+def setup_user(db):
+    """sets up a user to be used for login"""
+    user = CustomUser.objects.create_superuser("admin@domain.com", "admin")
+    user.status = "Active"
+    user.is_active = True
+    user.name = "Sachin"
+    user.save()
 
 @pytest.mark.django_db(transaction=True)
-def test_datasets(client, mocker):
+def test_datasets(setup_user, client, mocker):
+    client.login(email="admin@domain.com", password="admin")
 
     # Get dataset when no entry
     path = reverse('datasets')
