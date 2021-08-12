@@ -12,7 +12,7 @@ from users.models import CustomUser
 from django.contrib.auth.models import Group
 # from commons.utils.token_generator import id_generator
 from django.conf import settings
-auth_required= True if settings.AUTHENTICATION_REQUIRED == "True" else False
+authenticationRequired= True if settings.AUTHENTICATION_REQUIRED == "True" else False
 
 @pytest.fixture()
 def setup_user(db):
@@ -28,7 +28,7 @@ def test_authenticate_get(setup_user, client):
     path = reverse("login")
     client.login(email="admin@domain.com", password="admin")
     response = client.get(path)
-    assert response.json()["success"] == (True and auth_required)
+    assert response.json()["success"] == (True and authenticationRequired)
 
 def test_authenticate_post(setup_user, client):
     """ tests authenticate_post """

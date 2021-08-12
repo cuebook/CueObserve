@@ -34,7 +34,7 @@ class UnsafeSessionAuthentication(SessionAuthentication):
 class Account(APIView):
     """Account authentication"""
 
-    auth_required= True if settings.AUTHENTICATION_REQUIRED == "True" else False
+    authenticationRequired= True if settings.AUTHENTICATION_REQUIRED == "True" else False
     authentication_classes = (UnsafeSessionAuthentication,)
     @staticmethod
     def parse_user(user):
@@ -50,16 +50,16 @@ class Account(APIView):
     def get(self, request):
         """Checks existing session, etc"""
         print("request", request)
-        if self.auth_required:
+        if self.authenticationRequired:
             if request.user.is_authenticated :
                 user = Account.parse_user(request.user)
                 Users.objects.filter(pk=request.user.pk)
-                return Response({"data": user, "success": True, "isAuthenticationRequired": self.auth_required})
+                return Response({"data": user, "success": True, "isAuthenticationRequired": self.authenticationRequired})
             else:
                 # the login is a  GET request, so just show the user the login form.
-                return Response({"message": "Please log in", "success": False, "isAuthenticationRequired": self.auth_required }, status=401)
+                return Response({"message": "Please log in", "success": False, "isAuthenticationRequired": self.authenticationRequired }, status=401)
         else:
-                return Response({"message": "Authentication not required", "success": False, "isAuthenticationRequired": self.auth_required})
+                return Response({"message": "Authentication not required", "success": False, "isAuthenticationRequired": self.authenticationRequired})
 
 
 

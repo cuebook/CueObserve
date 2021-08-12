@@ -11,7 +11,6 @@ from django.conf import settings
 from users.models import CustomUser
 from django.contrib.auth import login, authenticate
 
-auth_required= True if settings.AUTHENTICATION_REQUIRED == "True" else False
 
 @pytest.fixture()
 def setup_user(db):

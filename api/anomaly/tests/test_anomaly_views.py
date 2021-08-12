@@ -10,7 +10,6 @@ from anomaly.services.anomalys import Anomalys
 from anomaly.models import AnomalyDefinition, Anomaly
 from users.models import CustomUser
 from django.conf import settings
-auth_required= True if settings.AUTHENTICATION_REQUIRED == "True" else False
 
 @pytest.fixture()
 def setup_user(db):
