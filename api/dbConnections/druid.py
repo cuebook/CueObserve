@@ -1,8 +1,8 @@
-from pydruid.db import connect
-from dbConnections.utils import limitSql
 import json
 import logging
 import pandas as pd
+from pydruid.db import connect
+from dbConnections.utils import limitSql
 
 logger = logging.getLogger(__name__)
 
@@ -14,6 +14,9 @@ class Druid:
 
     @staticmethod
     def checkConnection(params):
+        """
+        Check if connection can be esatblished for druid
+        """
         res = True
         try:
             host = params.get("host", "")
@@ -29,6 +32,9 @@ class Druid:
 
     @staticmethod
     def fetchDataframe(params: dict, sql: str, limit: bool = False):
+        """
+        Fetch dataframe for given sql
+        """
         dataframe = None
         try:
             host = params.get("host", "")
