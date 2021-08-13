@@ -195,7 +195,10 @@ export default function Anomaly(props) {
           }
         },
         {
-          title: "Value",
+          title: <div style={{ display: "grid" }}>
+                    <div>Value</div>
+                    <div className="text-xs">(Contribution)</div>
+                  </div>,
           dataIndex: "val",
           key: "val",
           align: "right",
