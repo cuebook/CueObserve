@@ -12,6 +12,7 @@ class Druid:
     Class to support functionalities on Druid connection
     """
 
+    @staticmethod
     def checkConnection(params):
         res = True
         try:
@@ -26,6 +27,7 @@ class Druid:
             res = False
         return res
 
+    @staticmethod
     def fetchDataframe(params: dict, sql: str, limit: bool = False):
         dataframe = None
         try:
