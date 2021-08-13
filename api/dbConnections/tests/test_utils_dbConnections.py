@@ -6,16 +6,6 @@ from django.test import TestCase
 from django.urls import reverse
 from mixer.backend.django import mixer
 from anomaly.models import Connection
-from users.models import CustomUser
-
-@pytest.fixture()
-def setup_user(db):
-    """sets up a user to be used for login"""
-    user = CustomUser.objects.create_superuser("admin@domain.com", "admin")
-    user.status = "Active"
-    user.is_active = True
-    user.name = "Sachin"
-    user.save()
 
 def test_limitSql():
 	""" limits sql """
@@ -25,10 +15,8 @@ def test_limitSql():
 	assert sql == "SELECT * from limit 234 limIt  3456  "
 
 @pytest.mark.django_db(transaction=True)
-def testDbConnection(setup_user, client, mocker ):
+def testDbConnection(client, mocker ):
 	""" Test DB connection"""
-	client.login(email="admin@domain.com", password="admin")
-
 	# Test cases for Druid connection 
 	connectionType = mixer.blend("anomaly.connectionType", name= "Druid")
 	mixer.blend("anomaly.connectionParam", connectionType = connectionType, name ="host")

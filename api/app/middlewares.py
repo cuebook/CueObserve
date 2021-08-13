@@ -57,23 +57,6 @@ class LoginRequiredMiddleware:
         return login_required(view_func)(request, *view_args, **view_kwargs)
 
 
-class RestrictApiMiddleware:
-    """
-    Middleware to block certain api requests for certain users
-    """
-
-    def __init__(self, get_response):
-        self.get_response = get_response
-        # One-time configuration and initialization.
-
-    def __call__(self, request):
-        """
-        Process request method to restrict api
-        """
-        path = "/api/creator"
-        if hasattr(request.user, "role") and request.user.role == "Viewer" and request.path.find(path) != -1:
-            return HttpResponseForbidden()
-        return self.get_response(request)
 
 
 def login_exempt(view):  # pylint: disable=C0103

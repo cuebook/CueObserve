@@ -9,22 +9,11 @@ from mixer.backend.django import mixer
 from anomaly.models import RCAAnomaly
 from ops.tasks import rootCauseAnalysisJob
 from ops.tasks.rootCauseAnalysis import _anomalyDetectionForValue
-from users.models import CustomUser
-
-@pytest.fixture()
-def setup_user(db):
-    """sets up a user to be used for login"""
-    user = CustomUser.objects.create_superuser("admin@domain.com", "admin")
-    user.status = "Active"
-    user.is_active = True
-    user.name = "Sachin"
-    user.save()
 
 @pytest.mark.django_db(transaction=True)
-def test_rootCauseAnalysis(setup_user, client, mocker):
+def test_rootCauseAnalysis(client, mocker):
     """
     """
-    client.login(email="admin@domain.com", password="admin")
     anomalyData = {
             'anomalyLatest': {'highOrLow': 'low',
              'value': 2.0,
@@ -236,9 +225,8 @@ def test_rootCauseAnalysis(setup_user, client, mocker):
 
 
 @pytest.mark.django_db(transaction=True)
-def test_calculateRCA(setup_user, client, mocker):
+def test_calculateRCA(client, mocker):
 
-    client.login(email="admin@domain.com", password="admin")
     mockRCAJob = mocker.patch(
         "ops.tasks.rootCauseAnalysis.rootCauseAnalysisJob.delay",
         new=mock.MagicMock(

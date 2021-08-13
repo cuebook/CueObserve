@@ -7,26 +7,13 @@ from django.urls import reverse
 from mixer.backend.django import mixer
 from anomaly.models import AnomalyDefinition
 from anomaly.services.anomalyDefinitions import AnomalyDefinitions
-from django.conf import settings
-from users.models import CustomUser
-from django.contrib.auth import login, authenticate
 
-
-@pytest.fixture()
-def setup_user(db):
-    """sets up a user to be used for login"""
-    user = CustomUser.objects.create_superuser("admin@domain.com", "admin")
-    user.status = "Active"
-    user.is_active = True
-    user.name = "Sachin"
-    user.save()
 
 @pytest.mark.django_db(transaction=True)
-def test_anomalyDefinition(setup_user,client, mocker):
+def test_anomalyDefinition(client, mocker):
     """
     Test cases for anomalyDefinition
     """
-    client.login(email="admin@domain.com", password="admin")
     schedule = mixer.blend("anomaly.customSchedule", name="Test Schedule")
     # Get anomlay when no entry
     path = reverse('anomalyDefs')

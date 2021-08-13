@@ -67,7 +67,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "app.middlewares.DisableCsrfCheck",
     "app.middlewares.LoginRequiredMiddleware",
-    "app.middlewares.RestrictApiMiddleware"
+    # "app.middlewares.RestrictApiMiddleware"
 ]
 AUTHENTICATION_BACKENDS = (
     # Needed to login by username in Django admin, regardless of `allauth`
