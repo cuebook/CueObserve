@@ -5,7 +5,9 @@ from dbConnections.utils import limitSql
 from django.test import TestCase
 from django.urls import reverse
 from mixer.backend.django import mixer
-from anomaly.models import Connection
+from anomaly.models import Connection, ConnectionType, ConnectionParam
+from conftest import populate_seed_data
+
 
 def test_limitSql():
 	""" limits sql """
@@ -90,3 +92,28 @@ def testDbConnection(client, mocker ):
 	assert Connection.objects.all().count() == 3
 
 
+@pytest.mark.django_db()
+def test_MSSQLConnection(client, populate_seed_data, mocker):
+	"""Testing if connection params in seed data are only needed"""
+	connectionType = ConnectionType.objects.get(name="MSSQL")
+	paramNames = list(ConnectionParam.objects.filter(connectionType=connectionType).values_list("name", flat=True))
+	params = {}
+	for name in paramNames:
+		params[name] = "test"
+
+	mockResponse = mocker.patch(
+		"dbConnections.mssql.pyodbc.connect",
+		new=mock.MagicMock(
+			autospec=True, return_value=True
+		),
+	)
+	mockResponse.start()
+
+	data = {'name': 'test connection', 'description': '', 'connectionType_id': connectionType.id, 'params': params}
+	path = reverse("connections")
+	response = client.post(path, data, content_type="application/json")	
+	assert response.status_code == 200
+	assert response.data["success"]
+	assert Connection.objects.all().count()
+
+	mockResponse.stop()
