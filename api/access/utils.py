@@ -30,15 +30,15 @@ def prepareAnomalyDataframes(
     if dimensionCol:
         if operation == "Top":
             dimValsData = topNDimensionalValues(
-                datasetDf, timestampCol, metricCol, dimensionCol, value
+                datasetDf, timestampCol, metricCol, dimensionCol, int(value)
             )
         elif operation == "Min % Contribution":
             dimValsData = contributionOnDimensionalValues(
                 datasetDf, timestampCol, metricCol, dimensionCol, value
             )
 
-        elif operation == "Min Value":
-            dimValsData = minValueOnDimensionalValues(datasetDf, timestampCol, metricCol, dimensionCol, value)
+        elif operation == "Min Avg Value":
+            dimValsData = minAvgValueOnDimensionalValues(datasetDf, timestampCol, metricCol, dimensionCol, value)
         else:
             dimValsData = topNDimensionalValues(datasetDf, timestampCol, metricCol, dimensionCol, 10)
     else:
@@ -115,7 +115,7 @@ def contributionOnDimensionalValues(
     return dimValsData
 
 
-def minValueOnDimensionalValues(
+def minAvgValueOnDimensionalValues(
     datasetDf, timestampCol, metricCol, dimensionCol=None, value=1
 ):
     """
@@ -132,10 +132,13 @@ def minValueOnDimensionalValues(
     dimVals = list(topValsDf[:].index)
     total = datasetDf[metricCol].sum()
     for dimVal in dimVals:
-
         tempDf = datasetDf[datasetDf[dimensionCol] == dimVal][[timestampCol, metricCol]]
         totalSum = tempDf[metricCol].sum()
-        if totalSum >= value:
+        tempDf = tempDf.groupby(timestampCol).sum() 
+        totalRow = (tempDf[metricCol] > 0).sum(axis=0)
+        avg = int(totalSum/totalRow)
+
+        if avg >= value:
             contriPercent = int(10000 * (totalSum / total)) / 100
             dimValsData.append(
                 {

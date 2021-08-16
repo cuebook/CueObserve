@@ -180,7 +180,6 @@ class AnomalyDefView(APIView):
         operation = request.data.get("operation", None)
         value = request.data.get("operationValue", 0)
         dimension = request.data.get("dimension", None)
-        dimension = request.data.get("dimension", None)
         detectionRuleTypeId = request.data.get("detectionRuleTypeId", 1)
         detectionRuleParams = request.data.get("detectionRuleParams", {})
         res = AnomalyDefinitions.addAnomalyDefinition(

@@ -345,7 +345,7 @@ export default function EditAnomalyDef(props){
                   MultiValueContainer: multiValueContainer
                 }}
                 options={options}
-                placeholder={`Measure [Dimension] [Top N / Min % Contribution X / Min Value Y] [High/Low] `}
+                placeholder={`Measure [Dimension] [Top N / Min % Contribution X / Min Avg Value Y] [High/Low] `}
               />
 
             </div>
