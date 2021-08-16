@@ -83,10 +83,10 @@ function generateOptions(autoCueOptions) {
     }
   ]
 
-  allOptions.minValue = [
+  allOptions.minAvgValue = [
     {
-      value:"Min Value",
-      label:"Min Value",
+      value:"Min Avg Value",
+      label:"Min Avg Value",
       optionType:"Value",
       color:"#12b1ff"
     }
@@ -134,21 +134,21 @@ function generateOptions(autoCueOptions) {
     {
       value:0.1 + "",
       label: 0.1 + "",
-      optionType: "Minimum Value",
+      optionType: "Minimum Avg Value",
       color:"#12b1ff"
 
     },
     {
       value:1 + "",
       label: 1 + "",
-      optionType: "Minimum Value",
+      optionType: "Minimum Avg Value",
       color:"#12b1ff"
 
     },
     {
       value:1000 + "",
       label: 1000 + "",
-      optionType: "Minimum Value",
+      optionType: "Minimum Avg Value",
       color:"#12b1ff"
 
     }
@@ -220,7 +220,7 @@ function getMetricHelpText(value, opts) {
 function getDimensionHelpText(value, opts) {
   if(opts){
     options = [];
-    options = [...options,...allOptions.top, ...allOptions.contribution, ...allOptions.minValue];
+    options = [...options,...allOptions.top, ...allOptions.contribution, ...allOptions.minAvgValue];
     return " [High/Low]";
   }
 }
@@ -280,7 +280,7 @@ function getHelpText(selectedOption) {
             newOption.optionType = "Min % Contribution"
           }
           else if (tempOption.optionType === "Value"){
-            newOption.optionType = "Minimum Value"
+            newOption.optionType = "Minimum Avg Value"
           }
           newOption.color = "#12b1ff"
           selectedOption.pop();
@@ -333,7 +333,7 @@ function getHelpText(selectedOption) {
       }
         break;
       case "Value":
-        if (lastOption.optionType === "Value" && tempOption.optionType === "Minimum Value"){
+        if (lastOption.optionType === "Value" && tempOption.optionType === "Minimum Avg Value"){
           text = getMinimumValHelpText(lastOption.value, selectedOption)
           tempOption = lastOption
         }
@@ -351,7 +351,7 @@ function getHelpText(selectedOption) {
         text = getContributionValuesHelpText(lastOption.value, selectedOption)
         tempOption = lastOption
         break
-      case "Minimum Value":
+      case "Minimum Avg Value":
         text = getMinimumValuesHelpText(lastOption.value, selectedOption)
         tempOption = lastOption
         break
@@ -461,7 +461,7 @@ const handleDetectionRuleTypeChange = value => {
         payload.operationValue = item.value
         operationValueOnDimension = item.value
       }
-      if (item.optionType === "Minimum Value"){
+      if (item.optionType === "Minimum Avg Value"){
         payload.operationValue = item.value
         operationValueOnDimension = item.value
       }
@@ -653,7 +653,7 @@ const handleDetectionRuleTypeChange = value => {
                   MultiValueContainer: multiValueContainer
                 }}
                 options={options}
-                placeholder="Measure [Dimension Top N / Min % Contribution X / Min Value Y] [High/Low] "
+                placeholder="Measure [Dimension Top N / Min % Contribution X / Min Avg Value Y] [High/Low] "
               />
               </div>
               <div className="mb-6">
