@@ -86,11 +86,13 @@ class AnomalyDefinition(models.Model):
                 "Prophet": "Anomaly Daily Template Prophet",
                 "Percentage Change": "Anomaly Daily Template Percentage Change",
                 "Lifetime": "Anomaly Daily Template Lifetime",
+                "Value Threshold": "Anomaly Daily Template Percentage Change"
             },
             "hour": {
                 "Prophet": "Anomaly Hourly Template Prophet",        
                 "Percentage Change": "Anomaly Hourly Template Percentage Change",
                 "Lifetime": "Anomaly Hourly Template Lifetime",
+                "Value Threshold": "Anomaly Hourly Template Percentage Change"
             }
         }
 
@@ -169,6 +171,11 @@ class DetectionRuleParam(models.Model):
 class DetectionRule(models.Model):
     anomalyDefinition = models.OneToOneField(AnomalyDefinition, on_delete=models.CASCADE)
     detectionRuleType = models.ForeignKey(DetectionRuleType, on_delete=models.CASCADE)
+
+    def __str__(self):
+        name = self.detectionRuleType.name
+        paramValuesString = " & ".join([f"{param['param__name']}: {param['value']}" for param in self.detectionruleparamvalue_set.all().values("param__name", "value")])
+        return f"{name} ({paramValuesString})" if paramValuesString else name
 
 class DetectionRuleParamValue(models.Model):
     param = models.ForeignKey(DetectionRuleParam, on_delete=models.CASCADE)

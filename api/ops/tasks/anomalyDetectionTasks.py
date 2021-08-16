@@ -112,15 +112,18 @@ def anomalyDetectionJob(anomalyDef_id: int, manualRun: bool = False):
     title = "CueObserve Alerts"
     if runStatusObj.status == ANOMALY_DETECTION_SUCCESS:
         if logs.get("numAnomaliesPulished", 0) > 0:
-            message = f"{logs['numAnomaliesPulished']} anomalies published. \n"
+            numPublished = logs["numAnomaliesPulished"]
+            message = f"{numPublished} {'anomalies' if numPublished > 1 else 'anomaly'} published. \n"
             topNtext = (
                 f" Top {anomalyDefinition.value}"
                 if int(float(anomalyDefinition.value)) > 0
                 else ""
             )
+            dimText = f" {anomalyDefinition.dimension}" if anomalyDefinition.dimension else ""
+            highLowText = f" {anomalyDefinition.highOrLow}" if anomalyDefinition.highOrLow else ""
             message = (
                 message
-                + f"Anomaly Definition: {anomalyDefinition.metric} {anomalyDefinition.dimension} {anomalyDefinition.highOrLow}{topNtext} \n"
+                + f"Anomaly Definition: *{anomalyDefinition.metric}{dimText}{highLowText}{topNtext}* \n"
             )
             message = (
                 message
@@ -136,7 +139,7 @@ def anomalyDetectionJob(anomalyDef_id: int, manualRun: bool = False):
             data.update(data["data"]["anomalyLatest"])
 
             details = (
-                html2text.html2text(Template(cardTemplate.title).render(Context(data)))
+                html2text.html2text(Template(cardTemplate.title).render(Context(data))).replace("**", "*")
                 + "\n"
             )
             details = details + html2text.html2text(

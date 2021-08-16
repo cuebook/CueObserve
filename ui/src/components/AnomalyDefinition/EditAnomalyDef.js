@@ -39,14 +39,14 @@ function getSelectedOptions(anomalyDef){
               value: anomalyDef.operation,
               label: anomalyDef.operation,
               optionType: "Top",
-              color: "#ff6767",
+              color: "#12b1ff",
               isFixed: true
             });
             temp.push({
               value: anomalyDef.value,
               label: anomalyDef.value,
               optionType: "Dimension Values",
-              color: "#ff6767",
+              color: "#12b1ff",
               isFixed: true
             });
           }

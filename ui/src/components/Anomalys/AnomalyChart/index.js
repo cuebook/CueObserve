@@ -99,7 +99,7 @@ export default function AnomalyChart(props) {
                 "anomaly",
                 anomaly => {
                   if (anomaly === 1) return 0;
-                  return anomaly;
+                  return 7;
                 }
               ]}
               opacity={[

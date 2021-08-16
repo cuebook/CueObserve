@@ -16,7 +16,7 @@ def checkLatestAnomaly(df):
         return {
             "highOrLow": "high" if higher else "low",
             "value": float(lastAnomalyRow["y"]),
-            "percentage": abs(lastAnomalyRow["percentageChange"]),
+            "percent": abs(lastAnomalyRow["percentageChange"]),
             "anomalyTimeISO": dp.parse(anomalyTime).isoformat(),
             "anomalyTime": dp.parse(anomalyTime).timestamp() * 1000,
         }

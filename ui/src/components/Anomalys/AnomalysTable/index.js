@@ -148,6 +148,8 @@ export default function AnomalysTable(props) {
       key: "contribution",
       sorter: () => {},
       render: (text, record) => {
+        if(!record.data.contribution)
+        return ""
         return (
           <p style={{float: "right"}}>{record.data.contribution.toFixed(2)}%</p>
         );
@@ -159,13 +161,16 @@ export default function AnomalysTable(props) {
       key: "anomaly",
       sorter: () => {},
       render: (text, record) => {
+        if(!record.data.anomalyLatest)
+        return ""
         let percentColor = record.data.anomalyLatest.highOrLow == "high" ? "green" : "red"
         let percentSign = record.data.anomalyLatest.highOrLow == "high" ? "+" : "-"
+        let percentDiv = record.data.anomalyLatest.percent?(<div><span style={{float: "right", color: percentColor}}>{percentSign}{record.data.anomalyLatest.percent.toFixed(2)}%</span></div>) : null
         return (
           <div>
           <div><span style={{float: "right"}}>{record.data.anomalyLatest.value}</span></div>
           <br />
-          <div><span style={{float: "right", color: percentColor}}>{percentSign}{record.data.anomalyLatest.percent}%</span></div>
+          {percentDiv}
           </div>
         );
       }
@@ -176,6 +181,8 @@ export default function AnomalysTable(props) {
       key: "anomalyTimeISO",
       sorter: () =>{},
       render: (text, record) => {
+        if(!record.data.anomalyLatest)
+        return ""
         return (
           <div>
           <p>{humanizeIsoTimestamp(record.data.anomalyLatest.anomalyTimeISO, record.granularity)}</p>

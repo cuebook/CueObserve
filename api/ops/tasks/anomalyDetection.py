@@ -5,6 +5,7 @@ import pandas as pd, datetime as dt, json
 from .detectionTypes.prophet import prophetDetect
 from .detectionTypes.percentageChange import percentChangeDetect
 from .detectionTypes.lifetime import lifetimeDetect
+from .detectionTypes.valueThreshold import valueThresholdDetect
 
 from anomaly.models import Anomaly
 
@@ -30,8 +31,11 @@ def detect(df, granularity, detectionRuleType, anomalyDef):
         threshold = float(anomalyDef.detectionrule.detectionruleparamvalue_set.get(param__name="threshold").value)
         return percentChangeDetect(df, granularity, threshold)
     elif detectionRuleType == "Lifetime":
-        highOrLow = anomalyDef.detectionrule.detectionruleparamvalue_set.get(param__name="highOrLow").value
-        return lifetimeDetect(df, granularity, highOrLow)
+        return lifetimeDetect(df, granularity)
+    elif detectionRuleType == "Value Threshold":
+        lowerThreshold = anomalyDef.detectionrule.detectionruleparamvalue_set.get(param__name="lowerThreshold").value
+        upperThreshold = anomalyDef.detectionrule.detectionruleparamvalue_set.get(param__name="upperThreshold").value
+        return valueThresholdDetect(df, granularity, lowerThreshold, upperThreshold)
 
 
 
