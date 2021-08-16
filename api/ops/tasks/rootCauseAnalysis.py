@@ -49,7 +49,6 @@ def _parallelizeAnomalyDetection(anomalyId: int, dimension: str, dimValsData: li
     Run anomaly detection in parallel in celery
     :param dimValsData: Data for anomaly detection
     """
-
     detectionJobs = group(
         _anomalyDetectionForValue.s(
             anomalyId,
@@ -74,22 +73,30 @@ def _anomalyDetectionForDimension(anomalyId: int, dimension: str, data: list):
     :param dimension: dimension for which anomaly is being detected
     :para data: data for dimension
     """
+    DEFAULT_OPERATION = "Min % Contribution"
+    DEFAULT_OPERATION_VALUE = 1
 
     anomaly = Anomaly.objects.get(id=anomalyId)
     try:
         df = pd.DataFrame(data=data)
+
+        operation = anomaly.anomalyDefinition.operation
+        operationValue = int(anomaly.anomalyDefinition.value)
+        operationValue = operationValue if operation else DEFAULT_OPERATION_VALUE
+        operation = operation if operation else DEFAULT_OPERATION
+
         dimValsData = prepareAnomalyDataframes(
             df,
             anomaly.anomalyDefinition.dataset.timestampColumn,
             anomaly.anomalyDefinition.metric,
             dimension,
-            anomaly.anomalyDefinition.operation,
-            int(anomaly.anomalyDefinition.value),
+            operation,
+            operationValue,
         )
 
         anomaly.rootcauseanalysis.logs = {
             **anomaly.rootcauseanalysis.logs,
-            dimension: "Ananlyzing..",
+            dimension: "Analyzing..",
         }
         anomaly.rootcauseanalysis.save()
 
@@ -102,7 +109,7 @@ def _anomalyDetectionForDimension(anomalyId: int, dimension: str, data: list):
         }
         anomaly.rootcauseanalysis.save()
 
-        if not all(results):
+        if not all([x["success"] for x in results]):
             return False
     except Exception as ex:
 
@@ -154,7 +161,7 @@ def rootCauseAnalysisJob(anomalyId: int):
         metric = anomaly.anomalyDefinition.metric
 
         rootCauseAnalysis.logs = {
-            **rootCauseAnalysis.logs,
+            # **rootCauseAnalysis.logs,
             "Analyzing Dimensions": ", ".join(otherDimensions),
         }
         rootCauseAnalysis.save()

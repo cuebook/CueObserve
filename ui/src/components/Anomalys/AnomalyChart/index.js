@@ -76,20 +76,29 @@ export default function AnomalyChart(props) {
 
   const chart = (
     <div className={style.chartDiv}>
-      <Chart scale={cols} autoFit padding={[10, 10, 25, 20]} height={400}>
-      <Legend visible={false} />
+      <Chart scale={cols} autoFit padding={ props.isMiniChart ? [5, 5, 5, 5] : [10, 10, 25, 20]} height={ props.isMiniChart ? 80 : 400 }>
+        { props.isMiniChart ? 
+          <>
+            <Axis name="ds" visible={false} />
+            <Axis name="y" grid={null} line={null} visible={false} />
+          </>
+          :
+          <>
+            <Axis name="ds" />
+            <Axis name="y" />
+          </>
+        }
+        <Legend visible={false} />
         <Tooltip crosshairs={{ type: "line" }} />
           {bandView}
           <View data={anomalyData.data.anomalyData.actual}>
-            <Axis name="ds" />
-            <Axis name="y" />
             <Geom
               type="point"
               position="ds*y"
               size={[
                 "anomaly",
                 anomaly => {
-                  if (anomaly === 1) return 1;
+                  if (anomaly === 1) return 0;
                   return 7;
                 }
               ]}
@@ -138,7 +147,7 @@ export default function AnomalyChart(props) {
             <Geom
               type="line"
               position={"ds*y"}
-              size={2}
+              size={props.isMiniChart ? 1.4 : 2}
             />
           </View>
           {predictedView}

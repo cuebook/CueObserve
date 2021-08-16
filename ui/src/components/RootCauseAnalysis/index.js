@@ -3,14 +3,10 @@ import style from "./style.module.scss";
 import { useParams, useHistory } from 'react-router-dom';
 import { Table, Button, Spin } from "antd";
 import { CaretUpOutlined, CaretDownOutlined } from '@ant-design/icons';
-import Moment from 'react-moment';
 
 import AnomalyChart from "components/Anomalys/AnomalyChart";
 import rootCauseAnalysisService from "services/rootCauseAnalysis";
 import RCALogs from "./rcaLogs"
-
-var moment = require("moment");
-
 
 export default function Anomaly(props) {
   const [ rcaData, setRCAData ] = useState(null);
@@ -83,7 +79,7 @@ export default function Anomaly(props) {
 
   const subTableColumns = [
     {
-      title: "Anomalous Segment",
+      title: "Segment",
       dataIndex: "dimensionValue",
       key: "dimensionValue",
       width: "28.57%",
@@ -107,7 +103,7 @@ export default function Anomaly(props) {
       }
     },
     {
-      title: "Contribution",
+      title: "Value",
       dataIndex: "value",
       key: "value",
       align: "right",
@@ -119,13 +115,13 @@ export default function Anomaly(props) {
         return (
           <div style={{ display: "grid" }}>
             <div>{record.data.anomalyLatest.value}</div>
-            <div style={{ fontSize: "12px" }}>({roundedPercentage}%)</div>
+            <div className="text-xs">({roundedPercentage}%)</div>
           </div>
         )
       }
     },
     {
-      title: "30-day Contribution",
+      title: "",
       dataIndex: "data",
       key: "data",
       align: "center",
@@ -134,7 +130,7 @@ export default function Anomaly(props) {
         return (
                 <div className="">
                   <AnomalyChart
-                    data={ {data: text} }
+                    data={ {data: text, metric: rcaData.measure, granularity: rcaData.granularity} }
                     isMiniChart={true}
                   />
                 </div>
@@ -150,7 +146,7 @@ export default function Anomaly(props) {
       dataIndex: "dimension",
       key: "dimension",
       width: "18%",
-      render: (text, record) => <h6>{text}</h6>
+      render: (text, record) => <strong>{text}</strong>
     },
     {
       title: "Contribution of Anomalous Segments",
@@ -166,10 +162,10 @@ export default function Anomaly(props) {
       }
     },
     {
-      title: "Segments",
+      title: "Anomalous Segments",
       children: [
         {
-          title: "Anomalous Segment",
+          title: "Segment",
           dataIndex: "rcaData",
           key: "rcaData",
           align: "center",
@@ -199,7 +195,10 @@ export default function Anomaly(props) {
           }
         },
         {
-          title: "Contribution",
+          title: <div style={{ display: "grid" }}>
+                    <div>Value</div>
+                    <div className="text-xs">(Contribution)</div>
+                  </div>,
           dataIndex: "val",
           key: "val",
           align: "right",
@@ -214,7 +213,7 @@ export default function Anomaly(props) {
           }
         },
         {
-          title: "30-day Contribution",
+          title: "",
           dataIndex: "rcaData",
           key: "rcaData",
           align: "center",
@@ -234,12 +233,13 @@ export default function Anomaly(props) {
 
 
   const enabledAnalyzeButton = !loading && [null, 'SUCCESS', 'ERROR'].includes(rcaData.status)
-  const anomalyTime = <Moment format="DD-MMM HH:mm">{rcaData.anomalyTime}</Moment>
-  const filterPart = rcaData.dimension ? <>where <span style={{background:"#eeeeee", padding: "0 4px", borderRadius: "4px"}}>{rcaData.dimension} = {rcaData.dimensionValue}</span>"</> : null;
+  let anomalyTime = rcaData.anomalyTime.slice(0,10)
+  anomalyTime += rcaData.granularity == "hour" ? " " + rcaData.anomalyTime.slice(11,16) : ""
+  const filterPart = rcaData.dimension ? <>where <span style={{background:"#eeeeee", padding: "0 4px", borderRadius: "4px"}}>{rcaData.dimension} = {rcaData.dimensionValue}</span></> : null;
 
   return (<div className="">
-            <div className="text-xl"><strong>Root Cause Analysis</strong></div>
-            <div className="text-base mb-2">
+            <div className={style.anomalyTitle}><strong>Root Cause Analysis</strong></div>
+            <div className={`${style.anomalyText} mb-2`}>
               Analysis of <b>{rcaData.measure}</b> {filterPart} on {anomalyTime}
               <div>
                 {rcaData.measure} = {rcaData.value}

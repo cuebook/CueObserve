@@ -2,10 +2,30 @@
   background: #F4F5F6;
   padding: 2px 5px;
   border-radius: 4px;
-  font-size: 12px;
+  /*font-size: 12px;*/
 }
 
 .loadingDiv {
   width: 100%;
   text-align: center;
+}
+
+
+.anomalyTitle {
+  /*width: calc(100% - 140px);*/
+  /*display: inline-block;*/
+  font-size: 20px;
+  overflow: wrap;
+}
+
+.anomalyText {
+  overflow: wrap;
+  /*width: calc(100% - 140px);*/
+  /*display: inline-block;*/
+  /*top: -15px;*/
+  /*padding: 0 25px 0 25px;*/
+  font-size: 14px;
+  /*width: 100%;*/
+
+  /*color: #586069 ;*/
 }

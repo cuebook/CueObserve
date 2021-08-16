@@ -412,6 +412,66 @@
             "width": "25%"
           }
         }
+      },
+      {
+        "model": "anomaly.connectionparam",
+        "pk": 22,
+        "fields": {
+          "name": "username",
+          "label": "Username",
+          "isEncrypted": false,
+          "connectionType": 7,
+          "properties": {
+            "rules": [
+              {
+                "required": true,
+                "message": "Username  can't be empty"
+              }
+            ],
+            "type": "text",
+            "width": "50%"
+          }
+        }
+      },
+      {
+        "model": "anomaly.connectionparam",
+        "pk": 23,
+        "fields": {
+          "name": "password",
+          "label": "Password",
+          "isEncrypted": true,
+          "connectionType": 7,
+          "properties": {
+            "rules": [
+              {
+                "required": true,
+                "message": "Password  can't be empty"
+              }
+            ],
+            "type": "text",
+            "width": "50%"
+          }
+        }
+      },
+      {
+        "model": "anomaly.connectionparam",
+        "pk": 24,
+        "fields": {
+          "name": "host",
+          "label": "Host",
+          "isEncrypted": false,
+          "connectionType": 7,
+          "properties": {
+            "rules": [
+              {
+                "required": true,
+                "message": "Host name can't be empty"
+              }
+            ],
+            "type": "text",
+            "width": "100%"
+          }
+        }
       }
     
 ]

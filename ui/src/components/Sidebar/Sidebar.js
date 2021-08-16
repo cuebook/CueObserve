@@ -17,11 +17,6 @@ export default function Sidebar(props) {
       "icon": "fa-cog"
     },
     {
-      "label": "Schedules",
-      "path": "/schedules",
-      "icon": "fa-calendar"
-    },
-    {
       "label": "Datasets",
       "path": "/datasets",
       "icon": "fa-table"
@@ -30,6 +25,11 @@ export default function Sidebar(props) {
       "label": "Connections",
       "path": "/connections",
       "icon": "fa-plug"
+    },
+    {
+      "label": "Schedules",
+      "path": "/schedules",
+      "icon": "fa-calendar"
     },
     {
       "label": "Settings",

@@ -40,5 +40,12 @@
         "fields": {
             "name": "Druid"
         }
+    },
+    {
+        "model": "anomaly.connectiontype",
+        "pk": 7,
+        "fields": {
+            "name": "MSSQL"
+        }
     }
 ]

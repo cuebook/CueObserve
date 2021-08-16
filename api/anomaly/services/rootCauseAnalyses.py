@@ -59,6 +59,7 @@ class RootCauseAnalyses:
 
         data = {
             **data,
+            "granularity": anomaly.anomalyDefinition.dataset.granularity,
             "measure": anomaly.anomalyDefinition.metric,
             "dimension": anomaly.anomalyDefinition.dimension,
             "dimensionValue": anomaly.dimensionVal,
@@ -87,19 +88,25 @@ class RootCauseAnalyses:
         output = {"dimVal": dimensionValue, "success": True}
         try:
             if dataFrameEmpty(df):
-                return
+                return output
             granularity = anomaly.anomalyDefinition.dataset.granularity
             result = detect(df, granularity, "Prophet", anomaly.anomalyDefinition)
 
             del result["anomalyData"]["predicted"]
             # removing anomalous point other than last one
             anomalyTimeISO = anomaly.data["anomalyLatest"]["anomalyTimeISO"]
-            if result["anomalyLatest"]["anomalyTimeISO"] != anomalyTimeISO:
+            if (
+                not "anomalyLatest" in result
+                or not result["anomalyLatest"]
+                or result["anomalyLatest"]["anomalyTimeISO"] != anomalyTimeISO
+            ):
                 return output
 
             for row in result["anomalyData"]["actual"]:
                 if not (row["ds"] == anomalyTimeISO and row["anomaly"] == 15):
                     row["anomaly"] = 1
+                else:
+                    row["anomaly"] = 6
 
             # removing prediction band
             result["anomalyData"]["band"] = result["anomalyData"]["band"][:-15]
