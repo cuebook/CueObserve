@@ -165,7 +165,7 @@ export default function AnomalysTable(props) {
         return ""
         let percentColor = record.data.anomalyLatest.highOrLow == "high" ? "green" : "red"
         let percentSign = record.data.anomalyLatest.highOrLow == "high" ? "+" : "-"
-        let percentDiv = record.data.anomalyLatest.percent?(<div><span style={{float: "right", color: percentColor}}>{percentSign}{record.data.anomalyLatest.percent}%</span></div>) : null
+        let percentDiv = record.data.anomalyLatest.percent?(<div><span style={{float: "right", color: percentColor}}>{percentSign}{record.data.anomalyLatest.percent.toFixed(2)}%</span></div>) : null
         return (
           <div>
           <div><span style={{float: "right"}}>{record.data.anomalyLatest.value}</span></div>

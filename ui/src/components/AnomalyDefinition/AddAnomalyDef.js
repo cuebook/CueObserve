@@ -70,7 +70,7 @@ function generateOptions(autoCueOptions) {
       value:"Top",
       label:"Top",
       optionType:"Top",
-      color:"#ff6767"
+      color:"#12b1ff"
     }
   ]
 
@@ -79,7 +79,7 @@ function generateOptions(autoCueOptions) {
       value:"Min % Contribution",
       label:"Min % Contribution",
       optionType:"Contribution",
-      color:"#ff6767"
+      color:"#12b1ff"
     }
   ]
 
@@ -88,7 +88,7 @@ function generateOptions(autoCueOptions) {
       value:"Min Value",
       label:"Min Value",
       optionType:"Value",
-      color:"#ff6767"
+      color:"#12b1ff"
     }
   ]
 
@@ -97,35 +97,35 @@ function generateOptions(autoCueOptions) {
       value:1 + "",
       label: 1 + "",
       optionType: "Min % Contribution",
-      color:"#ff6767"
+      color:"#12b1ff"
 
     },
     {
       value:2 + "",
       label: 2 + "",
       optionType: "Min % Contribution",
-      color:"#ff6767"
+      color:"#12b1ff"
 
     },
     {
       value:3 + "",
       label: 3 + "",
       optionType: "Min % Contribution",
-      color:"#ff6767"
+      color:"#12b1ff"
 
     },
     {
       value:4 + "",
       label: 4 + "",
       optionType: "Min % Contribution",
-      color:"#ff6767"
+      color:"#12b1ff"
 
     },
     {
       value:5 + "",
       label: 5 + "",
       optionType: "Min % Contribution",
-      color:"#ff6767"
+      color:"#12b1ff"
 
     }
   ]
@@ -135,21 +135,21 @@ function generateOptions(autoCueOptions) {
       value:0.1 + "",
       label: 0.1 + "",
       optionType: "Minimum Value",
-      color:"#ff6767"
+      color:"#12b1ff"
 
     },
     {
       value:1 + "",
       label: 1 + "",
       optionType: "Minimum Value",
-      color:"#ff6767"
+      color:"#12b1ff"
 
     },
     {
       value:1000 + "",
       label: 1000 + "",
       optionType: "Minimum Value",
-      color:"#ff6767"
+      color:"#12b1ff"
 
     }
   ]
@@ -161,28 +161,28 @@ function generateOptions(autoCueOptions) {
       value:10 + "",
       label: 10 + "",
       optionType: "Dimension Values",
-      color:"#ff6767"
+      color:"#12b1ff"
 
     },
     {
       value:20 + "",
       label: 20 + "",
       optionType: "Dimension Values",
-      color:"#ff6767"
+      color:"#12b1ff"
 
     },
     {
       value:30 + "",
       label: 30 + "",
       optionType: "Dimension Values",
-      color:"#ff6767"
+      color:"#12b1ff"
 
     },
     {
       value:40 + "",
       label: 40 + "",
       optionType: "Dimension Values",
-      color:"#ff6767"
+      color:"#12b1ff"
 
     }
   ]
@@ -282,7 +282,7 @@ function getHelpText(selectedOption) {
           else if (tempOption.optionType === "Value"){
             newOption.optionType = "Minimum Value"
           }
-          newOption.color = "#ff6767"
+          newOption.color = "#12b1ff"
           selectedOption.pop();
           selectedOption.push(newOption);
           lastOption = newOption
