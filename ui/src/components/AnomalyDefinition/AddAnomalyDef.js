@@ -6,7 +6,7 @@ import { Modal, Select, Spin, Switch, Button, Radio, message, Drawer } from "ant
 import datasetService from "services/datasets";
 import anomalyDefService from "services/anomalyDefinitions.js";
 import PercentageChange from "components/DetectionRuleParamSelector/PercentageChange";
-import Lifetime from "components/DetectionRuleParamSelector/Lifetime";
+import ValueThreshold from "components/DetectionRuleParamSelector/ValueThreshold";
 import  _, { last } from "lodash";
 
 const { Option } = Select;
@@ -593,9 +593,9 @@ const handleDetectionRuleTypeChange = value => {
       {
         paramSelector = <PercentageChange submitParams={setDetectionRuleParams} />
       }
-      if(detectionRuleType.name == "Lifetime")
+      if(detectionRuleType.name == "Value Threshold")
       {
-        paramSelector = <Lifetime submitParams={setDetectionRuleParams} />
+        paramSelector = <ValueThreshold submitParams={setDetectionRuleParams} />
       }
     }
 
