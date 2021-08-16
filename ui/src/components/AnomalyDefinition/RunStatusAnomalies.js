@@ -11,7 +11,6 @@ export default function RunStatusAnomalies(props) {
   const [loading, setLoading] = useState('');
   
   useEffect(() => {
-    console.log(props)
     getRunStatusAnomalies(props.runStatusId);
   }, [props]);
 
@@ -32,7 +31,7 @@ export default function RunStatusAnomalies(props) {
       render: (text, record) => {
         return (
           <span>
-            <a href={"#/anomaly/"+record.id} className={style.linkText}>{text}</a>
+            <a href={"#/anomaly/"+record.id} className={style.linkText}>{text ? text : "Anomaly"}</a>
           </span>
         );
       }

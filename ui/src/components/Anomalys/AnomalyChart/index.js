@@ -86,9 +86,13 @@ export default function AnomalyChart(props) {
             <Geom
               type="point"
               position="ds*y"
-              size={
-                "anomaly"
-              }
+              size={[
+                "anomaly",
+                anomaly => {
+                  if (anomaly === 1) return 1;
+                  return 7;
+                }
+              ]}
               opacity={[
                 "anomaly",
                 anomaly => {
