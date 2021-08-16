@@ -6,7 +6,6 @@ from anomaly.models import CustomSchedule as Schedule
 
 @pytest.mark.django_db(transaction=True)
 def test_schedules(client, populate_seed_data, mocker):
-
     # Create schedule test
     path = reverse('scheduleView')
     data = {'name': 'Schedule at 3 AM ',

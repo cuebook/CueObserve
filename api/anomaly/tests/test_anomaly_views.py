@@ -9,6 +9,7 @@ from mixer.backend.django import mixer
 from anomaly.services.anomalys import Anomalys
 from anomaly.models import AnomalyDefinition, Anomaly
 
+
 @pytest.mark.django_db(transaction=True)
 def test_anomalys(client, mocker):
     schedule = mixer.blend("anomaly.customSchedule", name="Test Schedule")

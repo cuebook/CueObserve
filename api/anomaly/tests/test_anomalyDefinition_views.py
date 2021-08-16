@@ -1,11 +1,13 @@
 import pytest
 import unittest
 from unittest import mock
+import json
 from django.test import TestCase
 from django.urls import reverse
 from mixer.backend.django import mixer
 from anomaly.models import AnomalyDefinition
 from anomaly.services.anomalyDefinitions import AnomalyDefinitions
+
 
 @pytest.mark.django_db(transaction=True)
 def test_anomalyDefinition(client, mocker):

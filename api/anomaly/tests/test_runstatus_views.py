@@ -11,6 +11,7 @@ def test_runstatus(client, mocker):
     """
     Test cases for anomalyDefinition
     """
+
     anomalyDef = mixer.blend("anomaly.AnomalyDefinition", periodicTask=None)
     runStatus = mixer.blend("anomaly.RunStatus", anomalyDefinition=anomalyDef, status="RUNNING")
 

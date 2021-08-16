@@ -25,7 +25,7 @@ SECRET_KEY = "django-insecure-y7^!ee%k(xh7+xdyug$65v1@8@q-ui8=s5f2ucquxof&-i&g_u
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG", True)
-
+SITE_ID = 1
 
 CSRF_TRUSTED_ORIGINS = ["localhost"]
 CORS_ORIGIN_WHITELIST = ["http://localhost:3000"]
@@ -33,6 +33,7 @@ CORS_ALLOW_CREDENTIALS = True
 ALLOWED_HOSTS = ["*", "localhost"]
 CORS_ORIGIN_ALLOW_ALL = True
 HTTP_HTTPS = "http://"
+ROOT_URLCONF = "app.urls"
 
 # Application definition
 INSTALLED_APPS = [
@@ -43,10 +44,17 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "corsheaders",
+    "allauth",
+    'django.contrib.sites',
+    "allauth.account",
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.google",
     "django_celery_beat",
     "anomaly",
+    "users",
     "rest_framework",
 ]
+AUTH_USER_MODEL = "users.CustomUser"
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
@@ -57,10 +65,23 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "app.middlewares.DisableCsrfCheck",
+    "app.middlewares.LoginRequiredMiddleware",
+    # "app.middlewares.RestrictApiMiddleware"
 ]
+AUTHENTICATION_BACKENDS = (
+    # Needed to login by username in Django admin, regardless of `allauth`
+    "django.contrib.auth.backends.ModelBackend",
+    # `allauth` specific authentication methods, such as login by e-mail
+    "allauth.account.auth_backends.AuthenticationBackend",
+)
 
-ROOT_URLCONF = "app.urls"
-
+AUTHENTICATION_REQUIRED=os.environ.get("IS_AUTHENTICATION_REQUIRED", False)
+ACCOUNT_AUTHENTICATION_METHOD = "email"
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",

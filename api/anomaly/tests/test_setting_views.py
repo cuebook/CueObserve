@@ -7,11 +7,8 @@ from mixer.backend.django import mixer
 from utils.apiResponse import ApiResponse
 
 
-from anomaly.models import Setting
-
 @pytest.mark.django_db(transaction=True)
 def test_setting(client, mocker):
-
     # Create setting test
     path = reverse('settings')
     res = ApiResponse("Successfully tested setting")
