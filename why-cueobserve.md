@@ -1,6 +1,6 @@
 # Why CueObserve
 
-CueObserve helps you automate the monitoring of business metrics. It helps you know when and where a metric isn't right, so that you can take action quickly.
+CueObserve helps you monitor your metrics. It helps you know when, where, and why a metric isn't right, so that you can take action quickly.
 
 ## Monitoring Business metrics is different from monitoring System metrics
 
@@ -12,7 +12,11 @@ To understand more, read our posts - [What is an anomaly?](https://cuebook.ai/bl
 
 ## No-code and Cost-effective Anomaly Detection
 
-Data Consumer should be able to configure anomaly detection jobs, and not be dependent on the engineering team. This saves time for both.
+CueObserve empowers data consumers to configure their own anomaly detection jobs, and not be dependent on the engineering team. This saves time for both.
 
 Since the data consumer can choose which metrics to monitor and how deep to monitor, it reduces noise and infrastructure costs. To understand more, read [Why anomaly detection at scale is expensive and noisy](https://cuebook.ai/blog/why-anomaly-detection-at-scale-is-hard-expensive-and-noisy/).
+
+## One-click Root Cause Analysis
+
+Data consumers can do root cause analysis on anomalies with just one click. This reduces time to action.
 

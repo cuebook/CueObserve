@@ -1,3 +1,9 @@
+---
+description: >-
+  CueObserve helps you monitor your metrics. Know when, where, and why a metric
+  isn't right.
+---
+
 # Overview
 
 With CueObserve, you can run **timeseries** **anomaly detection** on data in your SQL data warehouses and databases. It currently supports Snowflake, BigQuery, Redshift, Druid, Postgres, and MySQL.
