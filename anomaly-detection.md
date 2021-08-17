@@ -30,9 +30,3 @@ CueObserve saves the actual data with the bands and the forecast in its database
 
 Finally, CueObserve stores all the individual results of the process along with the metadata in a format for easy visual representation in the UI.
 
-## Anomaly Deviation
-
-Deviation in a metric is calculated as difference between the actual value and the forecasted value's threshold.
-
-![](.gitbook/assets/anomalydeviation.png)
-

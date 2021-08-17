@@ -2,6 +2,13 @@
 
 You can define one or more anomaly detection jobs on a dataset. The anomaly detection job can monitor a measure at an aggregate level or split the measure by a dimension.
 
+To define an anomaly job, you 
+
+1. Select a dataset
+2. Select a measure from the dataset
+3. Select a dimension to split the measure _\(optional\)_
+4. Select an anomaly rule
+
 ![](.gitbook/assets/anomalydefinitions.png)
 
 ## Split Measure by Dimension
@@ -41,4 +48,43 @@ Minimum Average Value limits the number of dimension values based on the measure
 ![](.gitbook/assets/minavgvalue.png)
 
 In the example above, only states where _average\(Orders\) &gt;= 10_ will be selected. If your granularity is daily, this means daily average orders. If your granularity is hourly, this means hourly average orders.
+
+## Anomaly Detection Algorithms
+
+CueObserve offers the following algorithms for anomaly detection.
+
+1. Prophet
+2. Percentage Change
+3. Lifetime High/Low
+4. Value Threshold
+
+### Prophet
+
+This algorithm uses the open-source [Prophet](https://github.com/facebook/prophet) procedure to generate a forecast for the timeseries. It then compares the actual value with the forecasted value. If the actual value is outside the forecast's confidence range \(_grey band in the image below_\), it marks the actual value as an anomalous data point.
+
+The metric's percentage deviation \(_45% in the image below_\) is calculated with respect to the threshold of the forecast's confidence range.
+
+![](.gitbook/assets/anomalydeviation.png)
+
+### Percentage Change
+
+This algorithm compares the metric's actual value with its previous value in the timeseries. For example, for a timeseries with daily granularity, it will compare the value on 15th August with the value on 14th August.
+
+If the percentage change is higher than the specified threshold, it marks the recent value as an anomalous data point.
+
+### Lifetime High/Low
+
+This algorithm finds the metric's highest and lowest values in the timeseries. It marks these data points as anomalous data points.
+
+### Value Threshold
+
+This algorithm identifies anomalous data points in the timeseries as per the mathematical rule specified in the anomaly definition screen. Below are a few sample rules:
+
+_Anomaly when Value greater than `X`_
+
+_Anomaly when Value not between `X` and `Y`_
+
+\_\_
+
+
 
