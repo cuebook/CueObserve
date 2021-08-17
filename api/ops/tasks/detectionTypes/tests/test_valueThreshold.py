@@ -65,9 +65,9 @@ def testValueThreshold():
         {'ds': '2020-08-08T00:00:00', 'y': 960, 'anomaly': 1},
         {'ds': '2020-08-09T00:00:00', 'y': 1311, 'anomaly': 15},
         {'ds': '2020-08-10T00:00:00', 'y': 725, 'anomaly': 1}]},
-        'anomalyLatest': {'highOrLow': 'high',
+        'anomalyLatest': {'operationCheck': 'greater than 1000',
         'value': 1311.0,
         'anomalyTimeISO': '2020-08-09T00:00:00',
         'anomalyTime': 1596931200000.0}}
     
-    assert valueThresholdDetect(df, "day", "null", 1000) == output
+    assert valueThresholdDetect(df, "day", "greater", 1000, "null") == output

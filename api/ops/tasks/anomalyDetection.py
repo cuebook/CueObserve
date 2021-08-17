@@ -30,12 +30,13 @@ def detect(df, granularity, detectionRuleType, anomalyDef):
     elif detectionRuleType == "Percentage Change":
         threshold = float(anomalyDef.detectionrule.detectionruleparamvalue_set.get(param__name="threshold").value)
         return percentChangeDetect(df, granularity, threshold)
-    elif detectionRuleType == "Lifetime":
+    elif detectionRuleType == "Lifetime High/Low":
         return lifetimeDetect(df, granularity)
     elif detectionRuleType == "Value Threshold":
-        lowerThreshold = anomalyDef.detectionrule.detectionruleparamvalue_set.get(param__name="lowerThreshold").value
-        upperThreshold = anomalyDef.detectionrule.detectionruleparamvalue_set.get(param__name="upperThreshold").value
-        return valueThresholdDetect(df, granularity, lowerThreshold, upperThreshold)
+        operator = anomalyDef.detectionrule.detectionruleparamvalue_set.get(param__name="operator").value
+        value1 = anomalyDef.detectionrule.detectionruleparamvalue_set.get(param__name="value1").value
+        value2 = anomalyDef.detectionrule.detectionruleparamvalue_set.get(param__name="value2").value
+        return valueThresholdDetect(df, granularity, operator, value1, value2)
 
 
 

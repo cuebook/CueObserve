@@ -19,8 +19,8 @@
     "model": "anomaly.detectionruletype",
     "pk": 3,
     "fields": {
-      "name": "Lifetime",
-      "description": "Calculates anomaly on lifetime highest/lowest value."
+      "name": "Lifetime High/Low",
+      "description": "Identifies lifetime highest/lowest value as an anomaly."
     }
   },
   {
@@ -28,7 +28,7 @@
     "pk": 4,
     "fields": {
       "name": "Value Threshold",
-      "description": "Calculates anomaly on strict bounds/threshoolds."
+      "description": "Calculates anomaly on strict bounds/thresholds."
     }
   }
 ]
