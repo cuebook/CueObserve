@@ -34,6 +34,11 @@ docker run -p 3000:3000 cuebook/cueobserve
 ```
 Now visit [http://localhost:3000](http://localhost:3000) in your browser. 
 
+## Demo Video
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=VZvgNa65GQU" target="_blank">
+ <img src="http://img.youtube.com/vi/VZvgNa65GQU/hqdefault.jpg" alt="Watch CueObserve video"/>
+</a>
+
 ## How it works
 You write a SQL GROUP BY query, map its columns as dimensions and measures, and save it as a virtual Dataset.
 
