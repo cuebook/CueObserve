@@ -22,6 +22,7 @@ export default function ValueThreshold(props){
       inputElement = (
       <span>
       <InputNumber min={1} onChange={val => setParams(param => {return {...param, value1: val}})} />
+      &nbsp; - &nbsp;
       <InputNumber min={1} onChange={val => setParams(param => {return {...param, value2: val}})} />
       </span>)
     }
@@ -34,14 +35,14 @@ export default function ValueThreshold(props){
     return (
       <div>
       <div className={style.paramBox}>
-        Anomaly when value <Select style={{width: "150px"}} defaultValue="greater" onChange={val => onChangeOperator(val)}>
+        Anomaly when value <Select style={{width: "200px"}} defaultValue="greater" onChange={val => onChangeOperator(val)}>
             <Option value="greater">{"greater than"}</Option>
-            <Option value="!lesser">{"not less than"}</Option>
+            <Option value="!lesser">{"greater than or equal to"}</Option>
             <Option value="lesser">{"less than"}</Option>
-            <Option value="!greater">{"not greater than"}</Option>
-            <Option value="between">in between</Option>
+            <Option value="!greater">{"less than or equal to"}</Option>
+            <Option value="between">between</Option>
             <Option value="!between">not between</Option>
-            </Select>{inputElement}
+            </Select> &nbsp; {inputElement}
             </div>
       </div>
     );

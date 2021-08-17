@@ -86,13 +86,13 @@ class AnomalyDefinition(models.Model):
                 "Prophet": "Anomaly Daily Template Prophet",
                 "Percentage Change": "Anomaly Daily Template Percentage Change",
                 "Lifetime High/Low": "Anomaly Daily Template Lifetime",
-                "Value Threshold": "Anomaly Daily Template Percentage Change"
+                "Value Threshold": "Anomaly Daily Template Value Threshold"
             },
             "hour": {
                 "Prophet": "Anomaly Hourly Template Prophet",        
                 "Percentage Change": "Anomaly Hourly Template Percentage Change",
                 "Lifetime High/Low": "Anomaly Hourly Template Lifetime",
-                "Value Threshold": "Anomaly Hourly Template Percentage Change"
+                "Value Threshold": "Anomaly Hourly Template Value Threshold"
             }
         }
 
