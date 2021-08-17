@@ -1,4 +1,5 @@
 import json
+import logging
 import traceback
 import datetime as dt
 import pandas as pd
@@ -15,6 +16,7 @@ from access.utils import prepareAnomalyDataframes
 
 # ANOMALY_DAILY_TEMPLATE = "Anomaly Daily Template"
 # ANOMALY_HOURLY_TEMPLATE = "Anomaly Hourly Template"
+logger = logging.getLogger(__name__)
 
 
 @shared_task
@@ -135,15 +137,23 @@ def rootCauseAnalysisJob(anomalyId: int):
     from anomaly.services.slack import SlackAlert
 
     anomaly = Anomaly.objects.get(id=anomalyId)
+    logger.info("Checking if detection rule not Prophet then remove it")
+    if (
+        hasattr(anomaly.anomalyDefinition, "detectionrule")
+        and str(anomaly.anomalyDefinition.detectionrule) == "Prophet"
+    ):
+        return False
     rootCauseAnalysis, _ = RootCauseAnalysis.objects.get_or_create(anomaly=anomaly)
     rootCauseAnalysis.startTimestamp = dt.datetime.now()
     rootCauseAnalysis.endTimestamp = None
     rootCauseAnalysis.logs = {}
     rootCauseAnalysis.status = RootCauseAnalysis.STATUS_RUNNING
     rootCauseAnalysis.save()
-    # Remove already existing rca data
+
+    logger.info("Removing already existing rca data")
     anomaly.rcaanomaly_set.all().delete()
-    # Todo fetch related data
+
+    # Todo pre-fetch related data
     try:
         # **rootCauseAnalysis.logs,
         rootCauseAnalysis = RootCauseAnalysis.objects.get(anomaly=anomaly)
@@ -194,3 +204,4 @@ def rootCauseAnalysisJob(anomalyId: int):
         rootCauseAnalysis.status = RootCauseAnalysis.STATUS_ERROR
     rootCauseAnalysis.endTimestamp = dt.datetime.now()
     rootCauseAnalysis.save()
+    return True

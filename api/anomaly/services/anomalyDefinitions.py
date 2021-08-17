@@ -8,7 +8,6 @@ from django_celery_beat.models import PeriodicTask, PeriodicTasks, CrontabSchedu
 from ops.tasks import anomalyDetectionJob
 from django.db.models import Q, Max
 
-CELERY_TASK_NAME = "ops.tasks.anomalyDetectionJob"
 RUN_STATUS_LIMIT = 10
 
 class AnomalyDefinitions:
@@ -190,7 +189,7 @@ class AnomalyDefJobServices:
         res = ApiResponse()
         scheduleObj = Schedule.objects.get(id=scheduleId)
         cronSchedule = scheduleObj.cronSchedule
-        ptask = PeriodicTask.objects.update_or_create(name = anomalyDefId ,defaults={"crontab" : cronSchedule, "task" : CELERY_TASK_NAME, "args" : f'["{anomalyDefId}"]'})
+        ptask = PeriodicTask.objects.update_or_create(name = anomalyDefId ,defaults={"crontab" : cronSchedule, "task" : anomalyDetectionJob.name, "args" : f'["{anomalyDefId}"]'})
         anomalyDefObj = AnomalyDefinition.objects.get(id=anomalyDefId)
         anomalyDefObj.periodicTask = ptask
         anomalyDefObj.periodicTask.save()

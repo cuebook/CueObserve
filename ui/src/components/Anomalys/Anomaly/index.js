@@ -33,9 +33,10 @@ export default function Anomaly(props) {
     </div>
     </div>
 
+    { anomalyData.detectionRuleStr != "Prophet" ? null : 
     <div className={`my-4 w-10/12 ${style.chartPanel}`}>
       < RootCauseAnalysis anomalyId={params.anomalyId} title={anomalyData.title}/>
-    </div>
+    </div>}
   </>)
 
 }

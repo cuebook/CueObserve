@@ -30,7 +30,7 @@ class AnomalyService {
             }
         })
         .catch(response => {
-            message.error(response.message)
+            // message.error(response.message)
             return null
         })
     }
