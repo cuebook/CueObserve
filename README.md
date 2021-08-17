@@ -14,9 +14,11 @@ CueObserve works with data in your SQL data warehouses and databases. It current
 
 ![Root Cause Analysis](.gitbook/assets/overview_rca.png)
 
-## How it works
+## Demo
 
 {% embed url="https://youtu.be/VZvgNa65GQU" %}
+
+## How it works
 
 You write a SQL GROUP BY query, map its columns as dimensions and measures, and save it as a virtual Dataset.
 
