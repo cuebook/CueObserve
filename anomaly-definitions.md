@@ -16,13 +16,13 @@ Choose the optional **High/Low** to detect only one type of anomalies. Choose **
 
 ### Limiting Dimension Values
 
-When you split a measure by a dimension, you must limit the number of unique dimension values. There are 3 ways to limit - **Top N**, **Min % Contribution**, and **Min Value**.
+When you split a measure by a dimension, you must limit the number of unique dimension values. There are 3 ways to limit - **Top N**, **Min % Contribution**, and **Min Avg Value**.
 
 #### Top N
 
 Top N limits the number of dimension values based on the dimension value's contribution to the measure.
 
-Say you want to monitor ReturnEntries measure. But you want to monitor it for your top 35 delivery regions only. You would then define anomaly something like below:
+Say you want to monitor Orders measure. But you want to monitor it for your top 10 states only. You would then define anomaly something like below:
 
 ![](.gitbook/assets/topn.png)
 
@@ -30,15 +30,15 @@ Say you want to monitor ReturnEntries measure. But you want to monitor it for yo
 
 Minimum % Contribution limits the number of dimension values based on the dimension value's contribution to the measure.
 
-Say you want to monitor ReturnEntries measure for every delivery region that contributed at least 2% to the total ReturnEntries, your anomaly definition would look something like below:
+Say you want to monitor Orders measure for every state that contributed at least 2% to the total Orders, your anomaly definition would look something like below:
 
 ![](.gitbook/assets/mincontribution.png)
 
-#### Min Value
+#### Min Avg Value
 
-Minimum Value limits the number of dimension values based on the measure's average value.
+Minimum Average Value limits the number of dimension values based on the measure's average value.
 
-![](.gitbook/assets/minvalue.png)
+![](.gitbook/assets/minavgvalue.png)
 
-In the example above, only delivery regions where _average\(ReturnEntries\) &gt;= 10_ will be selected. If your granularity is daily, this means daily average return entries. If your granularity is hourly, this means hourly average return entries.
+In the example above, only states where _average\(Orders\) &gt;= 10_ will be selected. If your granularity is daily, this means daily average orders. If your granularity is hourly, this means hourly average orders.
 
