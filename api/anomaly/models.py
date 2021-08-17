@@ -85,13 +85,13 @@ class AnomalyDefinition(models.Model):
             "day": {
                 "Prophet": "Anomaly Daily Template Prophet",
                 "Percentage Change": "Anomaly Daily Template Percentage Change",
-                "Lifetime": "Anomaly Daily Template Lifetime",
+                "Lifetime High/Low": "Anomaly Daily Template Lifetime",
                 "Value Threshold": "Anomaly Daily Template Percentage Change"
             },
             "hour": {
                 "Prophet": "Anomaly Hourly Template Prophet",        
                 "Percentage Change": "Anomaly Hourly Template Percentage Change",
-                "Lifetime": "Anomaly Hourly Template Lifetime",
+                "Lifetime High/Low": "Anomaly Hourly Template Lifetime",
                 "Value Threshold": "Anomaly Hourly Template Percentage Change"
             }
         }
@@ -174,7 +174,7 @@ class DetectionRule(models.Model):
 
     def __str__(self):
         name = self.detectionRuleType.name
-        paramValuesString = " & ".join([f"{param['param__name']}: {param['value']}" for param in self.detectionruleparamvalue_set.all().values("param__name", "value")])
+        paramValuesString = ", ".join([f"{param['param__name']}: {param['value']}" for param in self.detectionruleparamvalue_set.all().values("param__name", "value")])
         return f"{name} ({paramValuesString})" if paramValuesString else name
 
 class DetectionRuleParamValue(models.Model):

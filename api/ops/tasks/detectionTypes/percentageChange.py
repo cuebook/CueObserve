@@ -20,6 +20,7 @@ def checkLatestAnomaly(df):
             "anomalyTimeISO": dp.parse(anomalyTime).isoformat(),
             "anomalyTime": dp.parse(anomalyTime).timestamp() * 1000,
         }
+    return {}
 
 def percentChangeDetect(df, granularity, threshold):
     """
