@@ -15,7 +15,7 @@ GROUP BY 1, 2, 3
 ORDER BY 1
 ```
 
-## RedShift
+## Redshift
 
 ```sql
 SELECT
@@ -56,7 +56,7 @@ ORDER BY 1
 
 ## MySQL
 
-### Hourly granularity
+#### Hourly granularity
 
 ```sql
 SELECT
@@ -69,7 +69,7 @@ GROUP BY 1, 2, 3
 ORDER BY 1
 ```
 
-### Daily granularity
+#### Daily granularity
 
 ```sql
 SELECT
@@ -92,6 +92,34 @@ SUM("count") as Orders, SUM(Order_Amount) as OrderAmount -- measures
 FROM ORDERS
 WHERE __time >= CURRENT_TIMESTAMP - INTERVAL '13' MONTH -- limit historical data to use for forecasting
 GROUP BY 1, 2, 3
+ORDER BY 1
+```
+
+## SQL Server
+
+#### Hourly granularity
+
+```sql
+SELECT
+CONVERT(datetime, format(CreatedTS,'yyyy-MM-dd HH:00:00')) as OrderDate,
+City, State, -- dimensions
+COUNT(1) as Orders, SUM(Order_Amount) as OrderAmount -- measures
+FROM ORDERS
+WHERE CreatedTS >= DATEADD(DAY, -21, cast(GETDATE() as date)) -- limit historical data to use for forecasting
+GROUP BY format(CreatedTS,'yyyy-MM-dd HH:00:00'), City, State
+ORDER BY 1
+```
+
+#### Daily granularity
+
+```sql
+SELECT
+CONVERT(datetime, format(CreatedTS,'yyyy-MM-dd 00:00:00')) as OrderDate,
+City, State, -- dimensions
+COUNT(1) as Orders, SUM(Order_Amount) as OrderAmount -- measures
+FROM ORDERS
+WHERE CreatedTS >= DATEADD(DAY, -400, cast(GETDATE() as date)) -- limit historical data to use for forecasting
+GROUP BY format(CreatedTS,'yyyy-MM-dd 00:00:00'), City, State
 ORDER BY 1
 ```
 
