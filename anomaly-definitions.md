@@ -4,7 +4,7 @@ You can define one or more anomaly detection jobs on a dataset. The anomaly dete
 
 ![](.gitbook/assets/anomalydefinitions.png)
 
-## Define Anomaly
+## Split Measure by Dimension
 
 `Measure` \[`Dimension` `Limit` \] \[`High/Low`\]
 
@@ -14,7 +14,7 @@ Choose the optional **High/Low** to detect only one type of anomalies. Choose **
 
 ![](.gitbook/assets/anomalydefinition_cuel.gif)
 
-### Limiting Dimension Values
+### Limit Dimension Values
 
 When you split a measure by a dimension, you must limit the number of unique dimension values. There are 3 ways to limit - **Top N**, **Min % Contribution**, and **Min Avg Value**.
 
