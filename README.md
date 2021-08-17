@@ -6,7 +6,7 @@ description: >-
 
 # Overview
 
-With CueObserve, you can run **timeseries** **anomaly detection** on data in your SQL data warehouses and databases. It currently supports Snowflake, BigQuery, Redshift, Druid, Postgres, and MySQL.
+With CueObserve, you can run **timeseries** **anomaly detection** on data in your SQL data warehouses and databases. It currently supports Snowflake, BigQuery, Redshift, Druid, Postgres, MySQL, and SQL Server.
 
 ![](.gitbook/assets/overview.gif)
 
