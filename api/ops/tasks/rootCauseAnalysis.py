@@ -155,6 +155,12 @@ def rootCauseAnalysisJob(anomalyId: int):
 
     # Todo pre-fetch related data
     try:
+        # **rootCauseAnalysis.logs,
+        rootCauseAnalysis = RootCauseAnalysis.objects.get(anomaly=anomaly)
+        rootCauseAnalysis.logs = {
+            "Data": "Fetching..."
+        }
+        rootCauseAnalysis.save()
         datasetDf = Data.fetchDatasetDataframe(anomaly.anomalyDefinition.dataset)
 
         dimension = anomaly.anomalyDefinition.dimension
@@ -167,13 +173,14 @@ def rootCauseAnalysisJob(anomalyId: int):
             filteredDf = datasetDf
         timestampColumn = anomaly.anomalyDefinition.dataset.timestampColumn
         metric = anomaly.anomalyDefinition.metric
-
+        rootCauseAnalysis = RootCauseAnalysis.objects.get(anomaly=anomaly)
+        # **rootCauseAnalysis.logs,
+        # "Data": "Fetched",
         rootCauseAnalysis.logs = {
-            # **rootCauseAnalysis.logs,
+            
             "Analyzing Dimensions": ", ".join(otherDimensions),
         }
         rootCauseAnalysis.save()
-
         results = [
             _anomalyDetectionForDimension(
                 anomalyId,
