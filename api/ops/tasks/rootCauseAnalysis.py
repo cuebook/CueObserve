@@ -140,7 +140,7 @@ def rootCauseAnalysisJob(anomalyId: int):
     logger.info("Checking if detection rule not Prophet then remove it")
     if (
         hasattr(anomaly.anomalyDefinition, "detectionrule")
-        and str(anomaly.anomalyDefinition.detectionrule) == "Prophet"
+        and  str(anomaly.anomalyDefinition.detectionrule) != "Prophet"
     ):
         return False
     rootCauseAnalysis, _ = RootCauseAnalysis.objects.get_or_create(anomaly=anomaly)
@@ -178,7 +178,7 @@ def rootCauseAnalysisJob(anomalyId: int):
         # "Data": "Fetched",
         rootCauseAnalysis.logs = {
             
-            "Analyzing Dimensions": ", ".join(otherDimensions),
+            "Analyzing Dimensions": ", ".join(otherDimensions)
         }
         rootCauseAnalysis.save()
         results = [
@@ -196,6 +196,7 @@ def rootCauseAnalysisJob(anomalyId: int):
         else:
             rootCauseAnalysis.status = RootCauseAnalysis.STATUS_ERROR
     except Exception as ex:
+        rootCauseAnalysis = RootCauseAnalysis.objects.get(anomaly=anomaly)
         rootCauseAnalysis.logs = {
             **rootCauseAnalysis.logs,
             "Error Stack Trace": traceback.format_exc(),
