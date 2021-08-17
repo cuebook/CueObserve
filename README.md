@@ -42,6 +42,11 @@ When an anomaly detection job runs, CueObserve does the following:
 * Slack alerts when anomalies are detected
 * Monitoring. Slack alert when a job fails. CueObserve maintains detailed logs.
 
+#### Limitations
+
+* Currently supports Prophet for timeseries forecasting.
+* Not being built for real-time anomaly detection on streaming data.
+
 ## Support
 
 For general help using CueLake, read the documentation, or go to [Github Discussions](https://github.com/cuebook/CueObserve/discussions). To report a bug or request a feature, open a [Github issue](https://github.com/cuebook/CueObserve/issues).
