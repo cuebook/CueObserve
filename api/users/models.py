@@ -27,6 +27,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     email = LowercaseEmailField(_("email address"), unique=True)
     name = models.CharField(max_length=200, null=False, default="User")
     is_active = models.BooleanField(default=False)
+    is_staff = models.BooleanField(default=False)
     status = models.CharField(max_length=20, default="Inactive")
 
     USERNAME_FIELD = "email"

@@ -11,7 +11,7 @@ const { Panel } = Collapse;
 export default function RCALogs(props){
 	const logs = props.data.logs;
 
-	const logsJSX = Object.keys(logs).map(key => {
+	const logsJSX = Object.keys(logs).reverse().map(key => {
 		return <div className="flex">
 			<span className="w-3/12"><strong>{key}</strong></span>
 			<span className="w-9/12"><pre className="text-xs">{logs[key]}</pre></span>

@@ -141,12 +141,16 @@ def rootCauseAnalysisJob(anomalyId: int):
     rootCauseAnalysis.logs = {}
     rootCauseAnalysis.status = RootCauseAnalysis.STATUS_RUNNING
     rootCauseAnalysis.save()
-
     # Remove already existing rca data
     anomaly.rcaanomaly_set.all().delete()
-
     # Todo fetch related data
     try:
+        # **rootCauseAnalysis.logs,
+        rootCauseAnalysis = RootCauseAnalysis.objects.get(anomaly=anomaly)
+        rootCauseAnalysis.logs = {
+            "Data": "Fetching..."
+        }
+        rootCauseAnalysis.save()
         datasetDf = Data.fetchDatasetDataframe(anomaly.anomalyDefinition.dataset)
 
         dimension = anomaly.anomalyDefinition.dimension
@@ -159,13 +163,14 @@ def rootCauseAnalysisJob(anomalyId: int):
             filteredDf = datasetDf
         timestampColumn = anomaly.anomalyDefinition.dataset.timestampColumn
         metric = anomaly.anomalyDefinition.metric
-
+        rootCauseAnalysis = RootCauseAnalysis.objects.get(anomaly=anomaly)
+        # **rootCauseAnalysis.logs,
+        # "Data": "Fetched",
         rootCauseAnalysis.logs = {
-            # **rootCauseAnalysis.logs,
+            
             "Analyzing Dimensions": ", ".join(otherDimensions),
         }
         rootCauseAnalysis.save()
-
         results = [
             _anomalyDetectionForDimension(
                 anomalyId,
