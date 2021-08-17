@@ -214,6 +214,7 @@ class AnomalySerializer(serializers.ModelSerializer):
     granularity = serializers.SerializerMethodField()
     metric = serializers.SerializerMethodField()
     dimension = serializers.SerializerMethodField()
+    detectionRuleStr = serializers.SerializerMethodField()
 
     def get_datasetName(self, obj):
         return obj.anomalyDefinition.dataset.name
@@ -227,9 +228,15 @@ class AnomalySerializer(serializers.ModelSerializer):
     def get_dimension(self, obj):
         return obj.anomalyDefinition.dimension
 
+    def get_detectionRuleStr(self, obj):
+        if hasattr(obj.anomalyDefinition, "detectionrule"):
+            return str(obj.anomalyDefinition.detectionrule)
+        else:
+            return "Prophet"
+
     class Meta:
         model = Anomaly
-        fields = ["id", "datasetName", "published", "dimension", "dimensionVal", "granularity", "metric", "data"]
+        fields = ["id", "datasetName", "published", "dimension", "dimensionVal", "granularity", "metric", "data", "detectionRuleStr"]
 
 class ScheduleSerializer(serializers.ModelSerializer):
     """
