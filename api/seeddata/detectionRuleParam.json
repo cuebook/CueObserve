@@ -11,7 +11,7 @@
     "model": "anomaly.detectionruleparam",
     "pk": 4,
     "fields": {
-      "name": "lowerThreshold",
+      "name": "operator",
       "detectionRuleType": 4
     }
   },
@@ -19,7 +19,15 @@
     "model": "anomaly.detectionruleparam",
     "pk": 5,
     "fields": {
-      "name": "upperThreshold",
+      "name": "value1",
+      "detectionRuleType": 4
+    }
+  },
+  {
+    "model": "anomaly.detectionruleparam",
+    "pk": 6,
+    "fields": {
+      "name": "value2",
       "detectionRuleType": 4
     }
   }

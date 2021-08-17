@@ -5,40 +5,29 @@ import { Select, InputNumber } from "antd";
 const { Option } = Select;
 
 export default function ValueThreshold(props){
-    const [operator, setOperator] = useState("greater");
-    const [params, setParams] = useState({});
+    const [params, setParams] = useState({operator: "greater"});
 
     let inputElement = null
 
     const onChangeOperator = operator => {
-      setOperator(operator)
-      setParams({})
+      setParams({operator: operator})
     }
 
-    if(operator == "greater")
+    if(["greater", "!lesser", "lesser", "!greater"].includes(params.operator))
     {
-      inputElement = (<div className={style.paramBox}>
-        Lower Threshold: <InputNumber min={1} onChange={val => setParams({lowerThreshold: val, upperThreshold: "null"})} /> 
-      </div>)
+      inputElement = (<InputNumber min={1} onChange={val => setParams({operator: params.operator, value1: val, value2: "null"})} /> )
     }
-    if(operator == "lesser")
-    {
-      inputElement = (<div className={style.paramBox}>
-        Upper Threshold: <InputNumber min={1} onChange={val => setParams({lowerThreshold: "null", upperThreshold: val})} /> 
-      </div>)
-    }
-    if(operator == "between")
+    if(["between", "!between"].includes(params.operator))
     {
       inputElement = (
-      <div>
-        <div className={style.paramBox}>
-        Lower Threshold: <InputNumber min={1} onChange={val => setParams(param => {return {...param, lowerThreshold: val}})} />
-        </div>
-        <div className={style.paramBox}>
-        Upper Threshold: <InputNumber min={1} onChange={val => setParams(param => {return {...param, upperThreshold: val}})} />
-      </div>
-      </div>)
+      <span>
+      <InputNumber min={1} onChange={val => setParams(param => {return {...param, value1: val}})} />
+      &nbsp; - &nbsp;
+      <InputNumber min={1} onChange={val => setParams(param => {return {...param, value2: val}})} />
+      </span>)
     }
+
+    console.log(params)
   
     props.submitParams(params)
 
@@ -46,13 +35,15 @@ export default function ValueThreshold(props){
     return (
       <div>
       <div className={style.paramBox}>
-        Operator: <Select defaultValue="greater" onChange={val => onChangeOperator(val)}>
-            <Option value="greater">Greater than</Option>
-            <Option value="lesser">Less than</Option>
-            <Option value="between">In between</Option>
-            </Select>
+        Anomaly when value <Select style={{width: "200px"}} defaultValue="greater" onChange={val => onChangeOperator(val)}>
+            <Option value="greater">{"greater than"}</Option>
+            <Option value="!lesser">{"greater than or equal to"}</Option>
+            <Option value="lesser">{"less than"}</Option>
+            <Option value="!greater">{"less than or equal to"}</Option>
+            <Option value="between">between</Option>
+            <Option value="!between">not between</Option>
+            </Select> &nbsp; {inputElement}
             </div>
-            <div className={style.paramBox}>{inputElement}</div>
       </div>
     );
   }
