@@ -16,6 +16,8 @@ CueObserve works with data in your SQL data warehouses and databases. It current
 
 ## How it works
 
+{% embed url="https://youtu.be/VZvgNa65GQU" %}
+
 You write a SQL GROUP BY query, map its columns as dimensions and measures, and save it as a virtual Dataset.
 
 ![](.gitbook/assets/dataset_sql_cropped.png)
