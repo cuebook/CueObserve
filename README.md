@@ -15,9 +15,16 @@
 </p>
 <br>
 
-With CueObserve, you can run **timeseries anomaly detection** on data in your **SQL** data warehouses and databases. It currently supports Snowflake, BigQuery, Redshift, Druid, Postgres, and MySQL.
+CueObserve helps you monitor your metrics. Know when, where, and why a metric isn't right.
 
-![CueObserve](docs/images/Overview.gif)
+CueObserve uses **timeseries Anomaly detection** to find **where** and **when** a metric isn't right. It then offers **one-click Root Cause analysis** so that you know **why** a metric isn't right.
+
+CueObserve works with data in your SQL data warehouses and databases. It currently supports Snowflake, BigQuery, Redshift, Druid, Postgres, MySQL, and SQL Server.
+
+
+![CueObserve Anomaly](docs/images/Overview_Anomaly.png)
+![CueObserve RCA](docs/images/Overview_RCA.png)
+
 
 ## Getting Started
 Install via Docker
@@ -46,7 +53,8 @@ When an anomaly detection job runs, CueObserve does the following:
 
 ## Features
 - Automated SQL to timeseries transformation.
-- Run anomaly detection on the aggregate metric or break it down by any dimension.
+- Run anomaly detection on the aggregate metric or split it by any dimension. Limit the split to significant dimension values.
+- Use Prophet or simple mathematical rules to detect anomalies.
 - In-built Scheduler. CueObserve uses Celery as the executor and celery-beat as the scheduler.
 - Slack alerts when anomalies are detected.
 - Monitoring. Slack alert when a job fails. CueObserve maintains detailed logs.
