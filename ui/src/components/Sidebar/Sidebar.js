@@ -127,7 +127,7 @@ export default function Sidebar(props) {
           <Button
             type="secondary"
             onClick={signOut}
-            className={"uppercase font-bold py-3 text-gray-800 "}
+            className={"uppercase font-bold text-gray-800 "}
             >
               <i className={"fas fa-sign-out-alt mr-2 text-sm text-gray-400 "}></i>
             SIGN OUT

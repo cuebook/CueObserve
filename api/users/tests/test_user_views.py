@@ -4,6 +4,7 @@ from mixer.backend.django import mixer
 import json
 import pytest
 from unittest import mock
+from django.test import Client
 
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
@@ -39,3 +40,12 @@ def test_authenticate_post(setup_user, client):
     data = {"email": "random@cuebook.ai", "password": "random"}
     response = client.post(path, data=json.dumps(data), content_type="application/json")
     assert response.json()["success"] == False
+
+@pytest.fixture()
+def test_auth_middleware(client, mocker):
+    """ test middleware """
+    c = Client()
+    res = c.post("/accounts/login", {"email": "admin@domain.com", "password": "admin"} , follow=True)
+    res.status_code == 200
+    res = c.get("/accounts/login", follow=True)
+    assert res.status_code == 200
