@@ -67,9 +67,15 @@ def testPercentChange():
         {'ds': '2020-08-10T00:00:00', 'y': 725, 'anomaly': 1}]},
         'anomalyLatest': {'highOrLow': 'high',
         'value': 1324.0,
+        'highVal': 1324.0,
+        'highDate': '2020-07-30T00:00:00',
+        'lowVal': 340.0,
+        'lowDate': '2020-07-26T00:00:00',
+        'firstDate': '2020-07-12T00:00:00',
         'anomalyTimeISO': '2020-07-30T00:00:00',
         'anomalyTime': 1596067200000.0}}
-    
-    assert lifetimeDetect(df, "day") == output
+
+
+    assert  lifetimeDetect(df, "day") == output
 
     
