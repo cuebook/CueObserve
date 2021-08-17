@@ -37,6 +37,7 @@ When an anomaly detection job runs, CueObserve does the following:
 
 * Automated SQL to timeseries transformation.
 * Run anomaly detection on the aggregate metric or split it by any dimension. Limit the split to significant dimension values.
+* Use Prophet or simple mathematical rules to detect anomalies. 
 * In-built Scheduler. CueObserve uses Celery as the executor and celery-beat as the scheduler.
 * Slack alerts when anomalies are detected
 * Monitoring. Slack alert when a job fails. CueObserve maintains detailed logs.
