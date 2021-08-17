@@ -12,9 +12,17 @@ def checkLatestAnomaly(df):
         lastAnomalyRow = anomalies.iloc[-1]
         anomalyTime = lastAnomalyRow["ds"]
 
+        maxRow = anomalies[anomalies["y"] == anomalies.y.max()].iloc[-1]
+        minRow = anomalies[anomalies["y"] == anomalies.y.min()].iloc[-1]
+
         return {
-            "highOrLow": "high" if lastAnomalyRow["y"] == df.y.max() else "low",
+            "highOrLow": "high" if lastAnomalyRow["y"] == anomalies.y.max() else "low",
             "value": float(lastAnomalyRow["y"]),
+            "highVal": float(maxRow["y"]),
+            "highDate": dp.parse(maxRow["ds"]).isoformat(),
+            "lowVal": float(minRow["y"]),
+            "lowDate": dp.parse(minRow["ds"]).isoformat(),
+            "firstDate": dp.parse(df.iloc[0]["ds"]).isoformat(),
             "anomalyTimeISO": dp.parse(anomalyTime).isoformat(),
             "anomalyTime": dp.parse(anomalyTime).timestamp() * 1000,
         }

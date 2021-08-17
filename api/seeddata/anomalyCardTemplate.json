@@ -45,7 +45,7 @@
       "fields": {
         "templateName": "Anomaly Daily Template Lifetime",
         "title": "<b>{{metric}}</b>{% if dimensionVal %} for filter <span style=\"background:#eeeeee; padding: 0 4px; border-radius: 4px;\">{{dimension}} = {{dimensionVal}}</span>{% endif %} was at a lifetime {{highOrLow}} value on {{anomalyTimeISO|slice:\"0:10\"}}",
-        "bodyText": "{% if dimensionVal %}For <span style=\"background:#eeeeee; padding: 0 4px; border-radius: 4px;\">{{dimension}} = {{dimensionVal}}</span> filter, {% endif %}{{datasetName}}.{{metric}} was at lifetime {{highOrLow}} value of {{value}} on {{anomalyTimeISO|slice:\"0:10\"}}.{% if dimensionVal and contribution %} This filter's contribution to {{metric}} was {{contribution|floatformat:\"1\"}}%.{% endif %}",
+        "bodyText": "{% if dimensionVal %}For <span style=\"background:#eeeeee; padding: 0 4px; border-radius: 4px;\">{{dimension}} = {{dimensionVal}}</span> filter, {% endif %}{{datasetName}}.{{metric}} was at lifetime high value of {{highVal}} on {{highDate|slice:\"0:10\"}} and lifetime low value of {{lowVal}} on {{lowDate|slice:\"0:10\"}}.{% if dimensionVal and contribution %} This filter's contribution to {{metric}} was {{contribution|floatformat:\"1\"}}%.{% endif %} The lifetime period started on {{firstDate|slice:\"0:10\"}}.",
         "supportedVariables": "granularity, datasetName, metric, dimension, dimensionVal, percent, contribution, anomalyTimeISO, highOrLow"
       }
     },
@@ -55,7 +55,7 @@
       "fields": {
         "templateName": "Anomaly Hourly Template Lifetime",
         "title": "<b>{{metric}}</b>{% if dimensionVal %} for filter <span style=\"background:#eeeeee; padding: 0 4px; border-radius: 4px;\">{{dimension}} = {{dimensionVal}}</span>{% endif %} was at a lifetime {{highOrLow}} value on {{anomalyTimeISO|slice:\"0:10\"}} {{anomalyTimeISO|slice:\"11:16\"}}",
-        "bodyText": "{% if dimensionVal %}For <span style=\"background:#eeeeee; padding: 0 4px; border-radius: 4px;\">{{dimension}} = {{dimensionVal}}</span> filter, {% endif %}{{datasetName}}.{{metric}} was at lifetime {{highOrLow}} value of {{value}} on {{anomalyTimeISO|slice:\"0:10\"}} {{anomalyTimeISO|slice:\"11:16\"}}.{% if dimensionVal and contribution %} This filter's contribution to {{metric}} was {{contribution|floatformat:\"1\"}}%.{% endif %}",
+        "bodyText": "{% if dimensionVal %}For <span style=\"background:#eeeeee; padding: 0 4px; border-radius: 4px;\">{{dimension}} = {{dimensionVal}}</span> filter, {% endif %}{{datasetName}}.{{metric}} was at lifetime high value of {{highVal}} on {{highDate|slice:\"0:10\"}} {{highDate|slice:\"11:16\"}} and lifetime low value of {{lowVal}} on {{lowDate|slice:\"0:10\"}} {{lowDate|slice:\"11:16\"}}.{% if dimensionVal and contribution %} This filter's contribution to {{metric}} was {{contribution|floatformat:\"1\"}}%.{% endif %} The lifetime period started on {{firstDate|slice:\"0:10\"}} {{firstDate|slice:\"11:16\"}}.",
         "supportedVariables": "granularity, datasetName, metric, dimension, dimensionVal, percent, contribution, anomalyTimeISO, highOrLow"
       }
     },
@@ -65,7 +65,7 @@
       "fields": {
         "templateName": "Anomaly Daily Template Value Threshold",
         "title": "<b>{{metric}}</b>{% if dimensionVal %} for filter <span style=\"background:#eeeeee; padding: 0 4px; border-radius: 4px;\">{{dimension}} = {{dimensionVal}}</span>{% endif %} was {{operationCheck}}",
-        "bodyText": "{% if dimensionVal %}For <span style=\"background:#eeeeee; padding: 0 4px; border-radius: 4px;\">{{dimension}} = {{dimensionVal}}</span> filter, {% endif %}{{datasetName}}.{{metric}} was {{{operationCheck}} on {{anomalyTimeISO|slice:\"0:10\"}}.{% if dimensionVal and contribution %} This filter's contribution to {{metric}} was {{contribution|floatformat:\"1\"}}%.{% endif %}",
+        "bodyText": "{% if dimensionVal %}For <span style=\"background:#eeeeee; padding: 0 4px; border-radius: 4px;\">{{dimension}} = {{dimensionVal}}</span> filter, {% endif %}{{datasetName}}.{{metric}} was {{operationCheck}} on {{anomalyTimeISO|slice:\"0:10\"}}.{% if dimensionVal and contribution %} This filter's contribution to {{metric}} was {{contribution|floatformat:\"1\"}}%.{% endif %}",
         "supportedVariables": "granularity, datasetName, metric, dimension, dimensionVal, percent, contribution, anomalyTimeISO, operationCheck"
       }
     },
@@ -75,7 +75,7 @@
       "fields": {
         "templateName": "Anomaly Hourly Template Value Threshold",
         "title": "<b>{{metric}}</b>{% if dimensionVal %} for filter <span style=\"background:#eeeeee; padding: 0 4px; border-radius: 4px;\">{{dimension}} = {{dimensionVal}}</span>{% endif %} was {{operationCheck}}",
-        "bodyText": "{% if dimensionVal %}For <span style=\"background:#eeeeee; padding: 0 4px; border-radius: 4px;\">{{dimension}} = {{dimensionVal}}</span> filter, {% endif %}{{datasetName}}.{{metric}} was {{{operationCheck}} on {{anomalyTimeISO|slice:\"0:10\"}} {{anomalyTimeISO|slice:\"11:16\"}}.{% if dimensionVal and contribution %} This filter's contribution to {{metric}} was {{contribution|floatformat:\"1\"}}%.{% endif %}",
+        "bodyText": "{% if dimensionVal %}For <span style=\"background:#eeeeee; padding: 0 4px; border-radius: 4px;\">{{dimension}} = {{dimensionVal}}</span> filter, {% endif %}{{datasetName}}.{{metric}} was {{operationCheck}} on {{anomalyTimeISO|slice:\"0:10\"}} {{anomalyTimeISO|slice:\"11:16\"}}.{% if dimensionVal and contribution %} This filter's contribution to {{metric}} was {{contribution|floatformat:\"1\"}}%.{% endif %}",
         "supportedVariables": "granularity, datasetName, metric, dimension, dimensionVal, contribution, anomalyTimeISO, operationCheck"
       }
     }
