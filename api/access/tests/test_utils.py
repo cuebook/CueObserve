@@ -170,12 +170,10 @@ def test_datasets(client, mocker):
     assert dimValsData[0]["df"].iloc[0]["y"] == 11.0
     assert dimValsData[0]["dimVal"] == "Lucknow"
     assert dimValsData[1]["dimVal"] == "Indore"
-
-    dimValsData = prepareAnomalyDataframes(datasetDf, timestampCol="CREATEDTS", metricCol="ReceivedQty", dimensionCol="DeliveryCity", operation="Min Value")
+    dimValsData = prepareAnomalyDataframes(datasetDf, timestampCol="CREATEDTS", metricCol="ReceivedQty", dimensionCol="DeliveryCity", operation="Min Avg Value")
     assert (dimValsData[0]["df"].columns == ['ds', 'y']).all()
     assert dimValsData[0]["df"].iloc[0]["y"] == 11.0
     assert dimValsData[0]["dimVal"] == "Lucknow"
-    assert dimValsData[1]["dimVal"] == "Indore"
 
     dimValsData = prepareAnomalyDataframes(datasetDf, timestampCol="CREATEDTS", metricCol="ReceivedQty", dimensionCol="DeliveryCity", operation="Top")
     assert (dimValsData[1]["df"].columns == ['ds', 'y']).all()

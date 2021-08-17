@@ -67,7 +67,7 @@ def anomalyDetectionJob(anomalyDef_id: int, manualRun: bool = False):
             anomalyDefinition.metric,
             anomalyDefinition.dimension,
             anomalyDefinition.operation,
-            int(anomalyDefinition.value),
+            float(anomalyDefinition.value),
         )
 
         detectionJobs = group(
@@ -116,7 +116,7 @@ def anomalyDetectionJob(anomalyDef_id: int, manualRun: bool = False):
             message = f"{numPublished} {'anomalies' if numPublished > 1 else 'anomaly'} published. \n"
             topNtext = (
                 f" Top {anomalyDefinition.value}"
-                if int(anomalyDefinition.value) > 0
+                if int(float(anomalyDefinition.value)) > 0
                 else ""
             )
             dimText = f" {anomalyDefinition.dimension}" if anomalyDefinition.dimension else ""

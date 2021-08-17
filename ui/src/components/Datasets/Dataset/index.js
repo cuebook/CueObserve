@@ -188,6 +188,10 @@ export default function Dataset(props) {
   ]
   const selectFieldTypeTable = <Table columns={typeSelectorColumns} dataSource={datasetColumns} pagination={false} size="small" />
 
+  if (params.datasetId && _.isEmpty(datasetDetails)){
+    return null
+  }
+
   return (
     <>
       <div className={`xl:w-9/12 ${style.dataset}`}>
