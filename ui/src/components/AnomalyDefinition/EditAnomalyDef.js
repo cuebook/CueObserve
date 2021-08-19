@@ -2,9 +2,11 @@ import React, { useState, useEffect } from "react";
 import style from "./style.module.scss";
 import { components } from "react-select";
 import CreatableSelect from "react-select/creatable";
-import { Modal, Select, Spin, Switch, Button, Radio, notification, Drawer } from "antd";
+import { Modal, Select, Spin, Switch, Button, Radio, message, Drawer } from "antd";
 import datasetService from "services/datasets";
 import anomalyDefService from "services/anomalyDefinitions.js";
+import PercentageChange from "components/DetectionRuleParamSelector/PercentageChange";
+import ValueThreshold from "components/DetectionRuleParamSelector/ValueThreshold";
 import  _ from "lodash";
 
 const { Option } = Select;
@@ -161,6 +163,8 @@ export default function EditAnomalyDef(props){
   const [selectedOption, setSelectedOption] = useState([]);
   const [isFocused, setIsFocused] = useState(false);
   const [initialDataset, setInitialDataset] = useState([])
+  const [detectionRule, setDetectionRule] = useState()
+  const [updatedParams, setUpdatedParams] = useState({})
   const [anomalyDefId, setAnomalyDefId] = useState(0)
 
   useEffect(()=>{
@@ -170,6 +174,7 @@ export default function EditAnomalyDef(props){
     {
         let anomalyDef = props.editAnomalyDef["anomalyDef"]
         let datasetName = props.editAnomalyDef["datasetName"]
+        setDetectionRule(props.editAnomalyDef.detectionRule)
         setInitialDataset(datasetName)
         let selected = getSelectedOptions(anomalyDef)
         setSelectedOption(selected)
@@ -191,6 +196,22 @@ export default function EditAnomalyDef(props){
         payload.highOrLow = item.value;
       }
     });
+
+    let paramsUpdated = true
+    for(let param in detectionRule.params)
+    {
+      if(!updatedParams[param])
+      {
+        paramsUpdated = false
+      }
+    }
+
+    if(!paramsUpdated)
+    {
+      message.error("Update parameter values for detection rule");
+      return
+    }
+    payload.detectionRuleParams = updatedParams
 
     getEditAnomaly(payload)
 
@@ -279,12 +300,45 @@ export default function EditAnomalyDef(props){
   const handleIsFocused = (val) => {
     setIsFocused(val)
   }
-    // var datasetOption = [];
-    // datasetOption = allDatasets && allDatasets.map(dataset => (
-    //   <Option value={dataset.id} key={dataset.id}>
-    //     {dataset.name}
-    //   </Option>
-    // ));
+
+
+    let detectionRuleElem = null
+
+    if(detectionRule)
+    {
+      let paramSelector = null
+      //add values in param selector
+      if(detectionRule.detectionRuleType.name == "Percentage Change")
+      {
+        paramSelector = <PercentageChange submitParams={setUpdatedParams} defaultParams={detectionRule.params} />
+      }
+      if(detectionRule.detectionRuleType.name == "Value Threshold")
+      {
+        paramSelector = <ValueThreshold submitParams={setUpdatedParams} defaultParams={detectionRule.params} />
+      }
+
+      detectionRuleElem = (
+        <div className="mb-6">
+          <Select
+            className={`${style.selectEditor}`}
+            showSearch
+            disabled
+            placeholder="Create a detection rule"
+            value={detectionRule.detectionRuleType.name}
+            optionFilterProp="children"
+            filterOption={(input, option) =>
+              option.props.children
+                .toLowerCase()
+                .indexOf(input.toLowerCase()) >= 0
+            }
+          >
+          </Select>
+          <span style={{opacity: 0.6, paddingLeft: 5}}>{detectionRule.detectionRuleType.description}</span>
+          {paramSelector}
+        </div>
+      )
+    }
+
 
     return (
       <div>
@@ -349,6 +403,7 @@ export default function EditAnomalyDef(props){
               />
 
             </div>
+            {detectionRuleElem}
             <div className="mb-6">
             <Button
                 key="save"

@@ -201,7 +201,8 @@ class AnomalyDefView(APIView):
     def put(self, request):
         anomalyDefId = request.data.get("anomalyDefId", 0)
         highOrLow = request.data.get("highOrLow", None)
-        res = AnomalyDefinitions.editAnomalyDefinition(anomalyDefId, highOrLow)
+        detectionRuleParams = request.data.get("detectionRuleParams", {})
+        res = AnomalyDefinitions.editAnomalyDefinition(anomalyDefId, highOrLow, detectionRuleParams)
         return Response(res.json())
 
 
