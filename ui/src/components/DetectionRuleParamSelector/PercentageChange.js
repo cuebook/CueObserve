@@ -3,13 +3,13 @@ import style from "./style.module.scss";
 import { InputNumber } from "antd";
 
 export default function PercentageChange(props){
-  const [params, setParams] = useState({});
+  const [params, setParams] = useState(props.defaultParams ? props.defaultParams : {});
 
     props.submitParams(params)
 
     return (
       <div className={style.paramBox}>
-        Percentage Threshold: <InputNumber min={1} onChange={val => setParams({threshold: val})} /> 
+        Percentage Threshold: <InputNumber min={1} onChange={val => setParams({threshold: val})} value={params.threshold} /> 
       </div>
     );
   }

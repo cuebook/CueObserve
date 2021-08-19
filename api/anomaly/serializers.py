@@ -146,7 +146,7 @@ class AnomalyDefinitionSerializer(serializers.ModelSerializer):
     lastRunAnomalies = serializers.SerializerMethodField()
     datasetName = serializers.SerializerMethodField()
     datasetGranularity = serializers.SerializerMethodField()
-    detectionRuleStr = serializers.SerializerMethodField()
+    detectionRule = serializers.SerializerMethodField()
     
     def get_datasetName(self, obj):
         """
@@ -195,16 +195,26 @@ class AnomalyDefinitionSerializer(serializers.ModelSerializer):
             runStatusObj["runStatusId"] = runStatus.id
             return runStatusObj
     
-    def get_detectionRuleStr(self, obj):
+    def get_detectionRule(self, obj):
         if hasattr(obj, "detectionrule"):
-            return str(obj.detectionrule)
+            detectionRule = {
+                "id": obj.detectionrule.id,
+                "detectionRuleType": {
+                    "id": obj.detectionrule.detectionRuleType.id,
+                    "name": obj.detectionrule.detectionRuleType.name,
+                    "description": obj.detectionrule.detectionRuleType.description
+                },
+                "params": {param["param__name"]: param["value"] for param in obj.detectionrule.detectionruleparamvalue_set.all().values("param__name", "value")},
+                "detectionRuleStr": str(obj.detectionrule)
+            }
+            return detectionRule
         else:
-            return "Prophet"
+            return {"detectionRuleType": {"name": "Prophet"}, "params": {}, "detectionRuleStr": "Prophet"}
 
     
     class Meta:
         model = AnomalyDefinition
-        fields = ["id",  "anomalyDef", "schedule", "lastRun", "lastRunStatus", "lastRunAnomalies", "datasetName", "datasetGranularity", "detectionRuleStr"]
+        fields = ["id",  "anomalyDef", "schedule", "lastRun", "lastRunStatus", "lastRunAnomalies", "datasetName", "datasetGranularity", "detectionRule"]
 
 class AnomalySerializer(serializers.ModelSerializer):
     """
