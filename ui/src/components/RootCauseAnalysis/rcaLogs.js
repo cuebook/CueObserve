@@ -49,6 +49,14 @@ export default function RCALogs(props){
 				</div>			
 			</>
 	}
+	else if (props.data.status == "ABORTED"){
+		logsHeader = <>
+				<strong>Logs</strong>
+				<div className="text-xs">
+					aborted  <TimeAgo date={props.data.startTimestamp} />
+				</div>			
+			</>
+	}
 
 	return (<> 
 	  <Collapse defaultActiveKey={props.data.status == "RUNNING" ? ['1'] : null} bordered={false} >

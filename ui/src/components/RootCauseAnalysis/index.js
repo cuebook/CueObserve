@@ -35,7 +35,7 @@ export default function Anomaly(props) {
            }, 3000);
       }
 
-      if (["SUCCESS", "ERROR"].includes(data.status)){
+      if (["SUCCESS", "ERROR", "ABORTED"].includes(data.status)){
         clearInterval(refreshWorkflowRunsInterval);
       }
 
@@ -45,6 +45,15 @@ export default function Anomaly(props) {
   const doRCA = async () => {
     setLoading(true)
     const data = await rootCauseAnalysisService.doRCA(props.anomalyId)
+    if (data){
+      setLoading(false)
+      getRCA()
+    }
+  }
+
+  const abortRCA = async () => {
+    setLoading(true)
+    const data = await rootCauseAnalysisService.abortRCA(props.anomalyId)
     if (data){
       setLoading(false)
       getRCA()
@@ -232,7 +241,7 @@ export default function Anomaly(props) {
   ];
 
 
-  const enabledAnalyzeButton = !loading && [null, 'SUCCESS', 'ERROR'].includes(rcaData.status)
+  const enabledAnalyzeButton = !loading && [null, 'SUCCESS', 'ERROR', 'ABORTED'].includes(rcaData.status)
   let anomalyTime = rcaData.anomalyTime.slice(0,10)
   anomalyTime += rcaData.granularity == "hour" ? " " + rcaData.anomalyTime.slice(11,16) : ""
   const filterPart = rcaData.dimension ? <>where <span style={{background:"#eeeeee", padding: "0 4px", borderRadius: "4px"}}>{rcaData.dimension} = {rcaData.dimensionValue}</span></> : null;
@@ -247,6 +256,7 @@ export default function Anomaly(props) {
             </div>
 
             { <Button onClick={doRCA} disabled={!enabledAnalyzeButton} >Analyze</Button> }
+            { <Button onClick={abortRCA} disabled={enabledAnalyzeButton} >Abort</Button> }
             { rcaData.status && rcaData.status != "RECEIVED" ? <>
               <div className="my-2">
                 <RCALogs data={rcaData} />
