@@ -146,12 +146,6 @@ def rootCauseAnalysisJob(anomalyId: int):
     from anomaly.services.slack import SlackAlert
 
     anomaly = Anomaly.objects.get(id=anomalyId)
-    logger.info("Checking if detection rule not Prophet then remove it")
-    if (
-        hasattr(anomaly.anomalyDefinition, "detectionrule")
-        and str(anomaly.anomalyDefinition.detectionrule) != "Prophet"
-    ):
-        return False
     rootCauseAnalysis, _ = RootCauseAnalysis.objects.get_or_create(anomaly=anomaly)
     rootCauseAnalysis.startTimestamp = dt.datetime.now()
     rootCauseAnalysis.endTimestamp = None

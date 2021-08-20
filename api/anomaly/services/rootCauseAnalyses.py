@@ -91,6 +91,7 @@ class RootCauseAnalyses:
             app.control.revoke(rootCauseAnalysis.taskIds, terminate=True)
 
             rootCauseAnalysis.status = RootCauseAnalysis.STATUS_ABORTED
+            rootCauseAnalysis.endTimestamp = dt.datetime.now()
             rootCauseAnalysis.save()
             res.update(True, "Successfully triggered RCA calculation")
 
@@ -117,7 +118,9 @@ class RootCauseAnalyses:
             if dataFrameEmpty(df):
                 return output
             granularity = anomaly.anomalyDefinition.dataset.granularity
-            result = detect(df, granularity, "Prophet", anomaly.anomalyDefinition)
+            result = detect(
+                df, granularity, "Prophet", anomaly.anomalyDefinition, limit=6
+            )
 
             del result["anomalyData"]["predicted"]
             # removing anomalous point other than last one
