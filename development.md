@@ -68,6 +68,14 @@ export POSTGRES_DB_USERNAME="postgres"
 export POSTGRES_DB_PASSWORD="postgres"
 export POSTGRES_DB_SCHEMA="cue_observe"
 export POSTGRES_DB_PORT=5432
+
+## SUPERUSER'S VARIABLE
+export DJANGO_SUPERUSER_USERNAME="User"
+export DJANGO_SUPERUSER_PASSWORD="admin"
+export DJANGO_SUPERUSER_EMAIL="admin@domain.com"
+
+## AUTHENTICATION
+export IS_AUTHENTICATION_REQUIRED=False 
 ```
 
 Change the values based on your running PostgreSQL instance. If you do not wish to use PostgreSQL as your database for development, comment lines 4-8 and CueObserve will create a SQLite database file at the location `api/db/db.sqlite3`. 
