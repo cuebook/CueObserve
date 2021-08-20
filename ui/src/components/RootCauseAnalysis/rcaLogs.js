@@ -53,7 +53,7 @@ export default function RCALogs(props){
 		logsHeader = <>
 				<strong>Logs</strong>
 				<div className="text-xs">
-					aborted  <TimeAgo date={props.data.startTimestamp} />
+					aborted  <TimeAgo date={props.data.endTimestamp} /> in {formatedDiff}
 				</div>			
 			</>
 	}
