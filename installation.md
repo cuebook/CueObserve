@@ -8,7 +8,7 @@ docker run -p 3000:3000 cuebook/cueobserve
 
 Now visit [localhost:3000](http://localhost:3000) in your browser. 
 
-If you want data to persist across runs, specify a local folder location\(as below\) where db.sqlite3 file can be stored.
+By default, CueObserve uses sqlite as its database \(not recommended for production use, please refer below to use Postgres as the database for CueObserve\). If you want data to persist across runs, specify a local folder location \(as below\) where db.sqlite3 file can be stored.
 
 ```text
 docker run -v <local folder location>:/code/db -p 3000:3000 cuebook/cueobserve
@@ -36,12 +36,12 @@ In case your Postgres is hosted locally, pass the flag `--network="host"` to con
 
 ## Enabling Authentication
 
-CueObserve comes with built-in authentication \(powered by Django\). To enable authentication, create a `.env` file with the given variables: 
+CueObserve comes with built-in authentication \(powered by Django\). To enable authentication, create a `.env` file with the given variables or add these variables in the already created `.env` file with Postgres credentials.
 
 ```text
-DJANGO_SUPERUSER_USERNAME=User
-DJANGO_SUPERUSER_PASSWORD=password
-DJANGO_SUPERUSER_EMAIL=admin@domain.com
+DJANGO_SUPERUSER_USERNAME=<USER_NAME>
+DJANGO_SUPERUSER_PASSWORD=<PASSWORD>
+DJANGO_SUPERUSER_EMAIL=<YOUR_EMAIL@DOMAIN.COM>
 IS_AUTHENTICATION_REQUIRED=True
 ```
 
@@ -49,9 +49,9 @@ IS_AUTHENTICATION_REQUIRED=True
 docker run --env-file .env -dp 3000:3000 cuebook/cueobserve
 ```
 
-To create, read, update and delete\(CRUD\) users, you can visit [Django admin](http://localhost:3030/admin/users/customuser/) 
+If authentication is enabled you can access the [Django Admin](https://docs.djangoproject.com/en/3.2/ref/contrib/admin/) console to do the database operations with a nice UI. To access Django Admin go to [http://localhost:3000/admin](http://localhost:3000/admin) and enter the username and password provided in the `.env` file.
 
 ## Infra Requirements
 
-The minimum infrastructure requirement for CueObserve is _1 GB/ 1 CPU_. If Multiple CPUs\(cores\) are provided, they can be utilized by tasks like Anomaly Detection & Root Cause Analysis for faster processing.
+The minimum infrastructure requirement for CueObserve is _1 GB RAM/ 1 CPU_. If Multiple CPUs\(cores\) are provided, they can be utilized by tasks like Anomaly Detection & Root Cause Analysis for faster processing.
 
