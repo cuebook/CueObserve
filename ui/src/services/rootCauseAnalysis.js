@@ -13,7 +13,6 @@ class RootCauseAnalysisService {
             }
         })
         .catch(response => {
-            message.error(response.message)
             return null
         })
     }
@@ -29,7 +28,21 @@ class RootCauseAnalysisService {
             }
         })
         .catch(response => {
-            message.error(response.message)
+            return null
+        })
+    }
+
+    abortRCA(anomalyId){
+        return apiService.delete("anomaly/rca/" + anomalyId)
+        .then(response => {
+            if(response.success == true){
+                return true
+            } else {
+                message.error(response.message);
+                return null
+            }
+        })
+        .catch(response => {
             return null
         })
     }

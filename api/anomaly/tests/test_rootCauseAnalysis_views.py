@@ -227,10 +227,13 @@ def test_rootCauseAnalysis(client, mocker):
 @pytest.mark.django_db(transaction=True)
 def test_calculateRCA(client, mocker):
 
+    class DummyTask:
+        id = "fb7c7c32-8e66-4591-8b14-a92db9bb4d12"
+
     mockRCAJob = mocker.patch(
         "ops.tasks.rootCauseAnalysis.rootCauseAnalysisJob.delay",
         new=mock.MagicMock(
-            autospec=True, return_value=True
+            autospec=True, return_value=DummyTask
         ),
     )
     mockRCAJob.start()
@@ -244,3 +247,26 @@ def test_calculateRCA(client, mocker):
     assert response.data['success']
 
     mockRCAJob.stop()
+
+
+@pytest.mark.django_db(transaction=True)
+def test_abortRCA(client, mocker):
+
+    mockCeleryRevoke = mocker.patch(
+        "app.celery.app.control.revoke",
+        new=mock.MagicMock(
+            autospec=True, return_value=True
+        ),
+    )
+    mockCeleryRevoke.start()
+
+    anomalyDefinition = mixer.blend("anomaly.anomalyDefinition", periodicTask=None)
+    anomaly = mixer.blend("anomaly.anomaly", anomalyDefinition=anomalyDefinition) 
+    rootCauseAnalysis = mixer.blend("anomaly.rootCauseAnalysis", anomaly=anomaly, taskIds=["fb7c7c32-8e66-4591-8b14-a92db9bb4d12", ""])
+    path = reverse("rca", kwargs={"anomalyId": anomaly.id})
+    response = client.delete(path)
+
+    assert response.status_code == 200
+    assert response.data['success']
+
+    mockCeleryRevoke.stop()

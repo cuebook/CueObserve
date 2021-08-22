@@ -10,6 +10,7 @@ def isAnomaly(lowBand, highBand, value):
         return True
     return False
 
+
 def checkLatestAnomaly(df):
     """
     Looks up latest anomaly in dataframe
@@ -34,14 +35,17 @@ def checkLatestAnomaly(df):
         }
     return {}
 
-def prophetDetect(df, granularity):
+
+def prophetDetect(df, granularity, iterations=None):
     """
     Method to perform anomaly detection on given dataframe using fbProphet
     """
     today = dt.datetime.now()
     df["ds"] = pd.to_datetime(df["ds"])
     df["ds"] = df["ds"].apply(lambda date: date.isoformat()[:19])
-    todayISO = today.replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=None).isoformat()[:19]
+    todayISO = today.replace(
+        hour=0, minute=0, second=0, microsecond=0, tzinfo=None
+    ).isoformat()[:19]
     df = df[df["ds"] < todayISO]
     lastActualRow = df[-1:]
     lastISO = df.iloc[-1]["ds"]
@@ -49,11 +53,12 @@ def prophetDetect(df, granularity):
         lastWeekISO = (dp.parse(lastISO) + relativedelta(days=-7)).isoformat()
         df = df[df["ds"] > lastWeekISO]
     prophetModel = Prophet(
-        changepoint_prior_scale=0.01,
-        seasonality_prior_scale=1.0,
-        interval_width=0.75
+        changepoint_prior_scale=0.01, seasonality_prior_scale=1.0, interval_width=0.75
     )
-    prophetModel.fit(df)
+    if iterations:
+        prophetModel.fit(df, iter=iterations)
+    else:
+        prophetModel.fit(df)
     numPredictions = 15 if granularity == "day" else 24
     if granularity == "day":
         future = prophetModel.make_future_dataframe(periods=numPredictions)
@@ -67,7 +72,9 @@ def prophetDetect(df, granularity):
     forecast.ds = forecast.ds.apply(lambda x: x.isoformat()[:19])
     forecast.y = forecast.y.apply(lambda x: int(x))
     df = pd.merge(df, forecast[["ds", "lower", "upper"]], how="left")
-    df["anomaly"] = df.apply(lambda row: 15 if isAnomaly(row.lower, row.upper, row.y) else 1, axis=1)
+    df["anomaly"] = df.apply(
+        lambda row: 15 if isAnomaly(row.lower, row.upper, row.y) else 1, axis=1
+    )
     anomalyLatest = checkLatestAnomaly(df)
     df = df[["ds", "y", "anomaly"]]
     forecast["band"] = forecast.apply(lambda x: [x["lower"], x["upper"]], axis=1)
@@ -81,8 +88,8 @@ def prophetDetect(df, granularity):
         "anomalyData": {
             "actual": df[-numActual:].to_dict("records"),
             "predicted": forecast.to_dict("records"),
-            "band": band[-(numActual + numPredictions):].to_dict("records"),
+            "band": band[-(numActual + numPredictions) :].to_dict("records"),
         },
-        "anomalyLatest": anomalyLatest
+        "anomalyLatest": anomalyLatest,
     }
     return output

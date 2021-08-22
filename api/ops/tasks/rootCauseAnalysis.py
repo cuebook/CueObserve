@@ -1,4 +1,5 @@
 import json
+import time
 import logging
 import traceback
 import datetime as dt
@@ -7,6 +8,7 @@ import html2text
 from django.template import Template, Context
 from celery import shared_task, group
 from celery.result import allow_join_result
+from app.celery import app
 
 from anomaly.models import Anomaly, RootCauseAnalysis, RCAAnomaly
 
@@ -61,7 +63,14 @@ def _parallelizeAnomalyDetection(anomalyId: int, dimension: str, dimValsData: li
         )
         for obj in dimValsData
     )
+
+    rootCauseAnalysis = RootCauseAnalysis.objects.get(anomaly_id=anomalyId)
     _detectionJobs = detectionJobs.apply_async()
+
+    taskIds = [task.id for task in _detectionJobs.children]
+    rootCauseAnalysis.taskIds = [*rootCauseAnalysis.taskIds, *taskIds]
+    rootCauseAnalysis.save()
+
     with allow_join_result():
         results = _detectionJobs.get()
     return results
@@ -137,17 +146,15 @@ def rootCauseAnalysisJob(anomalyId: int):
     from anomaly.services.slack import SlackAlert
 
     anomaly = Anomaly.objects.get(id=anomalyId)
-    logger.info("Checking if detection rule not Prophet then remove it")
-    if (
-        hasattr(anomaly.anomalyDefinition, "detectionrule")
-        and  str(anomaly.anomalyDefinition.detectionrule) != "Prophet"
-    ):
-        return False
     rootCauseAnalysis, _ = RootCauseAnalysis.objects.get_or_create(anomaly=anomaly)
     rootCauseAnalysis.startTimestamp = dt.datetime.now()
     rootCauseAnalysis.endTimestamp = None
     rootCauseAnalysis.logs = {}
     rootCauseAnalysis.status = RootCauseAnalysis.STATUS_RUNNING
+    rootCauseAnalysis.taskIds = [
+        *rootCauseAnalysis.taskIds,
+        rootCauseAnalysisJob.request.id,
+    ]
     rootCauseAnalysis.save()
 
     logger.info("Removing already existing rca data")
@@ -157,9 +164,7 @@ def rootCauseAnalysisJob(anomalyId: int):
     try:
         # **rootCauseAnalysis.logs,
         rootCauseAnalysis = RootCauseAnalysis.objects.get(anomaly=anomaly)
-        rootCauseAnalysis.logs = {
-            "Data": "Fetching..."
-        }
+        rootCauseAnalysis.logs = {"Data": "Fetching..."}
         rootCauseAnalysis.save()
         datasetDf = Data.fetchDatasetDataframe(anomaly.anomalyDefinition.dataset)
 
@@ -176,10 +181,7 @@ def rootCauseAnalysisJob(anomalyId: int):
         rootCauseAnalysis = RootCauseAnalysis.objects.get(anomaly=anomaly)
         # **rootCauseAnalysis.logs,
         # "Data": "Fetched",
-        rootCauseAnalysis.logs = {
-            
-            "Analyzing Dimensions": ", ".join(otherDimensions)
-        }
+        rootCauseAnalysis.logs = {"Analyzing Dimensions": ", ".join(otherDimensions)}
         rootCauseAnalysis.save()
         results = [
             _anomalyDetectionForDimension(

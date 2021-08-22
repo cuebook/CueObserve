@@ -113,7 +113,7 @@ class AnomalyDefinitions:
         return response
 
     @staticmethod
-    def editAnomalyDefinition(anomalyId: int = 0, highOrLow: str = None):
+    def editAnomalyDefinition(anomalyId: int = 0, highOrLow: str = None, detectionRuleParams: dict = {}):
         """
         Update anomaly objects of given anomalyId
         """
@@ -121,6 +121,12 @@ class AnomalyDefinitions:
         anomalyObj = AnomalyDefinition.objects.get(id=anomalyId)
         anomalyObj.highOrLow = highOrLow
         anomalyObj.save()
+        if detectionRuleParams:
+            originalParams = list(anomalyObj.detectionrule.detectionruleparamvalue_set.all())
+            for param in originalParams:
+                if detectionRuleParams.get(param.param.name):
+                    param.value = detectionRuleParams.get(param.param.name)
+            DetectionRuleParamValue.objects.bulk_update(originalParams, ["value"])
         response.update(True, "Anomaly Definition updated successfully !")
         return response
     
