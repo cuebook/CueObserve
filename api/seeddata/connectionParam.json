@@ -599,7 +599,7 @@
         "fields": {
           "name": "timeout",
           "label": "Timeout for connect and send/receive in seconds",
-          "isEncrypted": true,
+          "isEncrypted": false,
           "connectionType": 8,
           "properties": {
             "rules": [
