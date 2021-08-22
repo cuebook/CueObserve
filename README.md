@@ -19,7 +19,7 @@ CueObserve helps you monitor your metrics. Know when, where, and why a metric is
 
 CueObserve uses **timeseries Anomaly detection** to find **where** and **when** a metric isn't right. It then offers **one-click Root Cause analysis** so that you know **why** a metric isn't right.
 
-CueObserve works with data in your SQL data warehouses and databases. It currently supports Snowflake, BigQuery, Redshift, Druid, Postgres, MySQL, and SQL Server.
+CueObserve works with data in your SQL data warehouses and databases. It currently supports Snowflake, BigQuery, Redshift, Druid, Postgres, MySQL, SQL Server and ClickHouse.
 
 
 ![CueObserve Anomaly](docs/images/Overview_Anomaly.png)

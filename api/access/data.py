@@ -7,6 +7,7 @@ from dbConnections import (
     MySQL,
     Postgres,
     MSSQL,
+    ClickHouse,
 )
 from anomaly.serializers import ConnectionDetailSerializer
 
@@ -37,6 +38,9 @@ class Data:
         if connectionType == "Snowflake":
             params = connectionParams
             dataframe = Snowflake.fetchDataframe(params, query, limit=limit)
+        if connectionType == "ClickHouse":
+            params = connectionParams
+            dataframe = ClickHouse.fetchDataframe(params, query, limit=limit)
 
         return dataframe
 

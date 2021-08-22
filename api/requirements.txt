@@ -90,3 +90,4 @@ sqlalchemy==1.4.20
 mysqlclient==2.0.3
 html2text==2020.1.16
 pyodbc==4.0.31
+clickhouse-driver[numpy]==0.2.1
