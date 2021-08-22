@@ -47,5 +47,12 @@
         "fields": {
             "name": "MSSQL"
         }
+    },
+    {
+        "model": "anomaly.connectiontype",
+        "pk": 8,
+        "fields": {
+            "name": "ClickHouse"
+        }
     }
 ]

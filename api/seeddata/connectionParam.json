@@ -472,6 +472,145 @@
             "width": "100%"
           }
         }
+      },
+      {
+        "model": "anomaly.connectionparam",
+        "pk": 25,
+        "fields": {
+          "name": "url",
+          "label": "ClickHouse DSN",
+          "isEncrypted": false,
+          "connectionType": 8,
+          "properties": {
+            "rules": [
+              {
+                "required": false,
+                "message": "look to https://clickhouse-driver.readthedocs.io/en/latest"
+              }
+            ],
+            "type": "text",
+            "width": "100%"
+          }
+        }
+      },
+      {
+        "model": "anomaly.connectionparam",
+        "pk": 26,
+        "fields": {
+          "name": "host",
+          "label": "ClickHouse Host",
+          "isEncrypted": false,
+          "connectionType": 8,
+          "properties": {
+            "rules": [
+              {
+                "required": false,
+                "message": "ClickHouse host"
+              }
+            ],
+            "type": "text",
+            "width": "50%"
+          }
+        }
+      },
+      {
+        "model": "anomaly.connectionparam",
+        "pk": 27,
+        "fields": {
+          "name": "port",
+          "label": "ClickHouse TCP Port",
+          "isEncrypted": false,
+          "connectionType": 8,
+          "properties": {
+            "rules": [
+              {
+                "required": false,
+                "message": "ClickHouse TCP Native protocol"
+              }
+            ],
+            "type": "text",
+            "width": "50%"
+          }
+        }
+      },
+      {
+        "model": "anomaly.connectionparam",
+        "pk": 28,
+        "fields": {
+          "name": "user",
+          "label": "ClickHouse User",
+          "isEncrypted": false,
+          "connectionType": 8,
+          "properties": {
+            "rules": [
+              {
+                "required": false,
+                "message": "ClickHouse User"
+              }
+            ],
+            "type": "text",
+            "width": "50%"
+          }
+        }
+      },
+      {
+        "model": "anomaly.connectionparam",
+        "pk": 29,
+        "fields": {
+          "name": "password",
+          "label": "ClickHouse Password",
+          "isEncrypted": true,
+          "connectionType": 8,
+          "properties": {
+            "rules": [
+              {
+                "required": false,
+                "message": "ClickHouse Password"
+              }
+            ],
+            "type": "text",
+            "width": "50%"
+          }
+        }
+      },
+      {
+        "model": "anomaly.connectionparam",
+        "pk": 30,
+        "fields": {
+          "name": "database",
+          "label": "ClickHouse Database",
+          "isEncrypted": false,
+          "connectionType": 8,
+          "properties": {
+            "rules": [
+              {
+                "required": false,
+                "message": "ClickHouse default Database which used for table names lookup"
+              }
+            ],
+            "type": "text",
+            "width": "50%"
+          }
+        }
+      },
+      {
+        "model": "anomaly.connectionparam",
+        "pk": 31,
+        "fields": {
+          "name": "timeout",
+          "label": "Timeout for connect and send/receive in seconds",
+          "isEncrypted": true,
+          "connectionType": 8,
+          "properties": {
+            "rules": [
+              {
+                "required": false,
+                "message": "Timeout in seconds"
+              }
+            ],
+            "type": "text",
+            "width": "50%"
+          }
+        }
       }
-    
 ]

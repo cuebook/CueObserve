@@ -13,8 +13,9 @@ python ./manage.py collectstatic
 mkdir /home/staticfiles
 mv static_root/* /home/staticfiles
 rm -rf static_root/
+(/usr/bin/redis-server) &
 (gunicorn app.wsgi --user www-data --bind 0.0.0.0:8000 --workers 3 --timeout 300) &
 (celery -A app worker --concurrency=6 -l INFO --purge) &
 (celery -A app beat -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler) &
-(/user/bin/redis-server)
+echo "starting nginx"
 nginx -g "daemon off;"
