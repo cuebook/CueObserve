@@ -17,73 +17,6 @@ logger = logging.getLogger(__name__)
 
 
 class SlackAlert:
-    # def slackAlert(url, title, message):
-    #     url = url
-    #     # message = "A Sample Message"
-    #     # title = "New Incoming Alert Message "
-    #     message = message
-    #     title = title
-    #     slack_data = {
-    #         "username": "CueObserveBot",
-    #         "icon_emoji": ":satellite:",
-    #         # "channel" : "#cue-observe",
-    #         "channel" : "#test",
-    #         "attachments": [
-    #             {
-    #                 "color": "#9733EE",
-    #                 "fields": [
-    #                     {
-    #                         "title": title,
-    #                         "value": message,
-    #                         "short": "false",
-    #                     }
-    #                 ]
-    #             }
-    #         ]
-    #     }
-    #     byte_length = str(sys.getsizeof(slack_data))
-    #     headers = {'Content-Type': "application/json", 'Content-Length': byte_length}
-    #     response = requests.post(url, data=json.dumps(slack_data), headers=headers)
-    #     if response.status_code != 200:
-    #         raise Exception(response.status_code, response.text)
-
-    # def slackAnomalyAlert(url, title, message, details):
-    #         url = url
-    #         # message = "A Sample Message"
-    #         # title = "New Incoming Alert Message "
-    #         message = message
-    #         title = title
-    #         slack_data = {
-    #             "username": "CueObserveBot",
-    #             "icon_emoji": ":satellite:",
-    #             # "channel" : "#cue-observe-anomaly",
-    #             "channel" : "#test",
-    #             "blocks": [
-    #                 {
-    #                     "type": "section",
-    #                     "text": {
-    #                         "type": "mrkdwn",
-    #                         "text": message
-    #                     }
-    #                 },
-    #                 {
-    #                     "type": "divider"
-    #                 },
-    #                 {
-    #                     "type": "section",
-    #                     "text": {
-    #                         "type": "mrkdwn",
-    #                         "text": details
-    #                     },
-    #                 }
-    #             ]
-    #         }
-    #         byte_length = str(sys.getsizeof(slack_data))
-    #         headers = {'Content-Type': "application/json", 'Content-Length': byte_length}
-    #         response = requests.post(url, data=json.dumps(slack_data), headers=headers)
-    #         if response.status_code != 200:
-    #             raise Exception(response.status_code, response.text)
-
 
     def slackAlertHelper(title, message, name, details="", anomalyId: int = None ):
         """
@@ -94,11 +27,11 @@ class SlackAlert:
         try:
             setting = Setting.objects.all()
             token = setting.values()[0]["value"]
-            # Anomaly Detection successfull 
+            # Anomaly Detection Alert 
             if name == "anomalyAlert":
                 channelId = setting.values()[1]["value"]
                 SlackAlert.cueObserveAnomalyAlert(token, channelId, anomalyId ,title, message, details)
-            # Anomaly Detection job failed
+            # AppAlert
             if name == "appAlert":
                 channelId = setting.values()[2]["value"]
                 SlackAlert.cueObserveAlert(token, channelId, title, message)

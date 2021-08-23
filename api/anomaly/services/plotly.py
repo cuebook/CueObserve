@@ -1,21 +1,13 @@
 
 from anomaly.models import Anomaly
 import pandas as pd
-import plotly.express as px
 import plotly.graph_objects as go
-from IPython.display import Image
-from PIL import Image
-import base64
-from io import BytesIO
-import io
-import logging
-import os
 
 class Plotly:
 
     @staticmethod
     def anomalyChartToImgStr(anomalyId: int = 0):
-        """ Generate anomaly chart and convert it to image bytes """
+        """ Generate anomaly chart and convert it to image """
         
         anomaly = Anomaly.objects.get(id=anomalyId)
         granularity = anomaly.anomalyDefinition.dataset.granularity
@@ -24,7 +16,6 @@ class Plotly:
         actualData = anomalyData["actual"]
         predictedData = anomalyData["predicted"]
         bandData = anomalyData["band"]
-        bandDataDf = pd.DataFrame(bandData)
         actualDataDf = pd.DataFrame(actualData)
         predictedDataDf = pd.DataFrame(predictedData)
         band_lower_y = [ band["y"][0] for band in bandData]
@@ -35,8 +26,8 @@ class Plotly:
         anomaly_y = anomalyDataDf["y"].to_list()
         actual_x = actualDataDf["ds"].to_list()
         actual_y = actualDataDf["y"].to_list()
-        predicted_y = predictedDataDf["y"].to_list()
         predicted_x = predictedDataDf["ds"].to_list()
+        predicted_y = predictedDataDf["y"].to_list()
         
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=actual_x, y=actual_y,
