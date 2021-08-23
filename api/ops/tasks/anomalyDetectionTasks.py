@@ -133,6 +133,7 @@ def anomalyDetectionJob(anomalyDef_id: int, manualRun: bool = False):
             highestContriAnomaly = anomalyDefinition.anomaly_set.order_by(
                 "data__contribution"
             ).last()
+            anomalyId = highestContriAnomaly.id
             data = AnomalySerializer(highestContriAnomaly).data
             templateName = anomalyDefinition.getAnomalyTemplateName()
             cardTemplate = AnomalyCardTemplate.objects.get(templateName=templateName)
@@ -147,7 +148,7 @@ def anomalyDetectionJob(anomalyDef_id: int, manualRun: bool = False):
             )
 
             name = "anomalyAlert"
-            SlackAlert.slackAlertHelper(title, message, name, details=details)
+            SlackAlert.slackAlertHelper(title, message, name, details=details, anomalyId=anomalyId)
 
     if runStatusObj.status == ANOMALY_DETECTION_ERROR:
         message = (

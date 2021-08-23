@@ -2,8 +2,9 @@ from utils.apiResponse import ApiResponse
 from anomaly.models import Setting
 from anomaly.serializers import SettingSerializer
 
-ANOMALY_ALERT_SLACK_URL = "Slack Webhook URL for Anomaly Alerts"
-APP_ALERTS_SLACK_URL = "Slack Webhook URL for App Monitoring"
+ANOMALY_ALERT_SLACK_ID = "Slack Channel ID for Anomaly Alerts"
+APP_ALERTS_SLACK_ID= "Slack Channel ID for App Monitoring"
+SLACK_BOT_TOKEN = "Bot User OAuth Access Token"
 
 
 class Settings:
@@ -11,7 +12,7 @@ class Settings:
     Services for settings
     """
 
-    defaultSettings: list = [ANOMALY_ALERT_SLACK_URL, APP_ALERTS_SLACK_URL]
+    defaultSettings: list = [SLACK_BOT_TOKEN, ANOMALY_ALERT_SLACK_ID, APP_ALERTS_SLACK_ID]
 
     @staticmethod
     def getSettings():
