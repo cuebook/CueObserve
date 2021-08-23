@@ -4,7 +4,8 @@ from unittest import mock
 from django.test import TestCase
 from django.urls import reverse
 from mixer.backend.django import mixer
-from anomaly.services import Plotly
+from anomaly.services import Plotly, settings
+from anomaly.services import SlackAlert
 
 @pytest.mark.django_db(transaction=True)
 def test_plotly():
@@ -161,10 +162,18 @@ def test_plotly():
     dts = mixer.blend("anomaly.Dataset", granularity="day")
     adf = mixer.blend("anomaly.AnomalyDefinition", dataset=dts, periodicTask=None)
     anomaly = mixer.blend("anomaly.anomaly", anomalyDefinition=adf,data = data, lastRun=None)
+    setting = mixer.blend("anomaly.setting")
     img_str=""
     img_str = Plotly.anomalyChartToImgStr(anomaly.id)
-
+    title = "Test slack alert"
+    message = "Hi there !"
+    token = "xoxb-somerandomnumbers"
+    channelId = "SCLKJDKLD"
+    SlackAlert.cueObserveAnomalyAlert(token, channelId, anomaly.id, title="", message="", details="")
+    name = "anomalyAlert"
+    SlackAlert.cueObserveAlert(token, channelId, title, message)
     assert len(img_str) > 0
+
 
 
 
