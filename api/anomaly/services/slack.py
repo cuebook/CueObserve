@@ -10,6 +10,7 @@ from anomaly.models import Anomaly, Setting
 from anomaly.services.plotChart import PlotChartService
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
+from anomaly.services.settings import ANOMALY_ALERT_SLACK_ID, APP_ALERTS_SLACK_ID, SLACK_BOT_TOKEN
 
 logger = logging.getLogger(__name__)
 
@@ -22,18 +23,23 @@ class SlackAlert:
         Helper method for slackAlert
         """
         token = ''
-        channelId = ''
+        anomalyAlertChannelId = ''
+        appAlertChannelId = ''
         try:
-            setting = Setting.objects.all()
-            token = setting.values()[0]["value"]
+            settings = Setting.objects.all()
+            for setting in settings.values():
+                if setting["name"] == ANOMALY_ALERT_SLACK_ID:
+                    anomalyAlertChannelId = setting["value"]
+                elif setting["name"] == APP_ALERTS_SLACK_ID:
+                    appAlertChannelId = setting["value"]
+                elif setting["name"] == SLACK_BOT_TOKEN:
+                    token = setting["value"]
             # Anomaly Detection Alert 
             if name == "anomalyAlert":
-                channelId = setting.values()[1]["value"]
-                SlackAlert.cueObserveAnomalyAlert(token, channelId, anomalyId ,title, message, details)
+                SlackAlert.cueObserveAnomalyAlert(token, anomalyAlertChannelId, anomalyId ,title, message, details)
             # AppAlert
             if name == "appAlert":
-                channelId = setting.values()[2]["value"]
-                SlackAlert.cueObserveAlert(token, channelId, title, message)
+                SlackAlert.cueObserveAlert(token, appAlertChannelId, title, message)
 
         except Exception as ex:
             logger.error("Slack URL not given or wrong URL given:%s", str(ex))
