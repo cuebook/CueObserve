@@ -19,6 +19,7 @@ from anomaly.services import (
 )
 
 from django.views.decorators.clickjacking import xframe_options_exempt
+from django.utils.decorators import method_decorator
 
 
 class AnomalysView(APIView):
@@ -337,7 +338,7 @@ class SettingsView(APIView):
     Provides views on settings
     """
 
-    @xframe_options_exempt
+    @method_decorator(xframe_options_exempt)
     def get(self, request):
         """get request"""
         res = Settings.getSettings()
