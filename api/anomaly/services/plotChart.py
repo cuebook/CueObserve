@@ -9,7 +9,6 @@ class PlotChartService:
     @staticmethod
     def anomalyChartToImgStr(anomalyId: int = 0):
         """ Generate anomaly chart and convert it to image """
-        
         anomaly = Anomaly.objects.get(id=anomalyId)
         granularity = anomaly.anomalyDefinition.dataset.granularity
         data = anomaly.data
@@ -29,7 +28,6 @@ class PlotChartService:
         actualYaxis = actualDataDf["y"].to_list()
         predictedXaxis = predictedDataDf["ds"].to_list()
         predictedYaxis = predictedDataDf["y"].to_list()
-        
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=actualXaxis, y=actualYaxis,
                     mode='lines',
@@ -44,8 +42,7 @@ class PlotChartService:
         fig.add_traces(go.Scatter( x=predictedXaxis, y=predictedYaxis,
                     mode="lines",
                     showlegend=False,
-                    line=dict(dash='dash', color="blue"))),
-                    
+                    line=dict(dash='dash', color="blue")))
         fig.add_traces(go.Scatter(
             name='Upper Bound',
             x=bandXaxis,
@@ -78,6 +75,6 @@ class PlotChartService:
             tickformat="%Y-%m-%d" if granularity == "day" else "%Y-%m-%d 00:00" # date format
         ) 
         # fig.show() # use to see chart locally
-        img_bytes = fig.to_image(format="png") # pass img_bytes instead of png file
+        imgBytes = fig.to_image(format="png") # pass img_bytes instead of png file
 
-        return img_bytes
+        return imgBytes
