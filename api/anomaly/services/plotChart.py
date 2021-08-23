@@ -1,9 +1,10 @@
 
-from anomaly.models import Anomaly
 import pandas as pd
 import plotly.graph_objects as go
+from anomaly.models import Anomaly
 
-class Plotly:
+
+class PlotChartService:
 
     @staticmethod
     def anomalyChartToImgStr(anomalyId: int = 0):
@@ -18,37 +19,37 @@ class Plotly:
         bandData = anomalyData["band"]
         actualDataDf = pd.DataFrame(actualData)
         predictedDataDf = pd.DataFrame(predictedData)
-        band_lower_y = [ band["y"][0] for band in bandData]
-        band_upper_y = [ band["y"][1] for band in bandData]
-        band_x = [ band["ds"] for band in bandData]
+        bandLowerYaxis = [ band["y"][0] for band in bandData]
+        bandUpperYaxis = [ band["y"][1] for band in bandData]
+        bandXaxis = [ band["ds"] for band in bandData]
         anomalyDataDf = actualDataDf.loc[actualDataDf['anomaly'] == 15]
-        anomaly_x = anomalyDataDf["ds"].to_list()
-        anomaly_y = anomalyDataDf["y"].to_list()
-        actual_x = actualDataDf["ds"].to_list()
-        actual_y = actualDataDf["y"].to_list()
-        predicted_x = predictedDataDf["ds"].to_list()
-        predicted_y = predictedDataDf["y"].to_list()
+        anomalyXaxis = anomalyDataDf["ds"].to_list()
+        anomalyYaxis = anomalyDataDf["y"].to_list()
+        actualXaxis = actualDataDf["ds"].to_list()
+        actualYaxis = actualDataDf["y"].to_list()
+        predictedXaxis = predictedDataDf["ds"].to_list()
+        predictedYaxis = predictedDataDf["y"].to_list()
         
         fig = go.Figure()
-        fig.add_trace(go.Scatter(x=actual_x, y=actual_y,
+        fig.add_trace(go.Scatter(x=actualXaxis, y=actualYaxis,
                     mode='lines',
                     showlegend=False
                         ))
-        fig.add_trace(go.Scatter(x=anomaly_x, y=anomaly_y,
+        fig.add_trace(go.Scatter(x=anomalyXaxis, y=anomalyYaxis,
                     mode='markers',
                     showlegend=False,
                     marker=dict(color="rgba(255,0,0,0.7)")
 
                     ))
-        fig.add_traces(go.Scatter( x=predicted_x, y=predicted_y,
+        fig.add_traces(go.Scatter( x=predictedXaxis, y=predictedYaxis,
                     mode="lines",
                     showlegend=False,
                     line=dict(dash='dash', color="blue"))),
                     
         fig.add_traces(go.Scatter(
             name='Upper Bound',
-            x=band_x,
-            y=band_upper_y,
+            x=bandXaxis,
+            y=bandUpperYaxis,
             mode='lines',
             marker=dict(color="#777"),
             line=dict(width=0),
@@ -56,8 +57,8 @@ class Plotly:
         ))
         fig.add_traces(go.Scatter(
             name='Lower Bound',
-            x=band_x,
-            y=band_lower_y,
+            x=bandXaxis,
+            y=bandLowerYaxis,
             marker=dict(color="#777"),
             line=dict(width=0),
             mode='lines',

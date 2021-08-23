@@ -1,14 +1,13 @@
 import os
 import json
 import sys
-import logging
 import random
+import logging
+import requests
 from typing import Set
 from celery.utils.log import set_in_sighandler
-import requests
 from anomaly.models import Anomaly, Setting
-from anomaly.services import plotly
-from anomaly.services.plotly import Plotly
+from anomaly.services.plotChart import PlotChartService
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 
@@ -45,7 +44,7 @@ class SlackAlert:
         Image uploads in slack
         """
 
-        fileImg = Plotly.anomalyChartToImgStr(anomalyId)
+        fileImg = PlotChartService.anomalyChartToImgStr(anomalyId)
         client = WebClient(token=token)  
         # The name of the file you're going to upload
         file_name = fileImg

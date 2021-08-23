@@ -4,11 +4,11 @@ from unittest import mock
 from django.test import TestCase
 from django.urls import reverse
 from mixer.backend.django import mixer
-from anomaly.services import Plotly, settings
+from anomaly.services import PlotChartService, settings
 from anomaly.services import SlackAlert
 
 @pytest.mark.django_db(transaction=True)
-def test_plotly():
+def test_plotChart():
     """" Test case for anomaly chart to img  """
     data = {'anomalyData': {'band': [{'y': [112.14571558223184, 406.80678382251216],
             'ds': '2021-07-06T00:00:00'},
@@ -164,7 +164,7 @@ def test_plotly():
     anomaly = mixer.blend("anomaly.anomaly", anomalyDefinition=adf,data = data, lastRun=None)
     setting = mixer.blend("anomaly.setting")
     img_str=""
-    img_str = Plotly.anomalyChartToImgStr(anomaly.id)
+    img_str = PlotChartService.anomalyChartToImgStr(anomaly.id)
     title = "Test slack alert"
     message = "Hi there !"
     token = "xoxb-somerandomnumbers"

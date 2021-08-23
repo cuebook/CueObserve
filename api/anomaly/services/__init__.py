@@ -8,4 +8,4 @@ from .settings import Settings
 from .slack import SlackAlert
 from .detectionRules import DetectionRules
 from .rootCauseAnalyses import RootCauseAnalyses
-from .plotly import Plotly
+from .plotChart import PlotChartService
