@@ -18,6 +18,8 @@ from anomaly.services import (
     RootCauseAnalyses,
 )
 
+from django.views.decorators.clickjacking import xframe_options_exempt
+
 
 class AnomalysView(APIView):
     """
@@ -202,7 +204,9 @@ class AnomalyDefView(APIView):
         anomalyDefId = request.data.get("anomalyDefId", 0)
         highOrLow = request.data.get("highOrLow", None)
         detectionRuleParams = request.data.get("detectionRuleParams", {})
-        res = AnomalyDefinitions.editAnomalyDefinition(anomalyDefId, highOrLow, detectionRuleParams)
+        res = AnomalyDefinitions.editAnomalyDefinition(
+            anomalyDefId, highOrLow, detectionRuleParams
+        )
         return Response(res.json())
 
 
@@ -333,6 +337,7 @@ class SettingsView(APIView):
     Provides views on settings
     """
 
+    @xframe_options_exempt
     def get(self, request):
         """get request"""
         res = Settings.getSettings()
