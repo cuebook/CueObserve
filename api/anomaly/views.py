@@ -103,8 +103,8 @@ class CreateDatasetView(APIView):
 
 # TODO
 # class for connections
-@api_view(["GET", "POST"])
 @xframe_options_exempt
+@api_view(["GET", "POST"])
 def connections(request: HttpRequest) -> Response:
     """
     Method to get or add connection
@@ -118,8 +118,8 @@ def connections(request: HttpRequest) -> Response:
         return Response(res.json())
 
 
-@api_view(["GET", "PUT", "DELETE"])
 @xframe_options_exempt
+@api_view(["GET", "PUT", "DELETE"])
 def connection(request: HttpRequest, connection_id: int) -> Response:
     """
     Method for crud operations on a single connection
@@ -137,8 +137,8 @@ def connection(request: HttpRequest, connection_id: int) -> Response:
         return Response(res.json())
 
 
-@api_view(["GET", "POST"])
 @xframe_options_exempt
+@api_view(["GET", "POST"])
 def connectionTypes(request: HttpRequest) -> Response:
     """
     Method to get all connection types
