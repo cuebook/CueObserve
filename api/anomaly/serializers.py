@@ -1,9 +1,9 @@
 import json
 import dateutil.parser as dp
 import datetime as dt
+from anomaly.settingDetails import settingDicts
 from rest_framework import serializers
 from anomaly.models import Anomaly, AnomalyDefinition, Connection,ConnectionType, CustomSchedule as Schedule, Dataset, RunStatus, Setting, RCAAnomaly, RootCauseAnalysis, DetectionRuleType
-
 
 class ConnectionSerializer(serializers.ModelSerializer):
     connectionTypeId = serializers.SerializerMethodField()
@@ -305,9 +305,17 @@ class SettingSerializer(serializers.ModelSerializer):
     """
     Serializer for the model Setting
     """
+    details = serializers.SerializerMethodField()
+    def get_details(self, obj):
+        """ Details for settings UI"""
+        settingdicts = settingDicts()
+        for settingdict in settingdicts:
+            if obj.name == settingdict["name"]:
+                return settingdict
+
     class Meta:
         model = Setting
-        fields = ["name", "value"]
+        fields = ["name", "value", "details"]
 
 class DetectionRuleTypeSerializer(serializers.ModelSerializer):
     """

@@ -10,7 +10,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.conf import settings
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
-from anomaly.services.settings import ANOMALY_ALERT_SLACK_ID, APP_ALERTS_SLACK_ID, SLACK_BOT_TOKEN
+from anomaly.services.settings import ANOMALY_ALERT_SLACK_ID, APP_ALERTS_SLACK_ID, SLACK_BOT_TOKEN, SEND_EMAIL_TO
 from email.mime.image import MIMEImage
 from anomaly.models import Anomaly, Setting
 from anomaly.services.plotChart import PlotChartService
@@ -98,11 +98,16 @@ class EmailAlert:
         """
         Email alert with image
         """
+        sendEmailTo = []
+        settingObjs = Setting.objects.all()
+        for settingObj in settingObjs.values():
+            if settingObj["name"] == SEND_EMAIL_TO:
+                sendEmailTo = settingObj["value"]
+        sendEmailTo = sendEmailTo.split(",")
         try:
             logger.info("Sending email procedure starts")
             imgByte = PlotChartService.anomalyChartToImgStr(anomalyId)
-            subject, from_email, to = subject, settings.EMAIL_HOST_USER, []
-            # text_content = message
+            subject, from_email, to = subject, settings.EMAIL_HOST_USER, sendEmailTo
             body_html =  message + details + '''
                 <html>
                     <body>

@@ -31,4 +31,4 @@ def test_setting(client, mocker):
     path = reverse("settings")
     response = client.get(path)
     assert response.status_code == 200
-    assert len(response.data["data"]) == 3
+    assert len(response.data["data"]) == 4
