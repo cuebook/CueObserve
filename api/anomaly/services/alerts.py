@@ -6,11 +6,14 @@ import logging
 import requests
 from typing import Set
 from celery.utils.log import set_in_sighandler
-from anomaly.models import Anomaly, Setting
-from anomaly.services.plotChart import PlotChartService
+from django.core.mail import EmailMultiAlternatives
+from django.conf import settings
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 from anomaly.services.settings import ANOMALY_ALERT_SLACK_ID, APP_ALERTS_SLACK_ID, SLACK_BOT_TOKEN
+from email.mime.image import MIMEImage
+from anomaly.models import Anomaly, Setting
+from anomaly.services.plotChart import PlotChartService
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +39,7 @@ class SlackAlert:
                     token = setting["value"]
             # Anomaly Detection Alert 
             if name == "anomalyAlert":
-                SlackAlert.cueObserveAnomalyAlert(token, anomalyAlertChannelId, anomalyId ,title, message, details)
+                SlackAlert.cueObserveAnomalyAlert(token, anomalyAlertChannelId, anomalyId , title, message, details)
             # AppAlert
             if name == "appAlert":
                 SlackAlert.cueObserveAlert(token, appAlertChannelId, title, message)
@@ -87,3 +90,40 @@ class SlackAlert:
             logger.error(f"Error posting message: {e}")
 
 
+
+
+class EmailAlert:
+
+    def sendEmail( message, details, subject,anomalyId ):
+        """
+        Email alert with image
+        """
+        try:
+            logger.info("Sending email procedure starts")
+            imgByte = PlotChartService.anomalyChartToImgStr(anomalyId)
+            subject, from_email, to = subject, settings.EMAIL_HOST_USER, []
+            # text_content = message
+            body_html =  message + details + '''
+                <html>
+                    <body>
+                        <img src="cid:logo.png" alt="anomaly image" />
+                    </body>
+                </html>
+                '''
+            msg = EmailMultiAlternatives(
+                subject,
+                body_html,
+                from_email=from_email,
+                to=to
+            )
+            msg.mixed_subtype = 'related'
+            msg.attach_alternative(body_html, "text/html")
+            image = 'logo.png'
+            img = MIMEImage(imgByte)
+            img.add_header('Content-ID', '<{name}>'.format(name=image))
+            img.add_header('Content-Disposition', 'inline', filename=image)
+            msg.attach(img)
+            msg.send()
+            logger.info("Email sent successfully !")
+        except Exception as ex:
+            logger.error(f"Email sent procedure failed ! {ex}")
