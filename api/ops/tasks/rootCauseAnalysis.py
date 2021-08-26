@@ -143,7 +143,7 @@ def rootCauseAnalysisJob(anomalyId: int):
     :param anomaly_id: id of anomaly object under analysis
     """
 
-    from anomaly.services.slack import SlackAlert
+    from anomaly.services.alerts import SlackAlert
 
     anomaly = Anomaly.objects.get(id=anomalyId)
     rootCauseAnalysis, _ = RootCauseAnalysis.objects.get_or_create(anomaly=anomaly)

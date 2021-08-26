@@ -2,6 +2,7 @@ import json
 import traceback
 import datetime as dt
 import pandas as pd
+from anomaly.services.alerts import EmailAlert
 import html2text
 from django.template import Template, Context
 from celery import shared_task, group
@@ -45,7 +46,7 @@ def anomalyDetectionJob(anomalyDef_id: int, manualRun: bool = False):
     :param manualRun: Boolean determining whether task was manually initiated
     """
 
-    from anomaly.services.slack import SlackAlert
+    from anomaly.services.alerts import SlackAlert
 
     runType = "Manual" if manualRun else "Scheduled"
     anomalyDefinition = AnomalyDefinition.objects.get(id=anomalyDef_id)
@@ -108,7 +109,7 @@ def anomalyDetectionJob(anomalyDef_id: int, manualRun: bool = False):
     runStatusObj.endTimestamp = dt.datetime.now()
     runStatusObj.save()
 
-    # Slack alerts
+    ################################################# Slack Alert ########################################################
     title = "CueObserve Alerts"
     if runStatusObj.status == ANOMALY_DETECTION_SUCCESS:
         if logs.get("numAnomaliesPulished", 0) > 0:
@@ -129,7 +130,6 @@ def anomalyDetectionJob(anomalyDef_id: int, manualRun: bool = False):
                 message
                 + f"Dataset: {anomalyDefinition.dataset.name} | Granularity: {anomalyDefinition.dataset.granularity} \n \n"
             )
-
             highestContriAnomaly = anomalyDefinition.anomaly_set.order_by(
                 "data__contribution"
             ).last()
@@ -149,6 +149,31 @@ def anomalyDetectionJob(anomalyDef_id: int, manualRun: bool = False):
 
             name = "anomalyAlert"
             SlackAlert.slackAlertHelper(title, message, name, details=details, anomalyId=anomalyId)
+        
+            ################################################## Email Alert ############################################################
+
+            numPublished = logs["numAnomaliesPulished"]
+            messageHtml = f"{numPublished} {'anomalies' if numPublished > 1 else 'anomaly'} published. <br>"
+            messageHtml = (
+                messageHtml
+                + f"Anomaly Definition: <b>{anomalyDefinition.metric}{dimText}{highLowText}{topNtext}</b> <br>"
+            )
+            messageHtml = (
+                messageHtml
+                + f"Dataset: {anomalyDefinition.dataset.name} <br>"
+            )
+            messageHtml = (
+                messageHtml +  f"Granularity: {anomalyDefinition.dataset.granularity} <br> <br>"
+            )
+            emailSubject = (
+                html2text.html2text(Template(cardTemplate.title).render(Context(data))).replace("**", "").replace("\n","")
+            
+            )
+            detailsHtml = Template(cardTemplate.title).render(Context(data)) + "<br>"
+            subjectHtml = emailSubject
+           
+            detailsHtml = detailsHtml + Template(cardTemplate.bodyText).render(Context(data)) +"<br>"
+            EmailAlert.sendEmail(messageHtml, detailsHtml, subjectHtml, anomalyId)
 
     if runStatusObj.status == ANOMALY_DETECTION_ERROR:
         message = (
