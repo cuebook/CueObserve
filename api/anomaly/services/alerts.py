@@ -1,23 +1,15 @@
-import os
-import json
-import sys
-import random
+
 import logging
-import requests
-from typing import Set
-from celery.utils.log import set_in_sighandler
 from django.core.mail import EmailMultiAlternatives
+from email.mime.image import MIMEImage
 from django.conf import settings
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 from anomaly.services.settings import ANOMALY_ALERT_SLACK_ID, APP_ALERTS_SLACK_ID, SLACK_BOT_TOKEN, SEND_EMAIL_TO
-from email.mime.image import MIMEImage
-from anomaly.models import Anomaly, Setting
+from anomaly.models import Setting
 from anomaly.services.plotChart import PlotChartService
 
 logger = logging.getLogger(__name__)
-
-
 
 class SlackAlert:
 
@@ -52,11 +44,10 @@ class SlackAlert:
         """
         Image uploads in slack
         """
-
         fileImg = PlotChartService.anomalyChartToImgStr(anomalyId)
         client = WebClient(token=token)  
         # The name of the file you're going to upload
-        file_name = fileImg
+        fileName = fileImg
         try:
             # Call the files.upload method using the WebClient
             # Uploading files requires the `files:write` scope
@@ -66,7 +57,7 @@ class SlackAlert:
                 # initial_comment="Here's my file :smile:",
                 initial_comment = message + "\n" + details ,
                 title=title,
-                file=fileImg,
+                file=fileName,
             )
             # Log the result
             logger.info(result)
@@ -88,8 +79,6 @@ class SlackAlert:
 
         except SlackApiError as e:
             logger.error(f"Error posting message: {e}")
-
-
 
 
 class EmailAlert:
