@@ -34,9 +34,9 @@ docker run --env-file .env -dp 3000:3000 cuebook/cueobserve
 
 In case your Postgres is hosted locally, pass the flag `--network="host"` to connect docker to the localhost of the machine.
 
-## Enabling Authentication
+## Authentication
 
-CueObserve comes with built-in authentication \(powered by Django\). To enable authentication, create a `.env` file with the given variables or add these variables in the already created `.env` file with Postgres credentials.
+CueObserve comes with built-in authentication \(powered by Django\). By default authentication is disabled, to enable authentication create a `.env` file with the given variables or add these variables in the already created `.env` file with Postgres credentials.
 
 ```text
 DJANGO_SUPERUSER_USERNAME=<USER_NAME>
@@ -50,6 +50,22 @@ docker run --env-file .env -dp 3000:3000 cuebook/cueobserve
 ```
 
 If authentication is enabled you can access the [Django Admin](https://docs.djangoproject.com/en/3.2/ref/contrib/admin/) console to do the database operations with a nice UI. To access Django Admin go to [http://localhost:3000/admin](http://localhost:3000/admin) and enter the username and password provided in the `.env` file.
+
+## Email Notification
+
+CueObserve comes with built-in email alert notification system\(powered by Django\). By default email notifications are disabled, to enable notifications create a `.env` file with the given variables or add these variables in the already created `.env` file.
+
+```text
+EMAIL_HOST="smtp.gmail.com" 
+EMAIL_HOST_USER=<YOUR_EMAIL@gmail.com>
+EMAIL_HOST_PASSWORD=<YOUR_EMAIL_PASSWORD>
+```
+
+Allow less secure apps: ON for your given EMAIL\_HOST\_USER email Id, click on [enable access to less secure app](https://myaccount.google.com/lesssecureapps?pli=1&rapt=AEjHL4N7wse3vhCsvRv-aWy8kKeEGDZS2YDbW1SfTL17HVhtemi7zZW5gzbZSBnrNgknL_gPBDn3xVo0qUj-W6NuaYTSU7agQQ)
+
+Unlock Captcha for your gmail account, click on [Unlock Captcha](https://accounts.google.com/b/0/UnlockCaptcha)
+
+
 
 ## Infra Requirements
 

@@ -11,11 +11,20 @@ description: >-
 
 CueObserve has 5 basic components:
 
-1. Frontend single page application written on [ReactJS](https://reactjs.org/).
+1. Frontend single-page application written on [ReactJS](https://reactjs.org/).
 2. Backend based on [Django](https://www.djangoproject.com/) \(python framework\), which is responsible for the communication with the frontend application via REST APIs.
 3. [Celery](https://docs.celeryproject.org/) to execute the tasks asynchronously. Tasks like anomaly detection are handled by Celery.
 4. [Celery beat](https://docs.celeryproject.org/en/stable/userguide/periodic-tasks.html) scheduler to trigger the scheduled tasks.
 5. [Redis](https://redis.io/documentation) to handle the task queue of Celery.
+
+### Getting code
+
+Get the code by cloning our open source [github repo](https://github.com/cuebook/cueobserve)
+
+```text
+git clone https://github.com/cuebook/CueObserve.git
+cd CueObserve
+```
 
 ### Frontend Development 
 
