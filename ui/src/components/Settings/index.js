@@ -7,6 +7,7 @@ const {TextArea} = Input;
 
 export default function Schedule(){
 	const [settings, setSettings] = useState(null);
+	const [loader, setLoader] = useState(false)
 
 
 	useEffect(()=>{
@@ -23,6 +24,7 @@ export default function Schedule(){
 	}
 
 	const onFinish = (values) => {
+		setLoader(true)
 	   console.log('Success:', values);
 	   updateSettings(values)
 
@@ -31,6 +33,7 @@ export default function Schedule(){
 	const updateSettings = async (values) => {
 		const data = await settingService.updateSettings(values)
 		if (data){
+			setLoader(false)
 			getSettings()
 		}
 	}
@@ -102,6 +105,7 @@ export default function Schedule(){
                 type="primary"
                 className="mr-2"
                 htmlType="submit"
+				loading={loader}
             >
                 Save
             </Button>
