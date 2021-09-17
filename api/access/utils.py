@@ -13,7 +13,7 @@ def aggregateDf(df, timestampCol):
 
 
 def prepareAnomalyDataframes(
-    datasetDf, timestampCol, metricCol, dimensionCol=None, operation=None, value=10
+    datasetDf, timestampCol, metricCol, dimensionCol=None, operation=None, value=10, nonRollup=False
 ):
     """
     Utility function to prepare anomaly dataframes by grouping on dimension

@@ -64,6 +64,7 @@ class Dataset(models.Model):
     timestampColumn = models.CharField(max_length=500)
     metrics = models.TextField(null=True, blank=True)
     dimensions = models.TextField(null=True, blank=True)
+    isNonRollup = models.BooleanField(default=False)
 
 
 class AnomalyDefinition(models.Model):

@@ -69,6 +69,7 @@ def anomalyDetectionJob(anomalyDef_id: int, manualRun: bool = False):
             anomalyDefinition.dimension,
             anomalyDefinition.operation,
             float(anomalyDefinition.value),
+            anomalyDefinition.dataset.isNonRollup,
         )
 
         detectionJobs = group(
