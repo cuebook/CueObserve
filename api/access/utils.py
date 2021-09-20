@@ -1,13 +1,14 @@
 import pandas as pd
 
 
-def aggregateDf(df, timestampCol):
+def aggregateDf(df, timestampCol, tsRollup=True):
     """
     Utility function to aggregate dataframe on timestamp column
     """
     df.dropna(inplace=True)
-    df = df.groupby(timestampCol).sum()
-    df.reset_index(inplace=True)
+    if tsRollup:
+        df = df.groupby(timestampCol).sum()
+        df.reset_index(inplace=True)
     df.columns = ["ds" if col == timestampCol else "y" for col in df.columns]
     return df
 
@@ -27,7 +28,21 @@ def prepareAnomalyDataframes(
         raise Exception(f"Metric column containing non numeric data: {ex}")
 
     dimValsData = []
-    if dimensionCol:
+
+    if nonRollup:
+        if dimensionCol:
+            if operation == "Min Avg Value":
+                dimValsData = minAvgValueOnDimensionalValuesNonRollup(datasetDf, timestampCol, metricCol, dimensionCol, value)
+        else:
+            tempDf = datasetDf[[timestampCol, metricCol]]
+            dimValsData.append(
+                {
+                    "dimVal": None,
+                    "contriPercent": 100.0,
+                    "df": aggregateDf(tempDf, timestampCol, tsRollup=False),
+                }
+            )
+    elif dimensionCol:
         if operation == "Top":
             dimValsData = topNDimensionalValues(
                 datasetDf, timestampCol, metricCol, dimensionCol, int(value)
@@ -147,5 +162,32 @@ def minAvgValueOnDimensionalValues(
                     "df": aggregateDf(tempDf, timestampCol),
                 }
             )
+
+    return dimValsData
+
+def minAvgValueOnDimensionalValuesNonRollup(
+    datasetDf, timestampCol, metricCol, dimensionCol=None, value=1
+):
+    """
+    Utility function to prepare anomaly dataframes by grouping on dimension for dimensional values
+    """
+    dimValsData = []
+    datasetDf = datasetDf[[timestampCol, dimensionCol, metricCol]]
+    topValsDf = (
+        datasetDf[[dimensionCol, metricCol]]
+        .groupby(dimensionCol)
+        .mean()
+        .sort_values(metricCol, ascending=False)
+    )
+    dimVals = list(topValsDf[topValsDf[metricCol]>value].index)
+    for dimVal in dimVals:
+        tempDf = datasetDf[datasetDf[dimensionCol] == dimVal][[timestampCol, metricCol]]
+        dimValsData.append(
+            {
+                "dimVal": dimVal,
+                "contriPercent": "",
+                "df": aggregateDf(tempDf, timestampCol, tsRollup=False),
+            }
+        )
 
     return dimValsData
