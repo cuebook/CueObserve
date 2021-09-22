@@ -58,6 +58,20 @@ def settingDicts():
                 ],
                 "type": "textarea",
                 }
+            },
+            {
+            "id": 5,
+                "name": "Webhook URL",
+                "isEncrypted": False,
+                "properties": {
+                "rules": [
+                    {
+                    "required": False,
+                    "message": ""
+                    }
+                ],
+                "type": "text",
+                }
             }
         ]
     return dicts
