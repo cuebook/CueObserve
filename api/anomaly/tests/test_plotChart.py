@@ -1,12 +1,13 @@
-from anomaly.services.alerts import EmailAlert, WebHookAlert
+from anomaly.services.alerts import EmailAlert
 import pytest
 import unittest
 from unittest import mock
 from django.test import TestCase
 from django.urls import reverse
 from mixer.backend.django import mixer
-from anomaly.services import PlotChartService, settings
+from anomaly.services import PlotChartService
 from anomaly.services import SlackAlert
+from ops.tasks.anomalyDetectionTasks import webhookAlertMessageFormat
 
 @pytest.mark.django_db(transaction=True)
 def test_plotChart():
@@ -159,12 +160,12 @@ def test_plotChart():
         'anomalyTime': 1629331200000.0,
         'contribution': 9.25,
         'anomalyTimeISO': '2021-08-19T00:00:00'}}
-
     dts = mixer.blend("anomaly.Dataset", granularity="day")
     adf = mixer.blend("anomaly.AnomalyDefinition", dataset=dts, periodicTask=None)
     anomaly = mixer.blend("anomaly.anomaly", anomalyDefinition=adf,data = data, lastRun=None)
     setting = mixer.blend("anomaly.setting", name="Send Email To", value="admin@domain.com")
     setting1 = mixer.blend("anomaly.setting", name="Webhook URL", value="https://www.google.com/")
+    anomalyTemplate = mixer.blend("anomaly.AnomalyCardTemplate", templateName = "Anomaly Daily Template Prophet", title="test", bodyText = "Test")
     img_str=""
     img_str = PlotChartService.anomalyChartToImgStr(anomaly.id)
     title = "Test slack alert"
@@ -177,10 +178,8 @@ def test_plotChart():
     details = "Email alert on anomaly detection "
     subject = "Email alert"
     EmailAlert.sendEmail(message, details, subject, anomaly.id)
-    subject = "Webhook Alert"
-    message = "Webhook testing alert"
-    subject = "Webhook alert on URL "
-    WebHookAlert.webhookAlertHelper(message, details, subject, adf.id,anomaly.id)
+    numPublished = 4 # Random number
+    webhookAlertMessageFormat(numPublished, adf)
     assert len(img_str) > 0
 
 

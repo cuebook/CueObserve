@@ -132,9 +132,9 @@ class WebHookAlert:
             for setting in settings.values():
                 if setting["name"] == WEBHOOK_URL:
                     webhookURL = setting["value"]
-            WebHookAlert.webhookAlert(webhookURL, message, details, subject,anomalyDefId, anomalyId)
+            WebHookAlert.webhookAlert(webhookURL, message, details, subject, anomalyDefId, anomalyId)
         except Exception as ex:
-            logger.error("Webhook URL not given:%s", str(ex))
+            logger.error("Webhook URL not given or URL not found:%s", str(ex))
 
 
 
@@ -145,11 +145,9 @@ class WebHookAlert:
             "message":message,
             "details":details,
             "Anomaly detected on anomaly definition Id ": anomalyDefId,
-            "Anomaly Id":anomalyId,
+            "Highest contributed anomaly Id":anomalyId,
         }
         try:
             response = requests.post(url, json=responseJson)
-            if response.status_code != 200:
-                raise Exception(response.status_code, response.text)
         except Exception as ex:
             logger.error("Webhook URL not accepting json data format or Wrong Webhook URL given", str(ex))
