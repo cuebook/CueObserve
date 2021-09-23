@@ -1,4 +1,4 @@
-from anomaly.services.alerts import EmailAlert
+from anomaly.services.alerts import EmailAlert, WebHookAlert
 import pytest
 import unittest
 from unittest import mock
@@ -164,6 +164,7 @@ def test_plotChart():
     adf = mixer.blend("anomaly.AnomalyDefinition", dataset=dts, periodicTask=None)
     anomaly = mixer.blend("anomaly.anomaly", anomalyDefinition=adf,data = data, lastRun=None)
     setting = mixer.blend("anomaly.setting", name="Send Email To", value="admin@domain.com")
+    setting1 = mixer.blend("anomaly.setting", name="Webhook URL", value="https://www.google.com/")
     img_str=""
     img_str = PlotChartService.anomalyChartToImgStr(anomaly.id)
     title = "Test slack alert"
@@ -176,6 +177,10 @@ def test_plotChart():
     details = "Email alert on anomaly detection "
     subject = "Email alert"
     EmailAlert.sendEmail(message, details, subject, anomaly.id)
+    subject = "Webhook Alert"
+    message = "Webhook testing alert"
+    subject = "Webhook alert on URL "
+    WebHookAlert.webhookAlertHelper(message, details, subject, adf.id,anomaly.id)
     assert len(img_str) > 0
 
 
