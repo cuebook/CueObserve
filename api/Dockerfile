@@ -1,4 +1,4 @@
-FROM python:3.9-slim
+FROM python:3.9-slim-buster
 
 RUN apt-get update && apt-get install -y build-essential gnupg2 curl libffi-dev libpq-dev gcc default-libmysqlclient-dev
 RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
