@@ -35,6 +35,26 @@ CORS_ORIGIN_ALLOW_ALL = True
 HTTP_HTTPS = "http://"
 ROOT_URLCONF = "app.urls"
 
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "file": {
+            "format": "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] [%(threadName)s] %(message)s",
+            "datefmt": "%d/%b/%Y %H:%M:%S",
+        },
+        "console": {"format": "%(asctime)s [%(name)s:%(lineno)s] %(levelname)-8s %(message)s"},
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "console",
+            "level": os.environ.get("LOG_LEVEL"),
+        }
+    },
+    "loggers": {"": {"level": os.environ.get("LOG_LEVEL"), "handlers": ["console"]}},
+}
+
 # Application definition
 INSTALLED_APPS = [
     "django.contrib.admin",
