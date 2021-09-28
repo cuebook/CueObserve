@@ -14,6 +14,7 @@ logger = logging.getLogger(__name__)
 
 class SlackAlert:
 
+    @staticmethod
     def slackAlertHelper(title, message, name, details="", anomalyId: int = None ):
         """
         Helper method for slackAlert
@@ -39,7 +40,7 @@ class SlackAlert:
         except Exception as ex:
             logger.error("Slack URL not given or wrong URL given:%s", str(ex))
 
-
+    @staticmethod
     def cueObserveAnomalyAlert(token, channelId, anomalyId, title="", message="", details=""):
         """
         Image uploads in slack
@@ -64,7 +65,7 @@ class SlackAlert:
 
         except SlackApiError as e:
             logger.error("Error uploading file: {}".format(e))
-
+    @staticmethod
     def cueObserveAlert(token, channelId, title="", message=""):
         """ Post message in slack"""
 
@@ -82,6 +83,7 @@ class SlackAlert:
 
 class EmailAlert:
 
+    @staticmethod
     def sendEmail(message, details, subject,anomalyId ):
         """
         Email alert with image
@@ -123,6 +125,7 @@ class EmailAlert:
 
 class WebHookAlert:
     """ Generic rest api for alert on webhook URL"""
+    @staticmethod
     def webhookAlertHelper(message, details, subject, anomalyDefId, anomalyId):
         try:
             webhookURL = ''
@@ -135,7 +138,7 @@ class WebHookAlert:
             logger.error("Webhook URL not given or URL not found:%s", str(ex))
 
 
-
+    @staticmethod
     def webhookAlert(url, message, details, subject, anomalyDefId, anomalyId):
         """ Alert Json formatted message in given Webhook URL"""
         responseJson = {
@@ -148,6 +151,6 @@ class WebHookAlert:
         try:
             response = requests.post(url, json=responseJson)
             if response.status_code == 200:
-                logger.info("Alert send to the URL :", str(url))
+                logger.info("Alert send to the URL :%s", str(url))
         except Exception as ex:
-            logger.error("Webhook URL not accepting json data format or Wrong Webhook URL given", str(ex))
+            logger.error("Webhook URL not accepting json data format or Wrong Webhook URL given :%s", str(ex))
