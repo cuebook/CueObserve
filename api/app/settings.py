@@ -34,7 +34,7 @@ ALLOWED_HOSTS = ["*", "localhost"]
 CORS_ORIGIN_ALLOW_ALL = True
 HTTP_HTTPS = "http://"
 ROOT_URLCONF = "app.urls"
-
+INFO = os.environ.get("LOG_LEVEL", "INFO")
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -49,10 +49,10 @@ LOGGING = {
         "console": {
             "class": "logging.StreamHandler",
             "formatter": "console",
-            "level": os.environ.get("LOG_LEVEL"),
+            "level": INFO,
         }
     },
-    "loggers": {"": {"level": os.environ.get("LOG_LEVEL"), "handlers": ["console"]}},
+    "loggers": {"": {"level": INFO, "handlers": ["console"]}},
 }
 
 # Application definition
