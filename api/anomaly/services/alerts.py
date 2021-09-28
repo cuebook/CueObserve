@@ -1,8 +1,8 @@
 
 import logging
+from email.mime.image import MIMEImage
 import requests
 from django.core.mail import EmailMultiAlternatives
-from email.mime.image import MIMEImage
 from django.conf import settings
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
@@ -36,7 +36,6 @@ class SlackAlert:
             # AppAlert
             if name == "appAlert":
                 SlackAlert.cueObserveAlert(token, appAlertChannelId, title, message)
-
         except Exception as ex:
             logger.error("Slack URL not given or wrong URL given:%s", str(ex))
 
@@ -77,14 +76,13 @@ class SlackAlert:
                 text= "*" + title + "*" + "\n" + message 
             )
             logger.info(result)
-
         except SlackApiError as e:
             logger.error(f"Error posting message: {e}")
 
 
 class EmailAlert:
 
-    def sendEmail( message, details, subject,anomalyId ):
+    def sendEmail(message, details, subject,anomalyId ):
         """
         Email alert with image
         """
@@ -149,5 +147,7 @@ class WebHookAlert:
         }
         try:
             response = requests.post(url, json=responseJson)
+            if response.status_code == 200:
+                logger.info("Alert send to the URL :", str(url))
         except Exception as ex:
             logger.error("Webhook URL not accepting json data format or Wrong Webhook URL given", str(ex))
