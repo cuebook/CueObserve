@@ -24,9 +24,24 @@ services:
       - /frontend:/app
     network_mode: "host"
 
+  postgresql-cue:
+    image: postgres:13
+    environment:
+      - PGDATA=/pg_data
+      - POSTGRES_DB=cue_observe
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - pgdata:/pg_data
+    network_mode: "host"
+
+
 networks:
   external-network:
     external:
       name: nginx-web
   cue-network:
     internal: true
+
+volumes:
+  pgdata:

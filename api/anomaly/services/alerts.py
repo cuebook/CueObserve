@@ -10,7 +10,7 @@ from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 
 logger = logging.getLogger(__name__)
-ALERT_API_URL = os.environ.get("ALERT_API_URL", "localhost:8100")
+ALERT_API_URL = os.environ.get("ALERT_API_URL", "http://localhost:8100")
 
 
 class SlackAlert:
@@ -34,15 +34,15 @@ class SlackAlert:
             # Anomaly Detection Alert 
             if name == "anomalyAlert":
                 url = f'{ALERT_API_URL}/alerts/anamoly-alert'
+                fileImg = PlotChartService.anomalyChartToImgStr(anomalyId)
                 payload = {
                     "token": token,
                     "anomalyAlertChannelId": anomalyAlertChannelId,
                     "title": title,
-                    "meesage": message,
+                    "message": message,
                     "details": details,
-                    "fileImg": PlotChartService.anomalyChartToImgStr(anomalyId)
                 }
-                requests.request("POST", url, data=payload)
+                requests.post(url, data=payload, files={'fileImg': fileImg})
             # AppAlert
             if name == "appAlert":
                 url = f'{ALERT_API_URL}/alerts/app-alert'
@@ -50,7 +50,7 @@ class SlackAlert:
                     "token": token,
                     "appAlertChannelId": appAlertChannelId,
                     "title": title,
-                    "meesage": message
+                    "message": message
                 }
                 requests.request("POST", url, data=payload)
 

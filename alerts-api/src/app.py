@@ -6,10 +6,10 @@ app = Flask(__name__)
 
 @app.route('/alerts/anamoly-alert', methods=['POST'])
 def anamoly_alert_api():
-    data = request.json
+    data = request.form
     token = data['token']
     anomalyAlertChannelId = data['anomalyAlertChannelId']
-    fileImg = data['fileImg']
+    fileImg = request.files['fileImg']
     title = data['title']
     message = data['message']
     details = data['details']
@@ -19,9 +19,9 @@ def anamoly_alert_api():
 
 @app.route('/alerts/app-alert', methods=['POST'])
 def app_alert_api():
-    data = request.json
+    data = request.form
     token = data['token']
-    appAlertChannelId = data['anomalyAlertChannelId']
+    appAlertChannelId = data['appAlertChannelId']
     title = data['title']
     message = data['message']
     SlackAlert.cueObserveAlert(token, appAlertChannelId, title, message)
