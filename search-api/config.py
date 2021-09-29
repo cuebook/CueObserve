@@ -9,6 +9,8 @@ BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 # # Example DB Configuration
 
+SQLALCHEMY_DATABASE_URI = "sqlite:////tmp/sqlite3.db"
+
 # SQLALCHEMY_DATABASE_URI = ''
 # DATABASE_CONNECT_OPTIONS = {}
 

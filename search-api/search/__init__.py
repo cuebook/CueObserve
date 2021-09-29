@@ -1,8 +1,10 @@
 # Import flask and template operators
 from flask import Flask, render_template
+from flask_migrate import Migrate
+
 
 # Could import flask extensions, such as SQLAlchemy, here
-# from flask.ext.sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy
 
 # Define WSGI object
 app = Flask(__name__)
@@ -13,7 +15,8 @@ app.config.from_object('config')
 
 # Some more example SQLAlchemy config
 # Define the database object which is imported by modules and controllers
-# db = SQLAlchemy(app)
+db = SQLAlchemy(app)
+
 
 # # HTTP error handling
 # @app.errorhandler(404)
@@ -27,10 +30,12 @@ app.config.from_object('config')
 
 
 # Import modules here
-from .cardTemplates import views 
-from .globalDimensions import views
+from .cardTemplates import views, models
+from .globalDimensions import views, models
+
+migrate = Migrate()
+migrate.init_app(app, db)
 
 
-# Build the database:
-# This will init the db
-# db.init_app(app)
+# if __name__ == "app":
+#     app = create_app(env, args)
