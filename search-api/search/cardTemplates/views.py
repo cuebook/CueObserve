@@ -1,5 +1,6 @@
 from search import app
 
-@app.route('/cardTemplates/')
+
+@app.route("/cardTemplates/")
 def getCardTemplates():
-    return 'Hello World!'
+    return "Hello World!"

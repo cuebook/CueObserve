@@ -11,7 +11,7 @@ else
 fi
 export FLASK_APP=search
 # flask db init
-flask db migrate
-# flask db upgrade
+# flask db migrate
+flask db upgrade
 
 exec "$@"

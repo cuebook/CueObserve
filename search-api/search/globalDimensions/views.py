@@ -1,5 +1,6 @@
 from search import app
 
-@app.route('/globalDimensions/')
+
+@app.route("/globalDimensions/")
 def getGlobalDimensions():
-    return 'Hello World!'
+    return "Hello World!"
