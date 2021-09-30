@@ -1,5 +1,6 @@
 #!/bin/bash
 
+source .env.dev
 if [[ $ENVIRONMENT == "PRODUCTION" ]]
 then
 	echo production 
