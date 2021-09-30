@@ -149,7 +149,8 @@ class WebHookAlert:
             "Highest contributed anomaly Id":anomalyId,
         }
         try:
-            response = requests.post(url, json=responseJson)
+            fileImg = PlotChartService.anomalyChartToImgStr(anomalyId)
+            response = requests.post(url, data=responseJson, files={"fileImg": fileImg})
             if response.status_code == 200:
                 logger.info("Alert send to the URL :%s", str(url))
         except Exception as ex:
