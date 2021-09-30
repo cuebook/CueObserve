@@ -3,4 +3,4 @@ WORKDIR /code
 COPY requirements.txt requirements.txt
 RUN python -m pip install -r requirements.txt
 ENTRYPOINT ["/code/entrypoint.sh"] 
-CMD ["python", "manage.py", "runserver", "--port", "8200"]
+CMD ["python", "manage.py", "run", "--port", "8200"]
