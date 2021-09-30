@@ -50,6 +50,7 @@ jobs:
         echo "************ Files Fetched **********"
         [[ -z $x ]] && return 0;
         
+        touch ../search-api/__init__.py
         pylint ../search-api --rcfile ../search-api/pylintrc --fail-under=8
 
         echo "************ Files in API folder in this PR **********"
