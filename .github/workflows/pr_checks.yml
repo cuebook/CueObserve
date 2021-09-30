@@ -54,7 +54,7 @@ jobs:
 
         echo "************ Files in API folder in this PR **********"
         echo "removing non main api folder files"
-        x=$(echo "$x" | grep "api/")
+        x=$(echo "$x" | grep "^api/")
         PYLINT_STATUS="SUCCESS";
         SUCCESS="SUCCESS";
         FAILED="FAILED";
