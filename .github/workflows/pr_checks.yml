@@ -34,8 +34,8 @@ jobs:
     - name: Install Pylint
       run: |
         python -m pip install --upgrade pip
-        pip install pylint==2.4.4
-        pip install pylint-django==2.0.14
+        pip install pylint==2.11.1
+        pip install pylint-django==2.4.4
         cat api/requirements.txt | xargs -n 1 pip install || true
         
     - name: Run Pylint
@@ -50,8 +50,12 @@ jobs:
         echo "************ Files Fetched **********"
         [[ -z $x ]] && return 0;
         
-        echo "************ Files in this PR **********"
-        echo $x
+        touch ../search-api/__init__.py
+        pylint ../search-api --rcfile ../search-api/pylintrc --fail-under=8
+
+        echo "************ Files in API folder in this PR **********"
+        echo "removing non main api folder files"
+        x=$(echo "$x" | grep "^api/")
         PYLINT_STATUS="SUCCESS";
         SUCCESS="SUCCESS";
         FAILED="FAILED";
