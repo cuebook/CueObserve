@@ -1,10 +1,11 @@
+import os
 import json
 import traceback
 import datetime as dt
-import pandas as pd
 from anomaly.services.alerts import EmailAlert
 import html2text
 from django.template import Template, Context
+from django.db import transaction
 from celery import shared_task, group
 from celery.result import allow_join_result
 
@@ -19,7 +20,7 @@ from anomaly.serializers import AnomalySerializer
 from access.data import Data
 from access.utils import prepareAnomalyDataframes
 
-from .anomalyDetection import anomalyService
+from ops.tasks.detection.core.anomalyDetection import anomalyService
 
 ANOMALY_DETECTION_RUNNING = "RUNNING"
 ANOMALY_DETECTION_SUCCESS = "SUCCESS"
@@ -27,15 +28,90 @@ ANOMALY_DETECTION_ERROR = "ERROR"
 
 
 @shared_task
-def _anomalyDetectionSubTask(anomalyDef_id, dimVal, contriPercent, dfDict):
+def _anomalyDetectionSubTask(dimValObj, dfDict, anomalyDefProps, detectionRuleType, detectionParams):
     """
     Internal anomaly detection subtask to be grouped by celery for each anomaly object
     """
-    anomalyDefinition = AnomalyDefinition.objects.get(id=anomalyDef_id)
     anomalyServiceResult = anomalyService(
-        anomalyDefinition, dimVal, contriPercent, pd.DataFrame(dfDict)
+        dimValObj, dfDict, anomalyDefProps, detectionRuleType, detectionParams
     )
     return anomalyServiceResult
+
+@transaction.atomic
+def createAnomalyObjects(dimValsData, anomalyDefinition):
+    """
+    Function to create anomaly objects for dimension values for an anomaly definition
+    :param anomalyResult: List of dicts, each corresponding to a dimension value
+    :param anomalyDefinition: AnomalyDefinition object for which to create Anomaly objects
+    """
+    for obj in dimValsData:
+        anomalyObj, _ = Anomaly.objects.get_or_create(
+            anomalyDefinition=anomalyDefinition, dimensionVal=obj["dimVal"], published=False
+        )
+        obj["anomalyId"] = anomalyObj.id
+
+@transaction.atomic
+def saveAnomalyObjects(anomalyResult):
+    """
+    Function to save the outputs from anomaly detection into respective Anomaly objects
+    :param anomalyResult: List of anomaly detection outputs
+    """
+    for obj in anomalyResult:
+        anomalyObj = Anomaly.objects.get(id=obj["anomalyId"])
+        anomalyObj.data = obj["data"]
+        anomalyObj.published = obj["published"]
+        anomalyObj.save()
+
+def distributeSubTasks(dimValsData, anomalyDefinition):
+    """
+    Function to distribute anomaly detection sub tasks on medium of choice
+    :param anomalyResult: List of dicts, each corresponding to a dimension value
+    :param anomalyDefinition: AnomalyDefinition object for which to run anomaly detection services
+    """
+    createAnomalyObjects(dimValsData, anomalyDefinition)
+    anomalyDefProps = {"granularity": anomalyDefinition.dataset.granularity, "highOrLow": anomalyDefinition.highOrLow}
+    detectionRuleType = "Prophet"
+    detectionParams = {}
+    if hasattr(anomalyDefinition, "detectionrule"):
+        detectionRuleType = anomalyDefinition.detectionrule.detectionRuleType.name
+        detectionParams = {param["param__name"]: param["value"] for param in anomalyDefinition.detectionrule.detectionruleparamvalue_set.all().values("param__name", "value")}
+
+    detectionServicePlatform = os.environ.get("DETECTION_SERVICE_PLATFORM")
+    if detectionServicePlatform == "AWS":
+        import requests
+        url = "https://wgofggwrv3.execute-api.ap-south-1.amazonaws.com/default/test-cueobserve"
+        result = []
+        for obj in dimValsData:
+            data = {
+                "dimValObj": {key: obj[key] for key in ["anomalyId", "dimVal", "contriPercent"]},
+                "dfDict": obj["df"].to_dict("records"),
+                "anomalyDefProps": anomalyDefProps,
+                "detectionRuleType": detectionRuleType,
+                "detectionParams": detectionParams,
+            }
+            print(f"Request sent for {obj['dimVal']}")
+            response = requests.post(url, data=json.dumps(data))
+            print(f"Received response with status code: {response.status_code}")
+            result.append(response.json())
+    else:
+        # Default case is anomaly detection via celery
+        detectionJobs = group(
+            _anomalyDetectionSubTask.s(
+                {key: obj[key] for key in ["anomalyId", "dimVal", "contriPercent"]},
+                obj["df"].to_dict("records"),
+                anomalyDefProps,
+                detectionRuleType,
+                detectionParams
+            )
+            for obj in dimValsData
+        )
+        _detectionJobs = detectionJobs.apply_async()
+        with allow_join_result():
+            result = _detectionJobs.get()
+        
+    saveAnomalyObjects(result)
+
+    return result
 
 
 @shared_task
@@ -71,18 +147,7 @@ def anomalyDetectionJob(anomalyDef_id: int, manualRun: bool = False):
             float(anomalyDefinition.value),
         )
 
-        detectionJobs = group(
-            _anomalyDetectionSubTask.s(
-                anomalyDef_id,
-                obj["dimVal"],
-                obj["contriPercent"],
-                obj["df"].to_dict("records"),
-            )
-            for obj in dimValsData
-        )
-        _detectionJobs = detectionJobs.apply_async()
-        with allow_join_result():
-            result = _detectionJobs.get()
+        result = distributeSubTasks(dimValsData, anomalyDefinition)
 
         Anomaly.objects.filter(
             id__in=[anomaly["anomalyId"] for anomaly in result if anomaly["success"]]
@@ -91,9 +156,9 @@ def anomalyDetectionJob(anomalyDef_id: int, manualRun: bool = False):
         logs["numAnomaliesPulished"] = len(
             [anomaly for anomaly in result if anomaly.get("published")]
         )
-        logs["numAnomalySubtasks"] = len(_detectionJobs)
+        logs["numAnomalySubtasks"] = len(dimValsData)
         logs["log"] = json.dumps(
-            {detection.id: detection.result for detection in _detectionJobs}
+            {anomaly["dimVal"]: anomaly for anomaly in result}
         )
         allTasksSucceeded = all([anomalyTask["success"] for anomalyTask in result])
     except Exception as ex:
