@@ -12,12 +12,13 @@ docker build -t cue-search .
 
 ## Run Development
 ``` sh
-docker run -v $(pwd):/code/ -p 8200:8200 cue-search
+docker run --network="host" -v $(pwd):/code/ -p 8200:8200 cue-search
 ```
 OR 
 ```sh
 python manage.py run
 ```
+visit http://127.0.0.1:8200/
 
 ### Migrations
 ```sh
