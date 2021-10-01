@@ -8,6 +8,7 @@ ANOMALY_ALERT_SLACK_ID = "Slack Channel ID for Anomaly Alerts"
 APP_ALERTS_SLACK_ID= "Slack Channel ID for App Monitoring"
 SLACK_BOT_TOKEN = "Bot User OAuth Access Token"
 SEND_EMAIL_TO = "Send Email To"
+WEBHOOK_URL = "Webhook URL"
 
 
 class Settings:
