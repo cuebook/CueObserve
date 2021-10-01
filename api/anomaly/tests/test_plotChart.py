@@ -163,6 +163,9 @@ def test_plotChart():
     dts = mixer.blend("anomaly.Dataset", granularity="day")
     adf = mixer.blend("anomaly.AnomalyDefinition", dataset=dts, periodicTask=None)
     anomaly = mixer.blend("anomaly.anomaly", anomalyDefinition=adf,data = data, lastRun=None)
+    setting = mixer.blend("anomaly.setting", name="Send Email To", value="admin@domain.com")
+    setting1 = mixer.blend("anomaly.setting", name="Webhook URL", value="https://www.google.com/")
+    anomalyTemplate = mixer.blend("anomaly.AnomalyCardTemplate", templateName = "Anomaly Daily Template Prophet", title="test", bodyText = "Test")
     img_str = PlotChartService.anomalyChartToImgStr(anomaly.id)
     message = "Hi there !"
     details = "Email alert on anomaly detection "
