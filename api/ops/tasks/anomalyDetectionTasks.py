@@ -79,7 +79,7 @@ def distributeSubTasks(dimValsData, anomalyDefinition):
     detectionServicePlatform = os.environ.get("DETECTION_SERVICE_PLATFORM")
     if detectionServicePlatform == "AWS":
         import requests
-        url = "https://wgofggwrv3.execute-api.ap-south-1.amazonaws.com/default/test-cueobserve"
+        url = os.environ.get("AWS_LAMBDA_URL")
         result = []
         for obj in dimValsData:
             data = {
