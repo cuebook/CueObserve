@@ -163,16 +163,8 @@ def test_plotChart():
     dts = mixer.blend("anomaly.Dataset", granularity="day")
     adf = mixer.blend("anomaly.AnomalyDefinition", dataset=dts, periodicTask=None)
     anomaly = mixer.blend("anomaly.anomaly", anomalyDefinition=adf,data = data, lastRun=None)
-    setting = mixer.blend("anomaly.setting", name="Send Email To", value="admin@domain.com")
-    img_str=""
     img_str = PlotChartService.anomalyChartToImgStr(anomaly.id)
-    title = "Test slack alert"
     message = "Hi there !"
-    token = "xoxb-somerandomnumbers"
-    channelId = "SCLKJDKLD"
-    SlackAlert.cueObserveAnomalyAlert(token, channelId, anomaly.id, title="", message="", details="")
-    name = "anomalyAlert"
-    SlackAlert.cueObserveAlert(token, channelId, title, message)
     details = "Email alert on anomaly detection "
     subject = "Email alert"
     EmailAlert.sendEmail(message, details, subject, anomaly.id)
