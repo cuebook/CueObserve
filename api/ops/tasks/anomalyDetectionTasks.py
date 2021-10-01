@@ -1,15 +1,17 @@
 import os
 import json
+import asyncio
 import traceback
 import logging
 import datetime as dt
-from anomaly.services.alerts import EmailAlert, WebHookAlert
+import aiohttp
 import html2text
 from django.template import Template, Context
 from django.db import transaction
 from celery import shared_task, group
 from celery.result import allow_join_result
 
+from anomaly.services.alerts import EmailAlert, WebHookAlert
 from anomaly.models import (
     Anomaly,
     AnomalyDefinition,
@@ -38,6 +40,38 @@ def _anomalyDetectionSubTask(dimValObj, dfDict, anomalyDefProps, detectionRuleTy
         dimValObj, dfDict, anomalyDefProps, detectionRuleType, detectionParams
     )
     return anomalyServiceResult
+
+async def _sendLambdaRequest(session, lambdaUrl, anomalyServiceObj):
+    """
+    Async method to send anomaly detection request to lambda
+    :param session: ClientSession instance for aiohttp
+    :param lambdaUrl: AWS Lambda invocation endpoint
+    :param anomalyServiceObject: Dict containing parameter data for anomaly service
+    """
+    resp = await session.post(lambdaUrl, data=json.dumps(anomalyServiceObj))
+    print(f"Request sent for {anomalyServiceObj['dimValObj']['dimVal']}")
+    responseData = await resp.json()
+    if(responseData.get("message") == "Endpoint request timed out"):
+        resp = await session.post(lambdaUrl, data=json.dumps(anomalyServiceObj))
+        print(f"Retrying request for {anomalyServiceObj['dimValObj']['dimVal']}")
+        responseData = await resp.json()
+    return responseData
+
+async def concurrentLambdaRequests(lambdaUrl, anomalyServiceObjects):
+    """
+    Async method to create and collect coroutines for all lambda requests
+    :param lambdaUrl: AWS Lambda invocation endpoint
+    :param anomalyServiceObjects: List of dicts containing parameter data for anomaly service
+    """
+    async with aiohttp.ClientSession() as session:
+        result = await asyncio.gather(
+            *(
+                _sendLambdaRequest(session, lambdaUrl, obj)
+                    for obj in anomalyServiceObjects
+                )
+            )
+        return result
+
 
 @transaction.atomic
 def createAnomalyObjects(dimValsData, anomalyDefinition):
@@ -80,21 +114,19 @@ def distributeSubTasks(dimValsData, anomalyDefinition):
 
     detectionServicePlatform = os.environ.get("DETECTION_SERVICE_PLATFORM")
     if detectionServicePlatform == "AWS":
-        import requests
-        url = os.environ.get("AWS_LAMBDA_URL")
-        result = []
-        for obj in dimValsData:
-            data = {
+        lambdaUrl = os.environ.get("AWS_LAMBDA_URL")
+        
+        anomalyServiceObjects = [
+            {
                 "dimValObj": {key: obj[key] for key in ["anomalyId", "dimVal", "contriPercent"]},
                 "dfDict": obj["df"].to_dict("records"),
                 "anomalyDefProps": anomalyDefProps,
                 "detectionRuleType": detectionRuleType,
                 "detectionParams": detectionParams,
-            }
-            print(f"Request sent for {obj['dimVal']}")
-            response = requests.post(url, data=json.dumps(data))
-            print(f"Received response with status code: {response.status_code}")
-            result.append(response.json())
+            }   for obj in dimValsData
+        ]
+
+        result = asyncio.run(concurrentLambdaRequests(lambdaUrl, anomalyServiceObjects))
     else:
         # Default case is anomaly detection via celery
         detectionJobs = group(
