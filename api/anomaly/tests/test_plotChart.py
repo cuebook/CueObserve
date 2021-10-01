@@ -166,15 +166,8 @@ def test_plotChart():
     setting = mixer.blend("anomaly.setting", name="Send Email To", value="admin@domain.com")
     setting1 = mixer.blend("anomaly.setting", name="Webhook URL", value="https://www.google.com/")
     anomalyTemplate = mixer.blend("anomaly.AnomalyCardTemplate", templateName = "Anomaly Daily Template Prophet", title="test", bodyText = "Test")
-    img_str=""
     img_str = PlotChartService.anomalyChartToImgStr(anomaly.id)
-    title = "Test slack alert"
     message = "Hi there !"
-    token = "xoxb-somerandomnumbers"
-    channelId = "SCLKJDKLD"
-    SlackAlert.cueObserveAnomalyAlert(token, channelId, anomaly.id, title="", message="", details="")
-    name = "anomalyAlert"
-    SlackAlert.cueObserveAlert(token, channelId, title, message)
     details = "Email alert on anomaly detection "
     subject = "Email alert"
     EmailAlert.sendEmail(message, details, subject, anomaly.id)
