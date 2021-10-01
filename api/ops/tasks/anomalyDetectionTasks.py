@@ -119,7 +119,7 @@ def distributeSubTasks(dimValsData, anomalyDefinition):
         anomalyServiceObjects = [
             {
                 "dimValObj": {key: obj[key] for key in ["anomalyId", "dimVal", "contriPercent"]},
-                "dfDict": obj["df"].to_dict("records"),
+                "dfDict": json.loads(obj["df"].to_json()),
                 "anomalyDefProps": anomalyDefProps,
                 "detectionRuleType": detectionRuleType,
                 "detectionParams": detectionParams,
