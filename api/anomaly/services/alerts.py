@@ -126,32 +126,50 @@ class EmailAlert:
 class WebHookAlert:
     """ Generic rest api for alert on webhook URL"""
     @staticmethod
-    def webhookAlertHelper(message, details, subject, anomalyDefId, anomalyId):
+    def webhookAlertHelper(name, subject, message, details = "", anomalyDefId : int = None, anomalyId : int = None):
         try:
             webhookURL = ''
             settings = Setting.objects.all()
             for setting in settings.values():
                 if setting["name"] == WEBHOOK_URL:
                     webhookURL = setting["value"]
-            WebHookAlert.webhookAlert(webhookURL, message, details, subject, anomalyDefId, anomalyId)
+            if name == "anomalyAlert":
+                WebHookAlert.webookAnomalyAlert(webhookURL, message, details, subject, anomalyDefId, anomalyId)
+            if name == "appAlert":
+                WebHookAlert.webookAppAlert(webhookURL, message, subject)
         except Exception as ex:
             logger.error("Webhook URL not given or URL not found:%s", str(ex))
 
 
     @staticmethod
-    def webhookAlert(url, message, details, subject, anomalyDefId, anomalyId):
-        """ Alert Json formatted message in given Webhook URL"""
+    def webookAnomalyAlert(url, message, details, subject, anomalyDefId, anomalyId):
+        """ Alerts Json formatted message in given Webhook URL, When anomaly is detected on anomaly definition """
         responseJson = {
             "subject":subject,
             "message":message,
             "details":details,
-            "Anomaly detected on anomaly definition Id ": anomalyDefId,
-            "Highest contributed anomaly Id":anomalyId,
+            "AnomalyDefinitionId": anomalyDefId,
+            "AnomalyId":anomalyId,
         }
         try:
             fileImg = PlotChartService.anomalyChartToImgStr(anomalyId)
             response = requests.post(url, data=responseJson, files={"fileImg": fileImg})
             if response.status_code == 200:
-                logger.info("Alert send to the URL :%s", str(url))
+                logger.info("Alert sent to the URL :%s", str(url))
+        except Exception as ex:
+            logger.error("Webhook URL not accepting json data format or Wrong Webhook URL given :%s", str(ex))
+            
+    @staticmethod
+    def webookAppAlert(url, message, subject):
+        """ Alerts JSON formatted message when anomaly detection job fails """
+        responseJson = {
+            "subject":subject,
+            "message":message,
+        }
+        try:
+            response = requests.post(url, data=responseJson)
+            if response.status_code == 200:
+                logger.info("Alert sent to the URL :%s", str(url))
+
         except Exception as ex:
             logger.error("Webhook URL not accepting json data format or Wrong Webhook URL given :%s", str(ex))
