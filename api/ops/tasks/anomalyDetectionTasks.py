@@ -1,8 +1,9 @@
 import json
 import traceback
+import logging
 import datetime as dt
 import pandas as pd
-from anomaly.services.alerts import EmailAlert
+from anomaly.services.alerts import EmailAlert, WebHookAlert
 import html2text
 from django.template import Template, Context
 from celery import shared_task, group
@@ -25,6 +26,7 @@ ANOMALY_DETECTION_RUNNING = "RUNNING"
 ANOMALY_DETECTION_SUCCESS = "SUCCESS"
 ANOMALY_DETECTION_ERROR = "ERROR"
 
+logger = logging.getLogger(__name__)
 
 @shared_task
 def _anomalyDetectionSubTask(anomalyDef_id, dimVal, contriPercent, dfDict):
@@ -45,7 +47,6 @@ def anomalyDetectionJob(anomalyDef_id: int, manualRun: bool = False):
     :param anomalyDef_id: ID of the anomaly definition
     :param manualRun: Boolean determining whether task was manually initiated
     """
-
     from anomaly.services.alerts import SlackAlert
 
     runType = "Manual" if manualRun else "Scheduled"
@@ -151,7 +152,6 @@ def anomalyDetectionJob(anomalyDef_id: int, manualRun: bool = False):
             SlackAlert.slackAlertHelper(title, message, name, details=details, anomalyId=anomalyId)
         
             ################################################## Email Alert ############################################################
-
             numPublished = logs["numAnomaliesPulished"]
             messageHtml = f"{numPublished} {'anomalies' if numPublished > 1 else 'anomaly'} published. <br>"
             messageHtml = (
@@ -175,6 +175,11 @@ def anomalyDetectionJob(anomalyDef_id: int, manualRun: bool = False):
             detailsHtml = detailsHtml + Template(cardTemplate.bodyText).render(Context(data)) +"<br>"
             EmailAlert.sendEmail(messageHtml, detailsHtml, subjectHtml, anomalyId)
 
+            ############################################################### Webhook Alert #############################################################################
+            
+            numPublished = logs["numAnomaliesPulished"]
+            webhookAlertMessageFormat(numPublished, anomalyDefinition)
+
     if runStatusObj.status == ANOMALY_DETECTION_ERROR:
         message = (
             "Anomaly Detection Job failed on AnomalyDefintion id : "
@@ -184,3 +189,47 @@ def anomalyDetectionJob(anomalyDef_id: int, manualRun: bool = False):
         message = message + str(logs["log"])
         name = "appAlert"
         SlackAlert.slackAlertHelper(title, message, name)
+
+
+
+def webhookAlertMessageFormat(numPublished, anomalyDefinition: AnomalyDefinition):
+    """ Format message for webhook URL alert"""
+    try:
+        textMessage = f"{numPublished} {'anomalies' if numPublished > 1 else 'anomaly'} published. "
+        topNtext = (
+            f" Top {anomalyDefinition.value}"
+            if int(float(anomalyDefinition.value)) > 0
+            else ""
+        )
+        dimText = f" {anomalyDefinition.dimension}" if anomalyDefinition.dimension else ""
+        highLowText = f" {anomalyDefinition.highOrLow}" if anomalyDefinition.highOrLow else ""
+        textMessage = (
+            textMessage
+            + f"Anomaly Definition: {anomalyDefinition.metric}{dimText}{highLowText}{topNtext}"+", "
+        )
+        textMessage = (
+            textMessage
+            + f"Dataset: {anomalyDefinition.dataset.name}" + ", "
+        )
+        textMessage = (
+            textMessage +  f"Granularity: {anomalyDefinition.dataset.granularity}" + ", "
+        )
+        highestContriAnomaly = anomalyDefinition.anomaly_set.order_by(
+            "data__contribution"
+        ).last()
+        anomalyId = highestContriAnomaly.id
+        data = AnomalySerializer(highestContriAnomaly).data
+        templateName = anomalyDefinition.getAnomalyTemplateName()
+        cardTemplate = AnomalyCardTemplate.objects.get(templateName=templateName)
+        data.update(data["data"]["anomalyLatest"])
+        textSubject = (
+            html2text.html2text(Template(cardTemplate.title).render(Context(data))).replace("**", "").replace("\n","")
+        
+        )
+        textDetails = Template(cardTemplate.title).render(Context(data)) + " "
+        textDetails = textDetails + Template(cardTemplate.bodyText).render(Context(data)) + " "
+        textDetails = textDetails.replace("<b>", "").replace("</b>", "")
+        WebHookAlert.webhookAlertHelper(textMessage, textDetails, textSubject, anomalyDefinition.id, anomalyId)
+    except Exception as ex:
+        logger.error("Webhook alert failed ",str(ex))
+

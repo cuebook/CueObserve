@@ -1,8 +1,8 @@
 import logging
 import os
 from email.mime.image import MIMEImage
-
 import requests
+from anomaly.services.settings import ANOMALY_ALERT_SLACK_ID, APP_ALERTS_SLACK_ID, SLACK_BOT_TOKEN, SEND_EMAIL_TO, WEBHOOK_URL
 from anomaly.models import Setting
 from anomaly.services.plotChart import PlotChartService
 from anomaly.services.settings import ANOMALY_ALERT_SLACK_ID, APP_ALERTS_SLACK_ID, SEND_EMAIL_TO, SLACK_BOT_TOKEN
@@ -15,7 +15,8 @@ ALERT_API_URL = os.environ.get("ALERT_API_URL", "http://localhost:8100")
 
 class SlackAlert:
 
-    def slackAlertHelper(title, message, name, details="", anomalyId: int = None):
+    @staticmethod
+    def slackAlertHelper(title, message, name, details="", anomalyId: int = None ):
         """
         Helper method for slackAlert
         """
@@ -98,3 +99,36 @@ class EmailAlert:
             logger.info("Email sent successfully !")
         except Exception as ex:
             logger.error(f"Email sent procedure failed ! {ex}")
+
+class WebHookAlert:
+    """ Generic rest api for alert on webhook URL"""
+    @staticmethod
+    def webhookAlertHelper(message, details, subject, anomalyDefId, anomalyId):
+        try:
+            webhookURL = ''
+            settings = Setting.objects.all()
+            for setting in settings.values():
+                if setting["name"] == WEBHOOK_URL:
+                    webhookURL = setting["value"]
+            WebHookAlert.webhookAlert(webhookURL, message, details, subject, anomalyDefId, anomalyId)
+        except Exception as ex:
+            logger.error("Webhook URL not given or URL not found:%s", str(ex))
+
+
+    @staticmethod
+    def webhookAlert(url, message, details, subject, anomalyDefId, anomalyId):
+        """ Alert Json formatted message in given Webhook URL"""
+        responseJson = {
+            "subject":subject,
+            "message":message,
+            "details":details,
+            "Anomaly detected on anomaly definition Id ": anomalyDefId,
+            "Highest contributed anomaly Id":anomalyId,
+        }
+        try:
+            fileImg = PlotChartService.anomalyChartToImgStr(anomalyId)
+            response = requests.post(url, data=responseJson, files={"fileImg": fileImg})
+            if response.status_code == 200:
+                logger.info("Alert send to the URL :%s", str(url))
+        except Exception as ex:
+            logger.error("Webhook URL not accepting json data format or Wrong Webhook URL given :%s", str(ex))

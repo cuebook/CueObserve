@@ -28,7 +28,7 @@ class ClickHouse:
             params.update({
                 "host": host,
                 "port": port,
-                "username": username,
+                "user": username,
                 "password": password,
                 "database": database,
             })
@@ -40,6 +40,8 @@ class ClickHouse:
                 })
 
             client = ch.Client(settings={'use_numpy': True}, **params)
+        dataframe = client.query_dataframe("select 1")
+
         return client
 
     @staticmethod
