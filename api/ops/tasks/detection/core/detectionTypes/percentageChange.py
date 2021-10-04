@@ -26,6 +26,7 @@ def percentChangeDetect(df, granularity, threshold):
     """
     Method to perform anomaly detection on given dataframe using fbProphet
     """
+    threshold = float(threshold)
     today = dt.datetime.now()
     df["ds"] = pd.to_datetime(df["ds"])
     df = df.sort_values("ds")

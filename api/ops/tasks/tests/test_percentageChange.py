@@ -1,6 +1,6 @@
 import pandas as pd
 from pandas import Timestamp
-from ops.tasks.detectionTypes.percentageChange import percentChangeDetect
+from ops.tasks.detection.core.detectionTypes.percentageChange import percentChangeDetect
 
 def testPercentChange():
     df = pd.DataFrame([{'ds': Timestamp('2020-07-12 00:00:00+0000', tz='UTC'), 'y': 484},

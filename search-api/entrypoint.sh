@@ -5,6 +5,7 @@ if [[ $ENVIRONMENT == "PRODUCTION" ]]
 then
 	echo production 
 else
+	export FLASK_ENV=development
 	pip install ipython
 	pip install -r requirements.txt
 	chmod -R 777 /code/

@@ -180,3 +180,92 @@ def test_datasets(client, mocker):
     assert dimValsData[1]["df"].iloc[0]["y"] == 7
     assert "Lucknow" in [dimVal["dimVal"] for dimVal in dimValsData]
 
+
+def test_nonRollupDataset():
+    datasetDf = pd.DataFrame([{'CREATEDTS': '2021-09-29T00:00:00.000Z',
+        'Brand': 'Adidas',
+        'OrderAmount': 225020.0},
+        {'CREATEDTS': '2021-09-29T00:00:00.000Z',
+        'Brand': 'Zara',
+        'OrderAmount': 1823.0},
+        {'CREATEDTS': '2021-09-28T00:00:00.000Z',
+        'Brand': 'Adidas',
+        'OrderAmount': 314205.0},
+        {'CREATEDTS': '2021-09-28T00:00:00.000Z',
+        'Brand': 'Zara',
+        'OrderAmount': 4713.0},
+        {'CREATEDTS': '2021-09-27T00:00:00.000Z',
+        'Brand': 'Adidas',
+        'OrderAmount': 132845.0},
+        {'CREATEDTS': '2021-09-27T00:00:00.000Z',
+        'Brand': 'Zara',
+        'OrderAmount': 3207.74},
+        {'CREATEDTS': '2021-09-26T00:00:00.000Z',
+        'Brand': 'Adidas',
+        'OrderAmount': 141930.0},
+        {'CREATEDTS': '2021-09-26T00:00:00.000Z',
+        'Brand': 'Zara',
+        'OrderAmount': 3657.7},
+        {'CREATEDTS': '2021-09-25T00:00:00.000Z',
+        'Brand': 'Adidas',
+        'OrderAmount': 105760.0},
+        {'CREATEDTS': '2021-09-25T00:00:00.000Z',
+        'Brand': 'Zara',
+        'OrderAmount': 6733.0},
+        {'CREATEDTS': '2021-09-24T00:00:00.000Z',
+        'Brand': 'Adidas',
+        'OrderAmount': 105375.0},
+        {'CREATEDTS': '2021-09-24T00:00:00.000Z',
+        'Brand': 'Zara',
+        'OrderAmount': 7752.56},
+        {'CREATEDTS': '2021-09-23T00:00:00.000Z',
+        'Brand': 'Adidas',
+        'OrderAmount': 106010.0},
+        {'CREATEDTS': '2021-09-23T00:00:00.000Z',
+        'Brand': 'Zara',
+        'OrderAmount': 6800.0},
+        {'CREATEDTS': '2021-09-22T00:00:00.000Z',
+        'Brand': 'Adidas',
+        'OrderAmount': 139675.0},
+        {'CREATEDTS': '2021-09-22T00:00:00.000Z',
+        'Brand': 'Zara',
+        'OrderAmount': 3889.0},
+        {'CREATEDTS': '2021-09-21T00:00:00.000Z',
+        'Brand': 'Adidas',
+        'OrderAmount': 179230.0},
+        {'CREATEDTS': '2021-09-21T00:00:00.000Z',
+        'Brand': 'Zara',
+        'OrderAmount': 3622.39},
+        {'CREATEDTS': '2021-09-20T00:00:00.000Z',
+        'Brand': 'Adidas',
+        'OrderAmount': 174915.0},
+        {'CREATEDTS': '2021-09-20T00:00:00.000Z',
+        'Brand': 'Zara',
+        'OrderAmount': 3879.0}])
+
+    dimValsData = prepareAnomalyDataframes(
+        datasetDf,
+        "CREATEDTS",
+        "OrderAmount",
+        "Brand",
+        "Min Avg Value",
+        float(1000),
+        True
+    )
+
+    assert len(dimValsData) == 2
+    assert dimValsData[0]["dimVal"] == "Adidas"
+    assert dimValsData[1]["dimVal"] == "Zara"
+
+    dimValsData = prepareAnomalyDataframes(
+        datasetDf,
+        "CREATEDTS",
+        "OrderAmount",
+        "Brand",
+        "Min Avg Value",
+        float(10000), #Checking for minAvg 10000
+        True
+    )
+
+    assert len(dimValsData) == 1
+    assert dimValsData[0]["dimVal"] == "Adidas"
