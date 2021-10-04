@@ -1,16 +1,14 @@
 import json
 import traceback
-import pandas as pd
 import datetime as dt
 import dateutil.parser as dp
 
-from anomaly.models import Anomaly
+import pandas as pd
 
 from .detectionTypes.prophet import prophetDetect
 from .detectionTypes.percentageChange import percentChangeDetect
 from .detectionTypes.lifetime import lifetimeDetect
 from .detectionTypes.valueThreshold import valueThresholdDetect
-
 
 def dataFrameEmpty(df):
     """Checks whether dataFrame has enough data for prophet"""
@@ -23,54 +21,37 @@ def dataFrameEmpty(df):
     return False
 
 
-def detect(df, granularity, detectionRuleType, anomalyDef, limit=None):
+def detect(df, granularity, detectionRuleType, detectionParams, limit=None):
     """
     Method to detect anomaly depending on the detection rule type
     """
     if detectionRuleType == "Prophet":
         return prophetDetect(df, granularity, limit)
     elif detectionRuleType == "Percentage Change":
-        threshold = float(
-            anomalyDef.detectionrule.detectionruleparamvalue_set.get(
-                param__name="threshold"
-            ).value
-        )
-        return percentChangeDetect(df, granularity, threshold)
+        return percentChangeDetect(df, granularity, detectionParams["threshold"])
     elif detectionRuleType == "Lifetime High/Low":
         return lifetimeDetect(df, granularity)
     elif detectionRuleType == "Value Threshold":
-        operator = anomalyDef.detectionrule.detectionruleparamvalue_set.get(
-            param__name="operator"
-        ).value
-        value1 = anomalyDef.detectionrule.detectionruleparamvalue_set.get(
-            param__name="value1"
-        ).value
-        value2 = anomalyDef.detectionrule.detectionruleparamvalue_set.get(
-            param__name="value2"
-        ).value
-        return valueThresholdDetect(df, granularity, operator, value1, value2)
+        return valueThresholdDetect(df, granularity, detectionParams["operator"], detectionParams["value1"], detectionParams["value2"])
 
 
-def anomalyService(anomalyDef, dimVal, contriPercent, df):
+def anomalyService(dimValObj, dfDict, anomalyDefProps, detectionRuleType, detectionParams):
     """
     Method to conduct the anomaly detection process
     """
-    anomalyObj, _ = Anomaly.objects.get_or_create(
-        anomalyDefinition=anomalyDef, dimensionVal=dimVal, published=False
-    )
-    output = {"dimVal": dimVal}
+    df = pd.DataFrame(dfDict)
+    anomalyId = dimValObj["anomalyId"]
+    dimVal = dimValObj["dimVal"]
+    contriPercent = dimValObj["contriPercent"]
+    output = {"dimVal": dimVal, "anomalyId": anomalyId}
+    granularity = anomalyDefProps["granularity"]
     try:
         if dataFrameEmpty(df):
             output["error"] = json.dumps({"message": "Insufficient data in dataframe."})
             output["success"] = False
             return output
-        granularity = anomalyDef.dataset.granularity
-        detectionRuleType = (
-            anomalyDef.detectionrule.detectionRuleType.name
-            if hasattr(anomalyDef, "detectionrule")
-            else "Prophet"
-        )
-        result = detect(df, granularity, detectionRuleType, anomalyDef)
+
+        result = detect(df, granularity, detectionRuleType, detectionParams)
         result["contribution"] = contriPercent
         toPublish = False
         if result["anomalyLatest"]:
@@ -81,17 +62,14 @@ def anomalyService(anomalyDef, dimVal, contriPercent, df):
                 - dp.parse(result["anomalyLatest"]["anomalyTimeISO"]).timestamp()
                 <= timeThreshold
             )
-            if anomalyDef.highOrLow:
+            if anomalyDefProps["highOrLow"]:
                 toPublish = (
                     toPublish
-                    and anomalyDef.highOrLow.lower()
+                    and anomalyDefProps["highOrLow"].lower()
                     == result["anomalyLatest"]["highOrLow"]
                 )
-        anomalyObj.data = result
-        anomalyObj.published = toPublish
-        anomalyObj.save()
+        output["data"] = result
         output["published"] = toPublish
-        output["anomalyId"] = anomalyObj.id
         output["success"] = True
     except Exception as ex:
         output["error"] = json.dumps(
