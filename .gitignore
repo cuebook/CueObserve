@@ -124,5 +124,6 @@ ui/node_modules
 
 # VS Code
 .vscode/
-
 ui/package-lock.json
+
+.idea/

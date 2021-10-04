@@ -32,6 +32,10 @@ Install via Docker
 ```
 docker run -p 3000:3000 cuebook/cueobserve
 ```
+**Or** build from codebase via docker-compose:
+```
+docker-compose up -d
+```
 Now visit [http://localhost:3000](http://localhost:3000) in your browser. 
 
 ## Demo Video

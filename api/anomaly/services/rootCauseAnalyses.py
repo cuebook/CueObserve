@@ -9,7 +9,7 @@ from app.celery import app
 
 from anomaly.models import RootCauseAnalysis, RCAAnomaly, Anomaly
 from anomaly.serializers import RootCauseAnalysisSerializer, RCAAnomalySerializer
-from ops.tasks.anomalyDetection import detect, dataFrameEmpty
+from ops.tasks.detection.core.anomalyDetection import detect, dataFrameEmpty
 
 logger = logging.getLogger(__name__)
 
