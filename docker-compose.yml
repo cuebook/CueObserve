@@ -16,12 +16,20 @@ services:
       - ${PWD}/alerts-api:/code:rw
     network_mode: "host"
 
+  cueo-search:
+    build:
+      context: search-api
+      dockerfile: Dockerfile
+    volumes:
+      - ${PWD}/search-api:/code:rw
+    network_mode: "host"
+
   cueo-frontend:
     build:
       context: ui
       dockerfile: Dockerfile
-    volumes:
-      - /frontend:/app
+    # volumes:
+    #   - /frontend:/app
     network_mode: "host"
 
   postgresql-cue:
