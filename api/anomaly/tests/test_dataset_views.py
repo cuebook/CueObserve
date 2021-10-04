@@ -26,7 +26,8 @@ def test_datasets(client, mocker):
         "metrics": ["Amount", "Quantity"],
         "dimensions": ["Category", "Region"],
         "timestamp": "CreatedAt",
-        "granularity": "day"
+        "granularity": "day",
+        "isNonRollup": False
     }
     response = client.post(path, data=data, content_type="application/json")
 
@@ -50,7 +51,7 @@ def test_datasets(client, mocker):
     assert response.status_code == 200
     assert response.data['data']
     assert response.data['data']['name'] == "something"
-    assert set(response.data['data'].keys()) == set(['id', 'name', 'sql', 'connection', 'dimensions', 'metrics', 'granularity', 'timestampColumn', 'anomalyDefinitionCount'])
+    assert set(response.data['data'].keys()) == set(['id', 'name', 'sql', 'connection', 'dimensions', 'metrics', 'granularity', 'timestampColumn', 'anomalyDefinitionCount', 'isNonRollup'])
 
 
     # Update dataset
@@ -61,7 +62,8 @@ def test_datasets(client, mocker):
         "metrics": ["Amount", "Quantity"],
         "dimensions": ["Category", "Region"],
         "timestamp": "CreatedAt",
-        "granularity": "day"
+        "granularity": "day",
+        "isNonRollup": False
     }
     path = reverse("dataset", kwargs={"datasetId": dataset['id']})
     response = client.post(path, data=data, content_type="application/json")

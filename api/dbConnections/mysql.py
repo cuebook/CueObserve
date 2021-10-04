@@ -2,7 +2,7 @@ from dbConnections.utils import limitSql
 import json
 import logging
 import pandas as pd
-# from MySQLdb import connect
+from MySQLdb import connect
 logger = logging.getLogger(__name__)
 
 
