@@ -1,7 +1,7 @@
 # Build frontend
 FROM node:12-slim as builder
 
-WORKDIR /usr/src/app
+WORKDIR /app
 COPY package.json ./
 RUN yarn install --silent
 COPY . ./

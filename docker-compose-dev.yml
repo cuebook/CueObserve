@@ -26,13 +26,16 @@ services:
       context: alerts-api
       dockerfile: Dockerfile
     volumes:
-      - ${PWD}/alerts-api:/code:rw
+      - ./alerts-api:/code:rw
     network_mode: "host"
 
   cueo-frontend:
     build:
       context: ui
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
+    stdin_open: true
+    volumes:
+      - ./ui/src:/app/src:rw
     network_mode: "host"
 
   cueo-postgresql:
@@ -49,14 +52,6 @@ services:
   cueo-redis:
     image: redis
     network_mode: "host"
-
-
-networks:
-  external-network:
-    external:
-      name: nginx-web
-  cue-network:
-    internal: true
 
 volumes:
   pgdata:
