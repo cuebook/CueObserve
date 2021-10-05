@@ -3,7 +3,7 @@ import { Button, Switch } from "antd";
 import React, { useState, useEffect } from "react";
 import { Link, Redirect } from "react-router-dom";
 import style from "./style.module.scss";
-import userService from "services/user"
+import userService from "services/main/user"
 import Admin from "layouts/Admin"
 import Login from "components/System/User/Login/index"
 import { LogoutOutlined } from '@ant-design/icons';

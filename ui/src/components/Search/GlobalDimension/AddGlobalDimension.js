@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Button, Form, Input, Switch, message, Select } from "antd";
 import style from "./style.module.scss";
 
-import searchService from "services/search.js"
+import searchService from "services/main/search.js"
 
 const { Option } = Select;
 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Table, Button, Popconfirm, Input, message, Tooltip, Drawer } from "antd";
 import style from "./style.module.scss";
-import scheduleService from "services/schedules.js"
+import scheduleService from "services/main/schedules.js"
 import EditSchedule from "components/Schedules/EditSchedule.js"
 import AddSchedule from "components/Schedules/AddSchedule.js"
 import { EyeOutlined, DeleteOutlined , EditOutlined} from '@ant-design/icons';

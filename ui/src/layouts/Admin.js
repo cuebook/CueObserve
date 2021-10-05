@@ -21,7 +21,7 @@ import Login from "components/System/User/Login/index"
 
 // contexts
 import { GlobalContextProvider } from "./GlobalContext";
-import userServices from "services/user.js"
+import userServices from "services/main/user.js"
 
 // Search 
 import GlobalDimensionTable from "views/admin/GlobalDimension"

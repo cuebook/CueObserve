@@ -4,7 +4,7 @@ import { Form, Input, Button } from "antd";
 import { Link } from "react-router-dom";
 import style from "./style.module.scss";
 import Footer from "../../AuthFooter/index.js"
-import userServices from "services/user.js"
+import userServices from "services/main/user.js"
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 
 

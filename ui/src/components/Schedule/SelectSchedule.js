@@ -13,7 +13,7 @@ import {
   } from "antd";
 import AddSchedule from "./AddSchedule";
 
-import scheduleService from "services/schedules.js"
+import scheduleService from "services/main/schedules.js"
 
 
 const { Option } = Select;

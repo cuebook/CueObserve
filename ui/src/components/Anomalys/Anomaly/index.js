@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import style from "./style.module.scss";
 import { useParams, useHistory } from 'react-router-dom';
-import anomalyService from "services/anomalys";
+import anomalyService from "services/main/anomalys";
 import AnomalyChart from "components/Anomalys/AnomalyChart"
 import RootCauseAnalysis from "components/RootCauseAnalysis"
 

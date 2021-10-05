@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import TimeAgo from 'react-timeago';
 import _ from "lodash";
-import anomalyService from "services/anomalys";
+import anomalyService from "services/main/anomalys";
 import style from "./style.module.scss";
 import { useHistory } from "react-router-dom";
 import {search} from "services/general.js"
