@@ -15,4 +15,4 @@ FROM nginx:1.17
 COPY --from=builder /app/build /app/build
 
 # # Copy nginx configuration
-ADD /app/nginx.conf /etc/nginx/conf.d/default.conf
+ADD nginx.conf /etc/nginx/conf.d/default.conf
