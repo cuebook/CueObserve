@@ -54,6 +54,12 @@ export default function Sidebar(props) {
       "path": "/settings",
       "icon": "fa-cogs"
     },
+
+    {
+      "label": "Global Dimension",
+      "path": "/search/global-dimension",
+      "icon": "fa-cube"
+    },
   ]
 
   let menuElements = []

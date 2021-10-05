@@ -354,3 +354,56 @@ class RootCauseAnalysisSerializer(serializers.ModelSerializer):
         model = RootCauseAnalysis
         fields = ["status", "logs", "startTimestamp", "endTimestamp"]
 
+
+class AllDimensionsSerializer(serializers.ModelSerializer):
+    """
+    Serializes data related to anomaly tree 
+    """
+    connectionName = serializers.SerializerMethodField()
+    dimensions = serializers.SerializerMethodField()
+
+    def get_connectionName(self, obj):
+        """
+        Gets connection name
+        """
+        return obj.connection.name
+
+    def get_dimensions(self, obj):
+        dimensions = json.loads(obj.dimensions) if obj.metrics else []
+        return dimensions if dimensions else []
+
+    # def get_metrics(self, obj):
+    #     metrics = json.loads(obj.metrics) if obj.metrics else []
+    #     return metrics if metrics else []
+
+    class Meta:
+        model = Dataset
+        fields = ['id', 'name','connectionName' ,'dimensions', 'granularity']
+
+
+class AllMeticsSerializer(serializers.ModelSerializer):
+    """
+    Serializes data related to anomaly tree 
+    """
+    connectionName = serializers.SerializerMethodField()
+    metrics = serializers.SerializerMethodField()
+
+    def get_connectionName(self, obj):
+        """
+        Gets connection name
+        """
+        return obj.connection.name
+
+    # def get_dimensions(self, obj):
+    #     dimensions = json.loads(obj.dimensions) if obj.metrics else []
+    #     return dimensions if dimensions else []
+
+    def get_metrics(self, obj):
+        metrics = json.loads(obj.metrics) if obj.metrics else []
+        return metrics if metrics else []
+
+    class Meta:
+        model = Dataset
+        fields = ['id', 'name','connectionName' ,'metrics', 'granularity']
+
+

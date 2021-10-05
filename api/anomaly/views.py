@@ -16,6 +16,7 @@ from anomaly.services import (
     Settings,
     DetectionRules,
     RootCauseAnalyses,
+    search,
 )
 
 
@@ -374,4 +375,10 @@ class RCAView(APIView):
     def delete(self, request, anomalyId: int):
         """make RCA request"""
         res = RootCauseAnalyses.abortRCA(anomalyId)
+        return Response(res.json())
+
+class DimensionView(APIView):
+    def get(self, request):
+        """get dimension"""
+        res = search.SearchUtils.getAllDimensions()
         return Response(res.json())
