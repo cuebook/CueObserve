@@ -16,7 +16,7 @@ docker run --network="host" -v $(pwd):/code/ -p 8200:8200 cue-search
 ```
 OR 
 ```sh
-python manage.py run
+flask run
 ```
 visit http://127.0.0.1:8200/
 
@@ -29,4 +29,9 @@ flask db migrate
 Exec in container & then install 
 ```sh
 python -m pip install <package-name>
+```
+
+## For logging/printing in running
+```python
+app.logger.info("logs in console")
 ```

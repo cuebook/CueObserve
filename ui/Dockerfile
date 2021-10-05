@@ -2,16 +2,16 @@
 FROM node:12-slim as builder
 
 WORKDIR /app
-COPY package.json ./
-RUN yarn install --silent
-COPY . ./
-RUN yarn build
+ENV PATH /app/node_modules/.bin:$PATH
+
+COPY package.json /app/
+RUN npm install --silent
+COPY . /app/
+RUN npm run build
 
 # Build a static version in a separate image
 FROM nginx:1.17
-WORKDIR /usr/src/app
+COPY --from=builder /app/build /app/build
 
-# Copy nginx configuration
-COPY --from=builder /usr/src/app/build ./build
-
-ADD nginx.conf /etc/nginx/conf.d/default.conf
+# # Copy nginx configuration
+ADD /app/nginx.conf /etc/nginx/conf.d/default.conf
