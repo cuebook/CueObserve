@@ -1,29 +1,22 @@
 import os
 
 # Enable Development Env
-
 DEBUG = True
 
 # Application Directory
-
-
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 # # Example DB Configuration
+if os.environ.get("SEARCH_POSTGRES_DB_HOST", None):
+    POSTGRES_DB_NAME = os.environ.get("SEARCH_POSTGRES_DB_SCHEMA")
+    POSTGRES_DB_USER = os.environ.get("SEARCH_POSTGRES_DB_USERNAME")
+    POSTGRES_DB_PASSWORD = os.environ.get("SEARCH_POSTGRES_DB_PASSWORD")
+    POSTGRES_DB_HOST = os.environ.get("SEARCH_POSTGRES_DB_HOST")
+    POSTGRES_DB_PORT = os.environ.get("SEARCH_POSTGRES_DB_PORT")
 
-
-if os.environ.get("POSTGRES_DB_HOST", False):
-	POSTGRES_DB_NAME = os.environ.get("POSTGRES_DB_SCHEMA")
-	POSTGRES_DB_USER = os.environ.get("POSTGRES_DB_USERNAME")
-	POSTGRES_DB_PASSWORD = os.environ.get("POSTGRES_DB_PASSWORD")
-	POSTGRES_DB_HOST = os.environ.get("POSTGRES_DB_HOST")
-	POSTGRES_DB_PORT = os.environ.get("POSTGRES_DB_PORT")
-
-	SQLALCHEMY_DATABASE_URI = f"postgresql://{POSTGRES_DB_USER}:{POSTGRES_DB_PASSWORD}@{POSTGRES_DB_HOST}:{POSTGRES_DB_PORT}/{POSTGRES_DB_NAME}"
+    SQLALCHEMY_DATABASE_URI = f"postgresql://{POSTGRES_DB_USER}:{POSTGRES_DB_PASSWORD}@{POSTGRES_DB_HOST}:{POSTGRES_DB_PORT}/{POSTGRES_DB_NAME}"
 else:
-	SQLALCHEMY_DATABASE_URI = f"sqlite:////{BASE_DIR}/db/db.sqlite3"
-
-
+    SQLALCHEMY_DATABASE_URI = f"sqlite:////{BASE_DIR}/db/db.sqlite3"
 
 # DATABASE_CONNECT_OPTIONS = {}
 
