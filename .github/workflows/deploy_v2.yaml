@@ -143,6 +143,8 @@ jobs:
   deploy-all:
     runs-on: ubuntu-latest
     needs: [build-and-push-frontend, build-and-push-backend, build-and-push-alerts, build-and-push-search]
+    
+    steps:
     - name: Deploy to cluster
       uses: ianbelcher/eks-kubectl-action@master
       with:
