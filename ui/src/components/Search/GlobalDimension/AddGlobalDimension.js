@@ -3,6 +3,7 @@ import { Button, Form, Input, Switch, message, Select } from "antd";
 import style from "./style.module.scss";
 
 import searchService from "services/main/search.js"
+import globalDimensionService from "services/search/globalDimension.js"
 
 const { Option } = Select;
 
@@ -47,7 +48,7 @@ export default function AddGlobalDimension(props) {
         // createGlobalDimension(payload)
         props.onAddGlobalDimensionSuccess()
 
-        const response = await searchService.AddGlobalDimension(payload)
+        const response = await globalDimensionService.AddGlobalDimension(payload)
 
         // if(response.success){
         //     props.onAddGlobalDimensionSuccess()

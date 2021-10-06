@@ -3,7 +3,7 @@ import apiService from "./api";
 class GlobalDimensionService {
 
     async AddGlobalDimension(payload){
-        const response = await apiService.post("/global-dimension/create", payload)
+        const response = await apiService.post("globalDimension/create/", payload)
         return response
     }
 
