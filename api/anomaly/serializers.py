@@ -133,7 +133,7 @@ class DatasetSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Dataset
-        fields = ['id', 'name', 'sql', 'connection', 'dimensions', 'metrics', 'granularity', 'timestampColumn', 'anomalyDefinitionCount']
+        fields = ['id', 'name', 'sql', 'connection', 'dimensions', 'metrics', 'granularity', 'timestampColumn', 'anomalyDefinitionCount', 'isNonRollup']
 
 class AnomalyDefinitionSerializer(serializers.ModelSerializer):
     """
@@ -147,6 +147,7 @@ class AnomalyDefinitionSerializer(serializers.ModelSerializer):
     datasetName = serializers.SerializerMethodField()
     datasetGranularity = serializers.SerializerMethodField()
     detectionRule = serializers.SerializerMethodField()
+    datasetIsNonRollup = serializers.SerializerMethodField()
     
     def get_datasetName(self, obj):
         """
@@ -212,9 +213,13 @@ class AnomalyDefinitionSerializer(serializers.ModelSerializer):
             return {"detectionRuleType": {"name": "Prophet"}, "params": {}, "detectionRuleStr": "Prophet"}
 
     
+    def get_datasetIsNonRollup(self, obj):
+        return obj.dataset.isNonRollup
+
+    
     class Meta:
         model = AnomalyDefinition
-        fields = ["id",  "anomalyDef", "schedule", "lastRun", "lastRunStatus", "lastRunAnomalies", "datasetName", "datasetGranularity", "detectionRule"]
+        fields = ["id",  "anomalyDef", "schedule", "lastRun", "lastRunStatus", "lastRunAnomalies", "datasetName", "datasetGranularity", "detectionRule", "datasetIsNonRollup"]
 
 class AnomalySerializer(serializers.ModelSerializer):
     """
@@ -225,6 +230,7 @@ class AnomalySerializer(serializers.ModelSerializer):
     metric = serializers.SerializerMethodField()
     dimension = serializers.SerializerMethodField()
     detectionRuleStr = serializers.SerializerMethodField()
+    datasetIsNonRollup = serializers.SerializerMethodField()
 
     def get_datasetName(self, obj):
         return obj.anomalyDefinition.dataset.name
@@ -243,10 +249,13 @@ class AnomalySerializer(serializers.ModelSerializer):
             return str(obj.anomalyDefinition.detectionrule)
         else:
             return "Prophet"
+    
+    def get_datasetIsNonRollup(self, obj):
+        return obj.anomalyDefinition.dataset.isNonRollup
 
     class Meta:
         model = Anomaly
-        fields = ["id", "datasetName", "published", "dimension", "dimensionVal", "granularity", "metric", "data", "detectionRuleStr"]
+        fields = ["id", "datasetName", "published", "dimension", "dimensionVal", "granularity", "metric", "data", "detectionRuleStr", "datasetIsNonRollup"]
 
 class ScheduleSerializer(serializers.ModelSerializer):
     """

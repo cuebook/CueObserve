@@ -56,6 +56,10 @@ jobs:
         echo "************ Files in API folder in this PR **********"
         echo "removing non main api folder files"
         x=$(echo "$x" | grep "^api/")
+        
+        echo "***** if no files in api ******"
+        [[ -z $x ]] && return 0;
+        
         PYLINT_STATUS="SUCCESS";
         SUCCESS="SUCCESS";
         FAILED="FAILED";

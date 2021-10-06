@@ -178,6 +178,7 @@ def anomalyDetectionJob(anomalyDef_id: int, manualRun: bool = False):
             anomalyDefinition.dimension,
             anomalyDefinition.operation,
             float(anomalyDefinition.value),
+            anomalyDefinition.dataset.isNonRollup,
         )
 
         result = distributeSubTasks(dimValsData, anomalyDefinition)
@@ -286,6 +287,9 @@ def anomalyDetectionJob(anomalyDef_id: int, manualRun: bool = False):
         message = message + str(logs["log"])
         name = "appAlert"
         SlackAlert.slackAlertHelper(title, message, name)
+        
+        ############ Webhook Alert ############
+        WebHookAlert.webhookAlertHelper(name, title, message)
 
 
 
@@ -326,7 +330,8 @@ def webhookAlertMessageFormat(numPublished, anomalyDefinition: AnomalyDefinition
         textDetails = Template(cardTemplate.title).render(Context(data)) + " "
         textDetails = textDetails + Template(cardTemplate.bodyText).render(Context(data)) + " "
         textDetails = textDetails.replace("<b>", "").replace("</b>", "")
-        WebHookAlert.webhookAlertHelper(textMessage, textDetails, textSubject, anomalyDefinition.id, anomalyId)
+        name = "anomalyAlert"
+        WebHookAlert.webhookAlertHelper(name, textSubject, textMessage, textDetails, anomalyDefinition.id, anomalyId)
     except Exception as ex:
         logger.error("Webhook alert failed ",str(ex))
 

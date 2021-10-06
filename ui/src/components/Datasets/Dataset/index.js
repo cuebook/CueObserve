@@ -37,6 +37,7 @@ export default function Dataset(props) {
   const [datasetColumns, setDatasetColumns] = useState([])
   const [datasetColumnType, setDatasetColumnType] = useState({})
   const [datasetGranularity, setDatasetGranlarity] = useState(null)
+  const [isNonRollup, setIsNonRollup] = useState(false)
   const [viewOnlyMode, setViewOnlyMode] = useState(false)
 
   const [isDataReceived, setIsDataReceived] = useState(false);
@@ -97,6 +98,11 @@ export default function Dataset(props) {
       return 
     }
 
+    if(isNonRollup && dimensions.length > 1){
+      message.error("Non roll-up dataset can have maximum one dimension")
+      return 
+    }
+
     const payload = {
       name: datasetName,
       sql: datasetSql,
@@ -105,6 +111,7 @@ export default function Dataset(props) {
       dimensions: dimensions,
       timestamp: timestamps[0],
       granularity: datasetGranularity,
+      isNonRollup: isNonRollup
     }
     if (params.datasetId)
       await datasetService.updateDataset(params.datasetId, payload)
@@ -208,6 +215,9 @@ export default function Dataset(props) {
           <div className={style.run}>
             <Button type="primary" onClick={runDatasetQuery} loading={loadingQueryData}>Run SQL</Button>
           </div>
+        </div>
+        <div className={style.buttons}>
+          <Switch checked={isNonRollup} onChange={val => setIsNonRollup(val)} /> &nbsp; Non Roll-up Dataset
         </div>
         <div className={`compact-table ${style.dataTable}`}>
           {queryDataTable}

@@ -16,6 +16,7 @@ let allOptions = {};
 let tempOption = {};
 
 function generateOptions(autoCueOptions) {
+  console.log(autoCueOptions)
   options = [];
   allOptions = {};
 
@@ -65,7 +66,7 @@ function generateOptions(autoCueOptions) {
     }
   ];
 
-  allOptions.top = [
+  allOptions.top = autoCueOptions.isNonRollup ? [] : [
     {
       value:"Top",
       label:"Top",
@@ -74,7 +75,7 @@ function generateOptions(autoCueOptions) {
     }
   ]
 
-  allOptions.contribution = [
+  allOptions.contribution = autoCueOptions.isNonRollup ? [] : [
     {
       value:"Min % Contribution",
       label:"Min % Contribution",
