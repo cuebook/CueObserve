@@ -1,6 +1,7 @@
 from .models import GlobalDimension, GlobalDimensionValues
-from search import app
-
+from search import app, db
+from flask import Flask, request, jsonify, make_response
+import requests
 
 def getGlobalDimensions(payloads):
     """
@@ -25,9 +26,21 @@ def createGlobalDimension(payloads):
     """ Create global dimension"""
     app.logger.info("payloads %s", payloads)
     name = payloads["name"]
-    dimensions = payloads["dimensionalValues"]
-    globalDimension = GlobalDimension.query.create(name=name)
+    # dimensions = payloads["dimensionalValues"]
+    globalDimension = GlobalDimension(name=name)
+    db.session.add(globalDimension)
+    db.session.commit()
+    app.logger.info("globaldimension %s", globalDimension)
+    res = {"success":True}
+    return res
 
+def getDimensionFromCueObserve():
+    """ Get dimension from cueObserve"""
+    url = "http://localhost:8000/api/anomaly/search/dimension/"
+    response = requests.get(url)
+        # response = {"success":True}
+    app.logger.info("resopnse %s", (response.json()))
+    payloads  = response.json()["data"]
+    res = getGlobalDimensions(payloads)
+    return res
 
-
-    return {"success":"true"}

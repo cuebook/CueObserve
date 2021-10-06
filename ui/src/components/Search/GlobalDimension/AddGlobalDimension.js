@@ -21,7 +21,8 @@ export default function AddGlobalDimension(props) {
     }, []);
 
     const getDimension = async () => {
-        const response = await searchService.getDimensions()
+        const response = await globalDimensionService.getDimensions()
+        console.log("response", response)
         setDimensions(response)
     }
 
