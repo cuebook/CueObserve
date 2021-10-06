@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 # start-server.sh
-redis-server &
 export DEBUG=false
 python manage.py migrate
 python manage.py loaddata seeddata/*.json
@@ -13,7 +12,6 @@ python ./manage.py collectstatic
 mkdir -p /home/staticfiles
 mv static_root/* /home/staticfiles
 rm -rf static_root/
-(/usr/bin/redis-server) &
 (celery -A app worker --concurrency=2 -l INFO --purge) &
 (celery -A app worker --concurrency=4 -Q anomalySubTask -l INFO --purge) &
 (celery -A app beat -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler) &
