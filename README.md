@@ -36,6 +36,10 @@ docker run -p 3000:3000 cuebook/cueobserve
 ```
 docker-compose up -d
 ```
+**Or** build from codebase via docker-compose **in development environment**:
+```
+docker-compose -f docker-compose-dev.yml up -d
+```
 Now visit [http://localhost:3000](http://localhost:3000) in your browser. 
 
 ## Demo Video

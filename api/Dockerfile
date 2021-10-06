@@ -19,7 +19,7 @@ RUN apt-get update && apt-get install -y gnupg2 curl
 RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
 RUN curl https://packages.microsoft.com/config/ubuntu/18.04/prod.list > /etc/apt/sources.list.d/mssql-release.list
 RUN apt-get update && ACCEPT_EULA=Y apt-get install -y --no-install-recommends unixodbc msodbcsql17 mssql-tools unixodbc-dev
-RUN apt-get install -y --no-install-recommends redis-server nginx default-libmysqlclient-dev
+RUN apt-get install -y --no-install-recommends nginx default-libmysqlclient-dev
 
 WORKDIR /code
 

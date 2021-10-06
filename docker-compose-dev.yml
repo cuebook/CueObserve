@@ -26,28 +26,16 @@ services:
       context: alerts-api
       dockerfile: Dockerfile
     volumes:
-      - ${PWD}/alerts-api:/code:rw
-    network_mode: "host"
-
-  cueo-search:
-    build:
-      context: search-api
-      dockerfile: Dockerfile
-    environment:
-      - SEARCH_POSTGRES_DB_HOST
-      - SEARCH_POSTGRES_DB_SCHEMA
-      - SEARCH_POSTGRES_DB_USERNAME
-      - SEARCH_POSTGRES_DB_PASSWORD
-      - SEARCH_POSTGRES_DB_HOST
-      - SEARCH_POSTGRES_DB_PORT
-    volumes:
-      - ${PWD}/search-api:/code:rw
+      - ./alerts-api:/code:rw
     network_mode: "host"
 
   cueo-frontend:
     build:
       context: ui
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
+    stdin_open: true
+    volumes:
+      - ./ui/src:/app/src:rw
     network_mode: "host"
 
   cueo-postgresql:
@@ -64,14 +52,6 @@ services:
   cueo-redis:
     image: redis
     network_mode: "host"
-
-
-networks:
-  external-network:
-    external:
-      name: nginx-web
-  cue-network:
-    internal: true
 
 volumes:
   pgdata:
