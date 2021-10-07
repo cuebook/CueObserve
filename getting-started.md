@@ -1,6 +1,20 @@
 # Getting Started
 
-## Install via Docker
+## Install via Docker-Compose
+
+**Development Mode:**
+
+```text
+docker-compose -f docker-compose-dev.yml up -d
+```
+
+**OR Production Mode:**
+
+```text
+docker-compose up -d
+```
+
+**OR** Install via Docker **\(Deprecated Method\)**
 
 ```text
 docker run -p 3000:3000 cuebook/cueobserve
