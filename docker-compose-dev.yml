@@ -38,6 +38,21 @@ services:
       - ./ui/src:/app/src:rw
     network_mode: "host"
 
+   cueo-search:
+    build:
+      context: search-api
+      dockerfile: Dockerfile
+    environment:
+      - SEARCH_POSTGRES_DB_HOST
+      - SEARCH_POSTGRES_DB_SCHEMA
+      - SEARCH_POSTGRES_DB_USERNAME
+      - SEARCH_POSTGRES_DB_PASSWORD
+      - SEARCH_POSTGRES_DB_HOST
+      - SEARCH_POSTGRES_DB_PORT
+    volumes:
+      - ${PWD}/search-api:/code:rw
+    network_mode: "host"
+
   cueo-postgresql:
     image: postgres:13
     environment:
