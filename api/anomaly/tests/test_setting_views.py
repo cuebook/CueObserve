@@ -20,8 +20,9 @@ def test_setting(client, mocker):
     )
     mockResponse.start()
     data = {
-        "Anomaly Alert via Slack Webhook Url": "test1URL",
-        "App Alerts via Slack Webhook Url": "test2URL"
+        "Bot User OAuth Access Token": "xoxb-someoriginaltoken",
+        "Slack Channel ID for App Monitoring": "CKDHFKLD",
+        "Slack Channel ID for Anomaly Alerts": "ADCLKJDZ"
     }
     response = client.post(path, data=data, content_type="application/json")
     assert response.status_code == 200
@@ -30,4 +31,4 @@ def test_setting(client, mocker):
     path = reverse("settings")
     response = client.get(path)
     assert response.status_code == 200
-    assert len(response.data["data"]) == 2
+    assert len(response.data["data"]) == 5

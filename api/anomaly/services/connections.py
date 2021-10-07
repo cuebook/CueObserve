@@ -1,7 +1,7 @@
 import logging
 from typing import List
 from utils.apiResponse import ApiResponse
-from dbConnections import BigQuery, Redshift, Snowflake, Druid, MySQL, Postgres, MSSQL
+from dbConnections import BigQuery, Redshift, Snowflake, Druid, MySQL, Postgres, MSSQL, ClickHouse
 from anomaly.models import (
     Connection,
     ConnectionParam,
@@ -79,6 +79,8 @@ class Connections:
             connectionResponse = Postgres.checkConnection(payload["params"])
         elif connectionName == "MSSQL":
             connectionResponse = MSSQL.checkConnection(payload["params"])
+        elif connectionName == "ClickHouse":
+            connectionResponse = ClickHouse.checkConnection(payload["params"])
         else:
             connectionResponse = True
 

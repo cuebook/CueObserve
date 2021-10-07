@@ -9,6 +9,7 @@ const {TextArea} = Input;
 export default function AddConnection(props) {
   const [connectionTypes, setConnectionTypes] = useState([]);
   const [selectedConnectionType, setSelectedConnectionType] = useState('');
+  const [loader, setLoader] = useState(false)
   const [form] = Form.useForm();
 
   useEffect(() => {
@@ -27,7 +28,7 @@ export default function AddConnection(props) {
   }
 
   const addConnectionFormSubmit = async (values) => {
-    
+    setLoader(true)
     let params = {...values}
     delete params["name"]
     let payload = {
@@ -38,10 +39,13 @@ export default function AddConnection(props) {
     };
     const response = await connectionService.addConnection(payload)
     if(response.success){
+        setLoader(false)
         props.onAddConnectionSuccess()
     }
     else{
         message.error(response.message);
+        setLoader(false)
+
     }
   };
 
@@ -158,6 +162,7 @@ export default function AddConnection(props) {
                 type="primary"
                 className="mr-2"
                 htmlType="submit"
+                loading = {loader}
             >
                 Add Connection
             </Button>

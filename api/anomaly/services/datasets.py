@@ -47,6 +47,7 @@ class Datasets:
         dimensions = data["dimensions"]
         timestamp = data["timestamp"]
         granularity = data["granularity"]
+        isNonRollup = data["isNonRollup"]
 
         dataset = Dataset.objects.get(id=datasetId)
         dataset.name = name
@@ -56,6 +57,7 @@ class Datasets:
         dataset.dimensions = json.dumps(dimensions)
         dataset.timestampColumn = timestamp
         dataset.granularity = granularity
+        dataset.isNonRollup = isNonRollup
         dataset.save()
 
         res.update(True, "Successfully updated dataset")
@@ -88,6 +90,7 @@ class Datasets:
         dimensions = data["dimensions"]
         timestamp = data["timestamp"]
         granularity = data["granularity"]
+        isNonRollup = data["isNonRollup"]
         Dataset.objects.create(
             name=name,
             sql=sql,
@@ -96,6 +99,7 @@ class Datasets:
             dimensions=json.dumps(dimensions),
             timestampColumn=timestamp,
             granularity=granularity,
+            isNonRollup=isNonRollup,
         )
 
         res.update(True, "Successfully created dataset")

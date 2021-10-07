@@ -1,14 +1,17 @@
 import json
+import logging
 import traceback
 import datetime as dt
 import dateutil.parser as dp
 from utils.apiResponse import ApiResponse
 from ops.tasks import rootCauseAnalysisJob
-
+from app.celery import app
 
 from anomaly.models import RootCauseAnalysis, RCAAnomaly, Anomaly
 from anomaly.serializers import RootCauseAnalysisSerializer, RCAAnomalySerializer
-from ops.tasks.anomalyDetection import detect, dataFrameEmpty
+from ops.tasks.detection.core.anomalyDetection import detect, dataFrameEmpty
+
+logger = logging.getLogger(__name__)
 
 
 class RootCauseAnalyses:
@@ -28,7 +31,11 @@ class RootCauseAnalyses:
         )
         rootCauseAnalysis.status = RootCauseAnalysis.STATUS_RECEIVED
         rootCauseAnalysis.save()
-        rootCauseAnalysisJob.delay(anomalyId)
+        task = rootCauseAnalysisJob.delay(anomalyId)
+        rootCauseAnalysis = RootCauseAnalysis.objects.get(anomaly_id=anomalyId)
+        rootCauseAnalysis.taskIds = [*rootCauseAnalysis.taskIds, task.id]
+        rootCauseAnalysis.save()
+
         res.update(True, "Successfully triggered RCA calculation")
         return res
 
@@ -73,6 +80,27 @@ class RootCauseAnalyses:
         return res
 
     @staticmethod
+    def abortRCA(anomalyId: int):
+        """
+        Abort RCA
+        :param anomalyId: id of anomaly object whose RCA needs to be aborted
+        """
+        res = ApiResponse("Error in aborting RCA")
+        try:
+            rootCauseAnalysis = RootCauseAnalysis.objects.get(anomaly_id=anomalyId)
+            app.control.revoke(rootCauseAnalysis.taskIds, terminate=True)
+
+            rootCauseAnalysis.status = RootCauseAnalysis.STATUS_ABORTED
+            rootCauseAnalysis.endTimestamp = dt.datetime.now()
+            rootCauseAnalysis.save()
+            res.update(True, "Successfully triggered RCA calculation")
+
+        except Exception as ex:
+            logger.error("Error in aborting RCA:%s", str(ex))
+
+        return res
+
+    @staticmethod
     def createRCAAnomaly(
         anomalyId: int, dimension: str, dimensionValue: str, contriPercent: float, df
     ):
@@ -90,7 +118,9 @@ class RootCauseAnalyses:
             if dataFrameEmpty(df):
                 return output
             granularity = anomaly.anomalyDefinition.dataset.granularity
-            result = detect(df, granularity, "Prophet", anomaly.anomalyDefinition)
+            result = detect(
+                df, granularity, "Prophet", anomaly.anomalyDefinition, limit=6
+            )
 
             del result["anomalyData"]["predicted"]
             # removing anomalous point other than last one

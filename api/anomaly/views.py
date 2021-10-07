@@ -183,7 +183,14 @@ class AnomalyDefView(APIView):
         detectionRuleTypeId = request.data.get("detectionRuleTypeId", 1)
         detectionRuleParams = request.data.get("detectionRuleParams", {})
         res = AnomalyDefinitions.addAnomalyDefinition(
-            metric, dimension, operation, highOrLow, value, datasetId, detectionRuleTypeId, detectionRuleParams
+            metric,
+            dimension,
+            operation,
+            highOrLow,
+            value,
+            datasetId,
+            detectionRuleTypeId,
+            detectionRuleParams,
         )
         return Response(res.json())
 
@@ -194,7 +201,8 @@ class AnomalyDefView(APIView):
     def put(self, request):
         anomalyDefId = request.data.get("anomalyDefId", 0)
         highOrLow = request.data.get("highOrLow", None)
-        res = AnomalyDefinitions.editAnomalyDefinition(anomalyDefId, highOrLow)
+        detectionRuleParams = request.data.get("detectionRuleParams", {})
+        res = AnomalyDefinitions.editAnomalyDefinition(anomalyDefId, highOrLow, detectionRuleParams)
         return Response(res.json())
 
 
@@ -347,6 +355,7 @@ class DetectionRuleTypeView(APIView):
         res = DetectionRules.getDetectionRuleTypes()
         return Response(res.json())
 
+
 class RCAView(APIView):
     """
     Provides views on RCA (Root Cause Analysis)
@@ -360,4 +369,9 @@ class RCAView(APIView):
     def post(self, request, anomalyId: int):
         """make RCA request"""
         res = RootCauseAnalyses.calculateRCA(anomalyId)
+        return Response(res.json())
+
+    def delete(self, request, anomalyId: int):
+        """make RCA request"""
+        res = RootCauseAnalyses.abortRCA(anomalyId)
         return Response(res.json())

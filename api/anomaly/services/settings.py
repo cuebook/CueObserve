@@ -1,17 +1,26 @@
+import json
 from utils.apiResponse import ApiResponse
 from anomaly.models import Setting
 from anomaly.serializers import SettingSerializer
+from anomaly.settingDetails import settingDicts
 
-ANOMALY_ALERT_SLACK_URL = "Slack Webhook URL for Anomaly Alerts"
-APP_ALERTS_SLACK_URL = "Slack Webhook URL for App Monitoring"
+ANOMALY_ALERT_SLACK_ID = "Slack Channel ID for Anomaly Alerts"
+APP_ALERTS_SLACK_ID= "Slack Channel ID for App Monitoring"
+SLACK_BOT_TOKEN = "Bot User OAuth Access Token"
+SEND_EMAIL_TO = "Send Email To"
+WEBHOOK_URL = "Webhook URL"
 
 
 class Settings:
     """
     Services for settings
     """
+    # defaultSettings: list = [SLACK_BOT_TOKEN, ANOMALY_ALERT_SLACK_ID, APP_ALERTS_SLACK_ID]
+    settingObjs = settingDicts()
+    defaultSettings: list = []
 
-    defaultSettings: list = [ANOMALY_ALERT_SLACK_URL, APP_ALERTS_SLACK_URL]
+    for settingObj in settingObjs:
+        defaultSettings.append(settingObj["name"])
 
     @staticmethod
     def getSettings():
@@ -22,7 +31,7 @@ class Settings:
         try:
             Settings.__createDefaultSettings()
             data = SettingSerializer(
-                Setting.objects.filter(name__in=Settings.defaultSettings), many=True
+                Setting.objects.filter(name__in=Settings.defaultSettings).order_by("id"), many=True
             ).data
             res.update(True, "Successfully retrieved settings", data)
         except Exception as ex:

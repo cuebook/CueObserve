@@ -64,6 +64,7 @@ class Dataset(models.Model):
     timestampColumn = models.CharField(max_length=500)
     metrics = models.TextField(null=True, blank=True)
     dimensions = models.TextField(null=True, blank=True)
+    isNonRollup = models.BooleanField(default=False)
 
 
 class AnomalyDefinition(models.Model):
@@ -86,19 +87,24 @@ class AnomalyDefinition(models.Model):
                 "Prophet": "Anomaly Daily Template Prophet",
                 "Percentage Change": "Anomaly Daily Template Percentage Change",
                 "Lifetime High/Low": "Anomaly Daily Template Lifetime",
-                "Value Threshold": "Anomaly Daily Template Value Threshold"
+                "Value Threshold": "Anomaly Daily Template Value Threshold",
             },
             "hour": {
-                "Prophet": "Anomaly Hourly Template Prophet",        
+                "Prophet": "Anomaly Hourly Template Prophet",
                 "Percentage Change": "Anomaly Hourly Template Percentage Change",
                 "Lifetime High/Low": "Anomaly Hourly Template Lifetime",
-                "Value Threshold": "Anomaly Hourly Template Value Threshold"
-            }
+                "Value Threshold": "Anomaly Hourly Template Value Threshold",
+            },
         }
 
-        detectionRuleType = self.detectionrule.detectionRuleType.name if hasattr(self, "detectionrule") else "Prophet"
-        
+        detectionRuleType = (
+            self.detectionrule.detectionRuleType.name
+            if hasattr(self, "detectionrule")
+            else "Prophet"
+        )
+
         return templateDict[self.dataset.granularity][detectionRuleType]
+
 
 class RunStatus(models.Model):
     """
@@ -154,6 +160,7 @@ class Setting(models.Model):
     name = models.TextField(null=True, blank=True)
     value = models.TextField(null=True, blank=True)
 
+
 class DetectionRuleType(models.Model):
     name = models.CharField(max_length=200, db_index=True, unique=True)
     description = models.TextField()
@@ -161,26 +168,41 @@ class DetectionRuleType(models.Model):
     def __str__(self):
         return self.name
 
+
 class DetectionRuleParam(models.Model):
     name = models.CharField(max_length=200)
-    detectionRuleType = models.ForeignKey(DetectionRuleType, on_delete=models.CASCADE, db_index=True)
+    detectionRuleType = models.ForeignKey(
+        DetectionRuleType, on_delete=models.CASCADE, db_index=True
+    )
 
     def __str__(self):
         return self.detectionRuleType.name + "_" + self.name
 
+
 class DetectionRule(models.Model):
-    anomalyDefinition = models.OneToOneField(AnomalyDefinition, on_delete=models.CASCADE)
+    anomalyDefinition = models.OneToOneField(
+        AnomalyDefinition, on_delete=models.CASCADE
+    )
     detectionRuleType = models.ForeignKey(DetectionRuleType, on_delete=models.CASCADE)
 
     def __str__(self):
         name = self.detectionRuleType.name
-        paramValuesString = ", ".join([f"{param['param__name']}: {param['value']}" for param in self.detectionruleparamvalue_set.all().values("param__name", "value")])
+        paramValuesString = ", ".join(
+            [
+                f"{param['param__name']}: {param['value']}"
+                for param in self.detectionruleparamvalue_set.all().values(
+                    "param__name", "value"
+                )
+            ]
+        )
         return f"{name} ({paramValuesString})" if paramValuesString else name
+
 
 class DetectionRuleParamValue(models.Model):
     param = models.ForeignKey(DetectionRuleParam, on_delete=models.CASCADE)
     detectionRule = models.ForeignKey(DetectionRule, on_delete=models.CASCADE)
     value = models.TextField()
+
 
 class RootCauseAnalysis(models.Model):
     """
@@ -191,6 +213,7 @@ class RootCauseAnalysis(models.Model):
     STATUS_RUNNING = "RUNNING"
     STATUS_SUCCESS = "SUCCESS"
     STATUS_ERROR = "ERROR"
+    STATUS_ABORTED = "ABORTED"
 
     anomaly = models.OneToOneField(Anomaly, on_delete=models.CASCADE, db_index=True)
 
@@ -198,6 +221,7 @@ class RootCauseAnalysis(models.Model):
     endTimestamp = models.DateTimeField(null=True, default=None)
     status = models.CharField(max_length=20)
     logs = models.JSONField(default=dict)
+    taskIds = models.JSONField(default=list)
 
 
 class RCAAnomaly(models.Model):

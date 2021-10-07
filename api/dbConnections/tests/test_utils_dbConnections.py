@@ -117,3 +117,30 @@ def test_MSSQLConnection(client, populate_seed_data, mocker):
 	assert Connection.objects.all().count()
 
 	mockResponse.stop()
+
+
+@pytest.mark.django_db()
+def test_ClickHouseConnection(client, populate_seed_data, mocker):
+	"""Testing if connection params in seed data are only needed"""
+	connectionType = ConnectionType.objects.get(name="ClickHouse")
+	paramNames = list(ConnectionParam.objects.filter(connectionType=connectionType).values_list("name", flat=True))
+	params = {}
+	for name in paramNames:
+		params[name] = "test"
+
+	mockResponse = mocker.patch(
+		"dbConnections.clickhouse.ClickHouse.checkConnection",
+		new=mock.MagicMock(
+			autospec=True, return_value=True
+		),
+	)
+	mockResponse.start()
+
+	data = {'name': 'test connection', 'description': '', 'connectionType_id': connectionType.id, 'params': params}
+	path = reverse("connections")
+	response = client.post(path, data, content_type="application/json")
+	assert response.status_code == 200
+	assert response.data["success"]
+	assert Connection.objects.all().count()
+
+	mockResponse.stop()

@@ -1,9 +1,9 @@
 import json
 import dateutil.parser as dp
 import datetime as dt
+from anomaly.settingDetails import settingDicts
 from rest_framework import serializers
 from anomaly.models import Anomaly, AnomalyDefinition, Connection,ConnectionType, CustomSchedule as Schedule, Dataset, RunStatus, Setting, RCAAnomaly, RootCauseAnalysis, DetectionRuleType
-
 
 class ConnectionSerializer(serializers.ModelSerializer):
     connectionTypeId = serializers.SerializerMethodField()
@@ -133,7 +133,7 @@ class DatasetSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Dataset
-        fields = ['id', 'name', 'sql', 'connection', 'dimensions', 'metrics', 'granularity', 'timestampColumn', 'anomalyDefinitionCount']
+        fields = ['id', 'name', 'sql', 'connection', 'dimensions', 'metrics', 'granularity', 'timestampColumn', 'anomalyDefinitionCount', 'isNonRollup']
 
 class AnomalyDefinitionSerializer(serializers.ModelSerializer):
     """
@@ -146,7 +146,8 @@ class AnomalyDefinitionSerializer(serializers.ModelSerializer):
     lastRunAnomalies = serializers.SerializerMethodField()
     datasetName = serializers.SerializerMethodField()
     datasetGranularity = serializers.SerializerMethodField()
-    detectionRuleStr = serializers.SerializerMethodField()
+    detectionRule = serializers.SerializerMethodField()
+    datasetIsNonRollup = serializers.SerializerMethodField()
     
     def get_datasetName(self, obj):
         """
@@ -195,16 +196,30 @@ class AnomalyDefinitionSerializer(serializers.ModelSerializer):
             runStatusObj["runStatusId"] = runStatus.id
             return runStatusObj
     
-    def get_detectionRuleStr(self, obj):
+    def get_detectionRule(self, obj):
         if hasattr(obj, "detectionrule"):
-            return str(obj.detectionrule)
+            detectionRule = {
+                "id": obj.detectionrule.id,
+                "detectionRuleType": {
+                    "id": obj.detectionrule.detectionRuleType.id,
+                    "name": obj.detectionrule.detectionRuleType.name,
+                    "description": obj.detectionrule.detectionRuleType.description
+                },
+                "params": {param["param__name"]: param["value"] for param in obj.detectionrule.detectionruleparamvalue_set.all().values("param__name", "value")},
+                "detectionRuleStr": str(obj.detectionrule)
+            }
+            return detectionRule
         else:
-            return "Prophet"
+            return {"detectionRuleType": {"name": "Prophet"}, "params": {}, "detectionRuleStr": "Prophet"}
+
+    
+    def get_datasetIsNonRollup(self, obj):
+        return obj.dataset.isNonRollup
 
     
     class Meta:
         model = AnomalyDefinition
-        fields = ["id",  "anomalyDef", "schedule", "lastRun", "lastRunStatus", "lastRunAnomalies", "datasetName", "datasetGranularity", "detectionRuleStr"]
+        fields = ["id",  "anomalyDef", "schedule", "lastRun", "lastRunStatus", "lastRunAnomalies", "datasetName", "datasetGranularity", "detectionRule", "datasetIsNonRollup"]
 
 class AnomalySerializer(serializers.ModelSerializer):
     """
@@ -215,6 +230,7 @@ class AnomalySerializer(serializers.ModelSerializer):
     metric = serializers.SerializerMethodField()
     dimension = serializers.SerializerMethodField()
     detectionRuleStr = serializers.SerializerMethodField()
+    datasetIsNonRollup = serializers.SerializerMethodField()
 
     def get_datasetName(self, obj):
         return obj.anomalyDefinition.dataset.name
@@ -233,10 +249,13 @@ class AnomalySerializer(serializers.ModelSerializer):
             return str(obj.anomalyDefinition.detectionrule)
         else:
             return "Prophet"
+    
+    def get_datasetIsNonRollup(self, obj):
+        return obj.anomalyDefinition.dataset.isNonRollup
 
     class Meta:
         model = Anomaly
-        fields = ["id", "datasetName", "published", "dimension", "dimensionVal", "granularity", "metric", "data", "detectionRuleStr"]
+        fields = ["id", "datasetName", "published", "dimension", "dimensionVal", "granularity", "metric", "data", "detectionRuleStr", "datasetIsNonRollup"]
 
 class ScheduleSerializer(serializers.ModelSerializer):
     """
@@ -295,9 +314,17 @@ class SettingSerializer(serializers.ModelSerializer):
     """
     Serializer for the model Setting
     """
+    details = serializers.SerializerMethodField()
+    def get_details(self, obj):
+        """ Details for settings UI"""
+        settingdicts = settingDicts()
+        for settingdict in settingdicts:
+            if obj.name == settingdict["name"]:
+                return settingdict
+
     class Meta:
         model = Setting
-        fields = ["name", "value"]
+        fields = ["name", "value", "details"]
 
 class DetectionRuleTypeSerializer(serializers.ModelSerializer):
     """

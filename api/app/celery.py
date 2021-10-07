@@ -6,7 +6,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "app.settings")
 
 app = Celery("app", broker=settings.REDIS_BROKER_URL)
 
-app.config_from_object("django.conf:settings", namespace="CELERY")
+# app.config_from_object("django.conf:settings", namespace="CELERY")
 app.autodiscover_tasks()
 
 
