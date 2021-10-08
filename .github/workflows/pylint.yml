@@ -38,10 +38,8 @@ jobs:
         URL="https://api.github.com/repos/${GITHUB_REPOSITORY}/pulls/${{ github.event.pull_request.number }}/files"
         echo "************ Getting files for this PR **********"
         git fetch 
-        x=$(git diff --name-only origin/main origin/${GITHUB_HEAD_REF} | grep .py | grep -v test | grep -v serializer | grep -v __init__.py | grep -v migrations | grep -v removed )
+        x=$(git diff --name-only origin/main origin/${GITHUB_HEAD_REF} | grep "\.py" | grep -v test | grep -v serializer | grep -v __init__.py | grep -v migrations | grep -v removed )
         
-        echo "echoing variable"
-        echo "$x"
         echo "************ Files Fetched **********"
         [[ -z $x ]] && return 0;
         
@@ -52,8 +50,6 @@ jobs:
         echo "removing non main api folder files"
         x=$(echo "$x" | grep "^api/")
         
-        echo "echoing variable"
-        echo "$x"
         echo "***** if no files in api ******"
         [[ -z $x ]] && return 0;
         
