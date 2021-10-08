@@ -1,36 +1,28 @@
 from .models import GlobalDimension, GlobalDimensionValues
 from search import app, db
 from flask import Flask, request, jsonify, make_response
+from .serializer import GlobalDimensionSchema, GlobalDimensionValuesSchema
 import requests
 
-def getGlobalDimensions(payloads):
-    """
-    Gets all dimensions
-    """
-    app.logger.info("payloads %s", payloads)
-    payloadDicts = []
-    for payload in payloads:
-        for dimension in payload["dimensions"]:
-            dictObjs = {}
-            dictObjs["datasetName"] = payload["name"]
-            dictObjs["datasetId"] = payload["id"]
-            dictObjs["dimension"] = dimension
-            payloadDicts.append(dictObjs)
 
-
-    app.logger.info("payload dicts %s", payloadDicts)
-    app.logger.info("payload dicts count %s", len(payloadDicts))
-    return payloadDicts
 
 def createGlobalDimension(payloads):
     """ Create global dimension"""
     app.logger.info("payloads %s", payloads)
     name = payloads["name"]
-    # dimensions = payloads["dimensionalValues"]
     globalDimension = GlobalDimension(name=name)
     db.session.add(globalDimension)
     db.session.commit()
-    app.logger.info("globaldimension %s", globalDimension)
+
+    dimensions = payloads["dimensionalValues"]
+    objs = payloads["dimensionalValues"]
+    dimensionalValueObjs = []
+    for obj in objs:
+        gdValues = GlobalDimensionValues(datasetId = obj["datasetId"], datasetName = obj["datasetName"], dimensionName = obj["dimension"], globalDimensionId = globalDimension.id)
+        dimensionalValueObjs.append(gdValues)
+    app.logger.info("dimensionalValuesOBjs %s", dimensionalValueObjs)
+    db.session.bulk_save_objects(dimensionalValueObjs)
+    db.session.commit()
     res = {"success":True}
     return res
 
@@ -41,6 +33,23 @@ def getDimensionFromCueObserve():
         # response = {"success":True}
     app.logger.info("resopnse %s", (response.json()))
     payloads  = response.json()["data"]
-    res = getGlobalDimensions(payloads)
+    payloadDicts = []
+    for payload in payloads:
+        for dimension in payload["dimensions"]:
+            dictObjs = {}
+            dictObjs["datasetName"] = payload["name"]
+            dictObjs["datasetId"] = payload["id"]
+            dictObjs["dimension"] = dimension
+            payloadDicts.append(dictObjs)
+
+    res = payloadDicts
     return res
+
+def getGlobalDimensions():
+    """ Services to get Global dimension and their linked dimension"""
+    globalDimensions = GlobalDimension.query.all()
+    data = GlobalDimensionSchema(many=True).dump(globalDimensions)
+    app.logger.info("GLobalDImension in services %s", data)
+    
+    return data
 

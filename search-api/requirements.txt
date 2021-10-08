@@ -7,3 +7,5 @@ Flask-Cors==3.0.10
 requests==2.18.4
 flask-apispec==0.11.0
 psycopg2-binary==2.9.1
+flask-marshmallow==0.14.0
+marshmallow-sqlalchemy==0.26.1
