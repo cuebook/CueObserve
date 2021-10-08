@@ -38,20 +38,17 @@ jobs:
         URL="https://api.github.com/repos/${GITHUB_REPOSITORY}/pulls/${{ github.event.pull_request.number }}/files"
         echo "************ Getting files for this PR **********"
         git fetch 
-        x=$(git diff --name-only origin/main origin/${GITHUB_HEAD_REF} | grep "\.py" | grep -v test | grep -v serializer | grep -v __init__.py | grep -v migrations | grep -v removed )
+        x=$(git diff --name-only origin/main origin/${GITHUB_HEAD_REF} | grep "\.py" | grep -v test | grep -v serializer | grep -v __init__.py | grep -v migrations | grep -v removed || echo 0)
         
         echo "************ Files Fetched **********"
-        [[ -z $x ]] && bash -c "exit 0";
+        [[ -z $x ]] && exit 0;    # this also fails the job
         
         touch ../search-api/__init__.py
         pylint ../search-api --rcfile ../search-api/pylintrc --fail-under=8
 
         echo "************ Files in API folder in this PR **********"
         echo "removing non main api folder files"
-        x=$(echo "$x" | grep "^api/")
-        
-        echo "***** if no files in api ******"
-        [[ -z $x ]] && bash -c "exit 0";
+        x=$(echo "$x" | grep "^api/" || echo 0)
         
         PYLINT_STATUS="SUCCESS";
         SUCCESS="SUCCESS";
