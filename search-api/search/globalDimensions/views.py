@@ -9,17 +9,14 @@ from search.globalDimensions import  createGlobalDimension, getDimensionFromCueO
 
 @app.route("/search/globalDimension/create/", methods=['POST'])
 def createGlobalDimensionView():
-    app.logger.info("json %s", request.json)
+    app.logger.info("Procedure starts for creating global dimension ")
     payloads = request.json
-    res1 = createGlobalDimension(payloads)
-    res = {"success": True}
-    # app.logger.info("json %s", res)
-
+    res = createGlobalDimension(payloads)
     return jsonify(res)
 
 @app.route("/search/dimension/", methods=['GET', 'POST', 'OPTIONS'])
 def getDimensions():
-    app.logger.info("request.header %s", request.headers)
+    app.logger.info("Get dimension from CueObserve ")
     res = getDimensionFromCueObserve()
     return jsonify(res)
 

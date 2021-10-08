@@ -5,7 +5,7 @@ from search.globalDimensions.models import GlobalDimension, GlobalDimensionValue
 class GlobalDimensionValuesSchema(ma.Schema):
     
     class Meta:
-        fields = ("id", "dimensionName","datasetId", "datasetName")
+        fields = ("id", "dimension","datasetId", "dataset")
         include_fk=True
 
 
@@ -13,7 +13,8 @@ class GlobalDimensionSchema(ma.Schema):
     
     id= ma.Integer()
     name = ma.String()
-    values = ma.List(ma.Nested(GlobalDimensionValuesSchema(only=("dimensionName",))))
+    published = ma.Boolean()
+    values = ma.List(ma.Nested(GlobalDimensionValuesSchema(only=("dimension","dataset"))))
 
 
 

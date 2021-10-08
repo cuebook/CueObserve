@@ -24,13 +24,8 @@ export default function GlobalDimensionTable(props) {
   const getData = async () => {
     const response = await globalDimensionService.getGlobalDimension()
     setData(response)
-    console.log("response", response)
 
   }
-
-
-
-
 
  const togglePublishState = (status, id) => {
     if (!id) {
@@ -58,29 +53,36 @@ export default function GlobalDimensionTable(props) {
     setIsAddDrawerVisible(true)
   }
   const onAddGlobalDimensionSuccess = () =>{
+    getData()
+
     setIsAddDrawerVisible(false)
   }
 
 let dataSource = []
-dataSource = data && data.map(items=>{return {"name":items["name"], "id":items["id"], "values":items["values"].map((item)=> item["dimensionName"])}})
+  dataSource = data && data.map(items=>{return {"name":items["name"], "id":items["id"], "values":items["values"].map((item)=> item["dataset"] + "."+ item["dimension"])}})
+let linkedDimension = []
+let linkedDimensionArray =[]
 
-
+if(dataSource.length != 0){
+  linkedDimension = dataSource.map((items) => items["values"])
+  linkedDimensionArray = [].concat.apply([],linkedDimension)
+}
     const columns = [
       {
         title: "Publish",
         dataIndex: "published",
         width: "10%",
-        key: arr => arr[0].globalDimension.id,
+        key: arr => arr.id,
         render: (text, entity) => {
           return (
             <Switch
-              checked={false}
-              // onChange={() =>
-              //   togglePublishState(
-              //     entity[0].globalDimension.published,
-              //     entity[0].globalDimension.id
-              //   )
-              // }
+              checked={entity.published}
+              onChange={() =>
+                togglePublishState(
+                  entity.published,
+                  entity.id
+                )
+              }
             />
           );
         }
@@ -135,7 +137,7 @@ dataSource = data && data.map(items=>{return {"name":items["name"], "id":items["
             <span className={style.actionButton}>
               <ButtonGroup className="mr-2">
                 <Button
-                  // icon={<EditOutlined />}
+                  icon={<EditOutlined />}
                   onClick={e => this.onClickEdit(record.id)}
                 />
               </ButtonGroup>
@@ -178,7 +180,7 @@ return (
         >
           { isAddDrawerVisible 
             ? 
-            <AddGlobalDimension onAddGlobalDimensionSuccess={onAddGlobalDimensionSuccess} />
+            <AddGlobalDimension onAddGlobalDimensionSuccess={onAddGlobalDimensionSuccess} linkedDimension={linkedDimensionArray} />
             :
             null
           }

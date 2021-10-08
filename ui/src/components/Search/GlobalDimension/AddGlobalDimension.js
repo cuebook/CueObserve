@@ -9,11 +9,14 @@ const { Option } = Select;
 
 export default function AddGlobalDimension(props) {
     const [form] = Form.useForm();
-
+    const [linkedDimension, setLinkedDimension] = useState([])
     const [globalDimension, setGlobalDimension] = useState([])
     const [dimensions, setDimensions] = useState(null)
     const [selectedDimension, setSelectedDimension] = useState([])
     useEffect(()=>{
+      if(props && props.linkedDimension){
+        setLinkedDimension(props.linkedDimension)
+      }
       if(!dimensions){
         getDimension()
       }
@@ -22,56 +25,48 @@ export default function AddGlobalDimension(props) {
 
     const getDimension = async () => {
         const response = await globalDimensionService.getDimensions()
-        console.log("response", response)
         setDimensions(response)
     }
 
     const onSelectChange = value => {
       setSelectedDimension(value)
-      console.log("value", value)
     }
 
     const addGlobalDimensionFormSubmit = async (values) => {
         let payload = {
         };
-        console.log("values on form submit", values)
         let dimensionalValues = []
         dimensionalValues = values["dimension"].map((value)=> {
           let temp = value.split(".");
           return {
             "datasetId":temp[0],
-            "datasetName":temp[1],
+            "dataset":temp[1],
             "dimension":temp[2],
         }})
         payload["name"] = values["name"]
         payload["dimensionalValues"] = dimensionalValues 
-        // Create Global Dimension 
-        // createGlobalDimension(payload)
-        props.onAddGlobalDimensionSuccess()
+        
 
         const response = await globalDimensionService.AddGlobalDimension(payload)
-
-        // if(response.success){
-        //     props.onAddGlobalDimensionSuccess()
-        // }
-        // else{
-        //     message.error(response.message);
-        // }
+        if(response.success){
+            props.onAddGlobalDimensionSuccess()
+        }
+        else{
+            message.error(response.message);
+        }
       };
-    
-  // const createGlobalDimension = async (payload) => {
-  //   const response = await searchService.AddGlobalDimension(payload)
-  // }
-
-  const children = [];
-    for (let i = 10; i < 36; i++) {
-      children.push(<Option key={i.toString(36) + i}>{i.toString(36) + i}</Option>);
-    }
 
     let dimensionForSuggestion = []
-    dimensionForSuggestion = dimensions && dimensions.map(item =>(<Option key={item["datasetId"] + "." + item["datasetName"] + "." + item["dimension"]} > {item["datasetName"] + "." + item["dimension"]} </Option>))
-
-    console.log("dimesionForSuggestion", dimensionForSuggestion)
+    dimensionForSuggestion = dimensions && dimensions.map(item =>(<Option value={item["datasetId"] + "." + item["dataset"]+ "." + item["dimension"]} key={item["dataset"] + "." + item["dimension"] } > {item["dataset"] + "." + item["dimension"]} </Option>))
+   let dimensionOptions = []
+   dimensionForSuggestion =
+      dimensionForSuggestion &&
+      dimensionForSuggestion.filter(
+        item =>
+          !linkedDimension.some(
+            item1 => item && item.key === item1
+          )
+      );
     let addGlobalDimensionParamElements = []
 
     let addGlobalDimensionFormElement = (

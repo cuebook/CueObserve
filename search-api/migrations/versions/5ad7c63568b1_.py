@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 3cbcb60b4c52
+Revision ID: 5ad7c63568b1
 Revises: 
-Create Date: 2021-10-07 12:18:29.513767
+Create Date: 2021-10-08 08:17:08.223372
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '3cbcb60b4c52'
+revision = '5ad7c63568b1'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -21,15 +21,16 @@ def upgrade():
     op.create_table('globaldimension',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.Text(), nullable=False),
+    sa.Column('published', sa.Boolean(), nullable=False),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('name')
     )
     op.create_table('globaldimensionvalues',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('datasetId', sa.Integer(), nullable=False),
-    sa.Column('datasetName', sa.Text(), nullable=False),
-    sa.Column('dimensionName', sa.Text(), nullable=False),
-    sa.Column('globalDimensionId', sa.Integer(), nullable=True),
+    sa.Column('dataset', sa.Text(), nullable=False),
+    sa.Column('dimension', sa.Text(), nullable=False),
+    sa.Column('globalDimensionId', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['globalDimensionId'], ['globaldimension.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
