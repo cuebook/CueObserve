@@ -1,17 +1,33 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Switch, Table, Button, Input, Drawer } from 'antd';
+import {EditOutlined } from '@ant-design/icons';
 
 import AddGlobalDimension from "components/Search/GlobalDimension/AddGlobalDimension.js"
+import globalDimensionService from "services/search/globalDimension.js"
+import style from "./style.module.scss"
 
 const { Search } = Input
+const ButtonGroup = Button.Group;
 
 export default function GlobalDimensionTable(props) {
-  const [globalDimension, setGlobalDimension] = useState([])
+  const [globalDimension, setGlobalDimension] = useState('')
+  const [data, setData] = useState('')
   const [isAddDrawerVisible, setIsAddDrawerVisible] = useState('')
   useEffect(()=>{
-    
+    if(!data){
+      getData()
+    }
     
   }, []);
+
+
+  const getData = async () => {
+    const response = await globalDimensionService.getGlobalDimension()
+    setData(response)
+    console.log("response", response)
+
+  }
+
 
 
 
@@ -45,6 +61,10 @@ export default function GlobalDimensionTable(props) {
     setIsAddDrawerVisible(false)
   }
 
+let dataSource = []
+dataSource = data && data.map(items=>{return {"name":items["name"], "id":items["id"], "values":items["values"].map((item)=> item["dimensionName"])}})
+
+
     const columns = [
       {
         title: "Publish",
@@ -54,13 +74,13 @@ export default function GlobalDimensionTable(props) {
         render: (text, entity) => {
           return (
             <Switch
-              checked={entity[0].globalDimension.published}
-              onChange={() =>
-                togglePublishState(
-                  entity[0].globalDimension.published,
-                  entity[0].globalDimension.id
-                )
-              }
+              checked={false}
+              // onChange={() =>
+              //   togglePublishState(
+              //     entity[0].globalDimension.published,
+              //     entity[0].globalDimension.id
+              //   )
+              // }
             />
           );
         }
@@ -69,18 +89,58 @@ export default function GlobalDimensionTable(props) {
           title: "Global Dimension",
           dataIndex: "name",
           key: "name",
+          render: (text, entity) => {
+            return (
+              <span
+                style={{ whiteSpace: "initial" }}
+                key={entity.name}
+              >
+                {entity.name}
+              </span>
+            );
+          }
         },
         {
           title: "Linked Dimensions",
-          dataIndex: "linkedDimension",
+          dataIndex: "values",
           key: "linkedDimension",
+          render: (text, entity) => {
+            let groupElements = entity.values
+  
+            var listIndividuals = groupElements.map(e => {
+              return (
+                <span
+                  style={{
+                    whiteSpace: "initial",
+                    marginRight: "5px",
+                    background: "#f4f5f6",
+                    borderRadius: "4px",
+                    padding: "1px 5px"
+                  }}
+                  key={e}
+                >
+                  {e}
+                </span>
+              );
+            });
+            return <div>{listIndividuals}</div>;
+          }
         },
         {
           title: "",
           dataIndex: "action",
           key: "actions",
           className: "text-right",
-          
+          render: (text, record) => (
+            <span className={style.actionButton}>
+              <ButtonGroup className="mr-2">
+                <Button
+                  // icon={<EditOutlined />}
+                  onClick={e => this.onClickEdit(record.id)}
+                />
+              </ButtonGroup>
+            </span>
+          )
     
         } 
       ]
@@ -105,7 +165,7 @@ return (
         rowKey={"id"}
         scroll={{ x: "100%" }}
         columns={columns}
-        dataSource={[]}
+        dataSource={dataSource}
         size={"small"}
         pagination={false}
       />
