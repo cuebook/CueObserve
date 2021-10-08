@@ -15,3 +15,4 @@ COPY --from=builder /app/build /app/build
 
 # # Copy nginx configuration
 ADD nginx.conf /etc/nginx/conf.d/default.conf
+CMD ["nginx", "-g", "daemon off;"]
