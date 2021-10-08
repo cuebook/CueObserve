@@ -58,6 +58,8 @@ jobs:
         x=$(echo "$x" | grep "^api/")
         
         echo "***** if no files in api ******"
+        echo "$x"
+        [[ -z $x ]] && echo Exiting - no files in api
         [[ -z $x ]] && return 0;
         
         PYLINT_STATUS="SUCCESS";
