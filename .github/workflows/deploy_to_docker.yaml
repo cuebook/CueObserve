@@ -31,8 +31,8 @@ jobs:
         # push it to ECR so that it can
         # be deployed to ECS.
         docker login -u vincue -p ${{ secrets.DOCKER_TOKEN }}
-        TAGNAME=${{ github.event.inputs.tagName }}
-        docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG -t $REGISTRY/$REPOSITORY:latest -t $REGISTRY/$REPOSITORY:$TAGNAME .
+        if [[ ${{ github.event.inputs.tagName }} ]]; then TAGNAME=${{ github.event.inputs.tagName }}; else TAGNAME="latest"; fi
+        docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG -t $REGISTRY/$REPOSITORY:$TAGNAME .
         docker push $REGISTRY/$REPOSITORY
         echo "::set-output name=image::$REGISTRY/$REPOSITORY:$IMAGE_TAG"
 
@@ -55,8 +55,8 @@ jobs:
         # push it to ECR so that it can
         # be deployed to ECS.
         docker login -u vincue -p ${{ secrets.DOCKER_TOKEN }}
-        TAGNAME=${{ github.event.inputs.tagName }}
-        docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG -t $REGISTRY/$REPOSITORY:latest -t $REGISTRY/$REPOSITORY:$TAGNAME .
+        if [[ ${{ github.event.inputs.tagName }} ]]; then TAGNAME=${{ github.event.inputs.tagName }}; else TAGNAME="latest"; fi
+        docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG -t $REGISTRY/$REPOSITORY:$TAGNAME .
         docker push $REGISTRY/$REPOSITORY
         echo "::set-output name=image::$REGISTRY/$REPOSITORY:$IMAGE_TAG"
 
@@ -79,8 +79,8 @@ jobs:
         # push it to ECR so that it can
         # be deployed to ECS.
         docker login -u vincue -p ${{ secrets.DOCKER_TOKEN }}
-        TAGNAME=${{ github.event.inputs.tagName }}
-        docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG -t $REGISTRY/$REPOSITORY:latest -t $REGISTRY/$REPOSITORY:$TAGNAME .
+        if [[ ${{ github.event.inputs.tagName }} ]]; then TAGNAME=${{ github.event.inputs.tagName }}; else TAGNAME="latest"; fi
+        docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG -t $REGISTRY/$REPOSITORY:$TAGNAME .
         docker push $REGISTRY/$REPOSITORY
         echo "::set-output name=image::$REGISTRY/$REPOSITORY:$IMAGE_TAG"
 
