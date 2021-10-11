@@ -19,7 +19,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
-    - name: Build, tag, and push image to Amazon ECR
+    - name: Build, tag, and push image to Docker Hub
       id: build-image
       env:
         REGISTRY: cuebook
@@ -43,7 +43,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
-    - name: Build, tag, and push image to Amazon ECR
+    - name: Build, tag, and push image to Docker Hub
       id: build-image
       env:
         REGISTRY: cuebook
@@ -63,11 +63,11 @@ jobs:
   build-and-push-alerts:
     runs-on: ubuntu-latest
 
-    - name: Login to Amazon ECR
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
 
-    - name: Build, tag, and push image to Amazon ECR
+    - name: Build, tag, and push image to Docker Hub
       id: build-image
       env:
         REGISTRY: cuebook
