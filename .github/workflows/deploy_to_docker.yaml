@@ -31,7 +31,8 @@ jobs:
         # push it to ECR so that it can
         # be deployed to ECS.
         docker login -u vincue -p ${{ secrets.DOCKER_TOKEN }}
-        if [[ ${{ github.event_name == 'workflow_dispatch' }} ]]; then TAGNAME=${{ github.event.inputs.tagName }}; else TAGNAME="latest"; fi
+        TAGNAME=latest
+        if [[ ${{ github.event_name == 'workflow_dispatch' }} ]]; then TAGNAME=${{ github.event.inputs.tagName }}; fi
         docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG -t $REGISTRY/$REPOSITORY:$TAGNAME .
         docker push $REGISTRY/$REPOSITORY
         echo "::set-output name=image::$REGISTRY/$REPOSITORY:$IMAGE_TAG"
@@ -55,7 +56,8 @@ jobs:
         # push it to ECR so that it can
         # be deployed to ECS.
         docker login -u vincue -p ${{ secrets.DOCKER_TOKEN }}
-        if [[ ${{ github.event_name == 'workflow_dispatch' }} ]]; then TAGNAME=${{ github.event.inputs.tagName }}; else TAGNAME="latest"; fi
+        TAGNAME=latest
+        if [[ ${{ github.event_name == 'workflow_dispatch' }} ]]; then TAGNAME=${{ github.event.inputs.tagName }}; fi
         docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG -t $REGISTRY/$REPOSITORY:$TAGNAME .
         docker push $REGISTRY/$REPOSITORY
         echo "::set-output name=image::$REGISTRY/$REPOSITORY:$IMAGE_TAG"
@@ -80,7 +82,8 @@ jobs:
         # be deployed to ECS.
         docker login -u vincue -p ${{ secrets.DOCKER_TOKEN }}
         echo ${{ github.event_name }}
-        if [[ ${{ github.event_name == 'workflow_dispatch' }} ]]; then TAGNAME=${{ github.event.inputs.tagName }}; else TAGNAME="latest"; fi
+        TAGNAME=latest
+        if [[ ${{ github.event_name == 'workflow_dispatch' }} ]]; then TAGNAME=${{ github.event.inputs.tagName }}; fi
         docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG -t $REGISTRY/$REPOSITORY:$TAGNAME .
         docker push $REGISTRY/$REPOSITORY
         echo "::set-output name=image::$REGISTRY/$REPOSITORY:$IMAGE_TAG"
