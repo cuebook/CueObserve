@@ -33,7 +33,7 @@ jobs:
         docker login -u vincue -p ${{ secrets.DOCKER_TOKEN }}
         TAGNAME=latest
         if [[ ${{ github.event_name == 'workflow_dispatch' }} ]]; then TAGNAME=${{ github.event.inputs.tagName }}; fi
-        docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG -t $REGISTRY/$REPOSITORY:$TAGNAME .
+        docker build -t $REGISTRY/$REPOSITORY:$TAGNAME .
         docker push $REGISTRY/$REPOSITORY
         echo "::set-output name=image::$REGISTRY/$REPOSITORY:$IMAGE_TAG"
 
@@ -58,7 +58,7 @@ jobs:
         docker login -u vincue -p ${{ secrets.DOCKER_TOKEN }}
         TAGNAME=latest
         if [[ ${{ github.event_name == 'workflow_dispatch' }} ]]; then TAGNAME=${{ github.event.inputs.tagName }}; fi
-        docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG -t $REGISTRY/$REPOSITORY:$TAGNAME .
+        docker build -t $REGISTRY/$REPOSITORY:$TAGNAME .
         docker push $REGISTRY/$REPOSITORY
         echo "::set-output name=image::$REGISTRY/$REPOSITORY:$IMAGE_TAG"
 
@@ -83,11 +83,8 @@ jobs:
         docker login -u vincue -p ${{ secrets.DOCKER_TOKEN }}
         echo ${{ github.event_name }}
         TAGNAME=latest
-        echo $TAGNAME
-        export TAGNAME=latest
         if [[ ${{ github.event_name == 'workflow_dispatch' }} ]]; then TAGNAME=${{ github.event.inputs.tagName }}; fi
-        docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG -t $REGISTRY/$REPOSITORY:$TAGNAME .
+        docker build -t $REGISTRY/$REPOSITORY:$TAGNAME .
         docker push $REGISTRY/$REPOSITORY
         echo "::set-output name=image::$REGISTRY/$REPOSITORY:$IMAGE_TAG"
-        echo ${{ github.event.inputs.tagName }}
 
