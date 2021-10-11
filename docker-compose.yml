@@ -1,11 +1,7 @@
 version: '3.3'
 services:
   cueo-backend:
-    build:
-      context: api
-      dockerfile: Dockerfile
-    volumes:
-      - ./api:/app:rw
+    image: cuebook/cue-observe-backend:latest
     environment:
       ENVIRONMENT: ${ENVIRONMENT}
       API_URL: ${API_URL}
@@ -19,44 +15,24 @@ services:
       DJANGO_SUPERUSER_PASSWORD: ${DJANGO_SUPERUSER_PASSWORD}
       DJANGO_SUPERUSER_EMAIL: ${DJANGO_SUPERUSER_EMAIL}
       IS_AUTHENTICATION_REQUIRED: ${IS_AUTHENTICATION_REQUIRED}
+    volumes:
+      - sqliteDB:/code/db:rw
     network_mode: "host"
 
   cueo-alerts:
-    build:
-      context: alerts-api
-      dockerfile: Dockerfile
-    volumes:
-      - ${PWD}/alerts-api:/code:rw
+    image: cuebook/cue-observe-alerts:latest
     network_mode: "host"
 
   cueo-frontend:
-    build:
-      context: ui
-      dockerfile: Dockerfile
-    network_mode: "host"
-
-  cueo-postgresql:
-    image: postgres:13
-    environment:
-      - PGDATA=/pg_data
-      - POSTGRES_DB=cue_observe
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-    volumes:
-      - pgdata:/pg_data
+    image: cuebook/cue-observe-frontend:latest
+    depends_on:
+      - cueo-backend
     network_mode: "host"
 
   cueo-redis:
     image: redis
     network_mode: "host"
 
-
-networks:
-  external-network:
-    external:
-      name: nginx-web
-  cue-network:
-    internal: true
-
 volumes:
-  pgdata:
+  sqliteDB:
+    

@@ -1,0 +1,86 @@
+on:
+  push:
+    branches:
+      - latest_release
+  workflow_dispatch:
+    inputs:
+      tagName:
+        description: 'Tag Name'     
+        required: true
+        default: 'latest'
+
+name: Deploy to Docker
+
+jobs:
+  build-and-push-frontend:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Build, tag, and push image to Amazon ECR
+      id: build-image
+      env:
+        REGISTRY: cuebook
+        REPOSITORY: cue-observe-frontend
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        cd ui
+        # Build a docker container and
+        # push it to ECR so that it can
+        # be deployed to ECS.
+        docker login -u vincue -p ${{ secrets.DOCKER_TOKEN }}
+        TAGNAME=${{ github.event.inputs.tagName }}
+        docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG -t $REGISTRY/$REPOSITORY:latest -t $REGISTRY/$REPOSITORY:$TAGNAME .
+        docker push $REGISTRY/$REPOSITORY
+        echo "::set-output name=image::$REGISTRY/$REPOSITORY:$IMAGE_TAG"
+
+  build-and-push-backend:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Build, tag, and push image to Amazon ECR
+      id: build-image
+      env:
+        REGISTRY: cuebook
+        REPOSITORY: cue-observe-backend
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        cd api
+        # Build a docker container and
+        # push it to ECR so that it can
+        # be deployed to ECS.
+        docker login -u vincue -p ${{ secrets.DOCKER_TOKEN }}
+        TAGNAME=${{ github.event.inputs.tagName }}
+        docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG -t $REGISTRY/$REPOSITORY:latest -t $REGISTRY/$REPOSITORY:$TAGNAME .
+        docker push $REGISTRY/$REPOSITORY
+        echo "::set-output name=image::$REGISTRY/$REPOSITORY:$IMAGE_TAG"
+
+  build-and-push-alerts:
+    runs-on: ubuntu-latest
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Build, tag, and push image to Amazon ECR
+      id: build-image
+      env:
+        REGISTRY: cuebook
+        REPOSITORY: cue-observe-alerts
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        cd alerts-api
+        # Build a docker container and
+        # push it to ECR so that it can
+        # be deployed to ECS.
+        docker login -u vincue -p ${{ secrets.DOCKER_TOKEN }}
+        TAGNAME=${{ github.event.inputs.tagName }}
+        docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG -t $REGISTRY/$REPOSITORY:latest -t $REGISTRY/$REPOSITORY:$TAGNAME .
+        docker push $REGISTRY/$REPOSITORY
+        echo "::set-output name=image::$REGISTRY/$REPOSITORY:$IMAGE_TAG"
+
