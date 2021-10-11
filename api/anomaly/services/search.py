@@ -12,7 +12,7 @@ class SearchUtils:
     def getAllDimensions():
         """ Gets dimension from all datasets """
         res = ApiResponse()
-        datasets = list(Dataset.objects.all().iterator(chunk_size=2000)) # Get all datasets
+        datasets = Dataset.objects.all() # Get all datasets
         data = AllDimensionsSerializer(datasets, many=True).data
         url = f'{ENVIRONMENT_URL}/search/global-dimension'
         res.update(True,"Successfully data transfer",data)
@@ -20,7 +20,7 @@ class SearchUtils:
 
     def getAllMetrics():
         """ Gets metric from all datasets """
-        datasets = list(Dataset.objects.all().iterator(chunk_size=2000)) # Get all datasets
+        datasets = Dataset.objects.all() # Get all datasets
         data = AllMeticsSerializer(datasets, many=True).data
         url = f'{ENVIRONMENT_URL}/search/metrics'
 
