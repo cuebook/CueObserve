@@ -20,7 +20,8 @@ else:
 
 # DATABASE_CONNECT_OPTIONS = {}
 
-GET_DIMENSION_URL = os.environ.get("GET_DIMENSION_URL", "http://localhost:8000/api/anomaly/search/dimension/")
+DIMENSION_URL = os.environ.get("DIMENSION_URL", "http://localhost:8000/api/anomaly/search/dimension/")
+FRONTEND_URL = os.environ.get("FRONTEND_URL", "http://localhost:3000")
 # # Application threads. Common assumption is
 # # to use 2 threads per available core.
 # # Handles incoming requests using one and

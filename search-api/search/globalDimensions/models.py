@@ -23,4 +23,4 @@ class GlobalDimensionValues(db.Model):
     globalDimensionId = db.Column(db.Integer, db.ForeignKey('globaldimension.id'), nullable=False)
 
     def __repr__(self):
-        return "<GlobalDimensionValues(dimensionName='%s')>" % (self.dimensionName)
+        return "<GlobalDimensionValues(dimension='%s')>" % (self.dimension)

@@ -3,7 +3,7 @@ from flask import Flask, request, jsonify, make_response
 import requests
 from .models import GlobalDimension, GlobalDimensionValues
 from .serializer import GlobalDimensionSchema, GlobalDimensionValuesSchema
-from config import GET_DIMENSION_URL
+from config import DIMENSION_URL
 
 def createGlobalDimension(payloads):
     """ Create global dimension"""
@@ -12,7 +12,7 @@ def createGlobalDimension(payloads):
         app.logger.info("Global dimension creating with name %s", name)
         globalDimension = GlobalDimension(name=name)
         db.session.add(globalDimension)
-        db.session.commit()
+        db.session.flush()
         app.logger.info("Global dimension objs saved ")
         dimensions = payloads["dimensionalValues"]
         objs = payloads["dimensionalValues"]
@@ -22,6 +22,7 @@ def createGlobalDimension(payloads):
             dimensionalValueObjs.append(gdValues)
         app.logger.info("dimensionalValuesOBjs %s", dimensionalValueObjs)
         db.session.bulk_save_objects(dimensionalValueObjs)
+        db.session.flush()
         db.session.commit()
         app.logger.info("Global Dimension Values created ")
         res = {"success":True}
@@ -35,12 +36,12 @@ def createGlobalDimension(payloads):
 def getDimensionFromCueObserve():
     """ Get dimension from cueObserve"""
     try:
-        url = GET_DIMENSION_URL
+        url = DIMENSION_URL
         response = requests.get(url)
         payloads  = response.json()["data"]
         payloadDicts = []
         for payload in payloads:
-            for dimension in payload["dimensions"]:
+            for dimension in payload.get("dimensions", []):
                 dictObjs = {}
                 dictObjs["dataset"] = payload["name"]
                 dictObjs["datasetId"] = payload["id"]

@@ -15,11 +15,3 @@ class GlobalDimensionSchema(ma.Schema):
     name = ma.String()
     published = ma.Boolean()
     values = ma.List(ma.Nested(GlobalDimensionValuesSchema(only=("dimension","dataset"))))
-
-
-
-# globaldimension_schema = GlobalDimensionSchema()
-# globaldimensions_schema = GlobalDimensionSchema(many=True)
-
-# globaldimensionValue_schema = GlobalDimensionValuesSchema()
-# globaldimensionValues_schema = GlobalDimensionValuesSchema(many=True)
