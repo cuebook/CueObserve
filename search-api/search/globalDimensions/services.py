@@ -38,7 +38,7 @@ def getDimensionFromCueObserve():
     try:
         url = DIMENSION_URL
         response = requests.get(url)
-        payloads  = response.json()["data"]
+        payloads  = response.json().get("data", [])
         payloadDicts = []
         for payload in payloads:
             for dimension in payload.get("dimensions", []):
