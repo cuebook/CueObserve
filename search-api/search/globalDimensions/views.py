@@ -43,7 +43,7 @@ def createGlobalDimensionView():
 
     return jsonify(res)
 
-@app.route("/search/dimension/", methods=['GET', 'POST', 'OPTIONS'])
+@app.route("/search/dimension/", methods=['GET'])
 def getDimensions():
     app.logger.info("request.header %s", request.headers)
     res = getDimensionFromCueObserve()

@@ -16,4 +16,4 @@ rm -rf static_root/
 (celery -A app worker --concurrency=4 -Q anomalySubTask -l INFO --purge) &
 (celery -A app beat -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler) &
 
-gunicorn app.wsgi --user www-data --bind 0.0.0.0:8000 --workers 3 --timeout 300 --reload
+gunicorn app.wsgi --reload --user www-data --bind 0.0.0.0:8000 --workers 3 --timeout 300
