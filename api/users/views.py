@@ -62,8 +62,6 @@ class Account(APIView):
                 return Response({"message": "Authentication not required", "success": False, "isAuthenticationRequired": self.authenticationRequired})
 
 
-
-
     def post(self, request):
             """For new login"""
             res = {"message": "Some error occured", "success": False}
@@ -89,3 +87,12 @@ class Account(APIView):
         """Remove session, log outs user"""
         logout(request)
         return Response({"message": "Logged out successfully", "success":True})
+
+
+class AuthView(APIView):
+    def get(self, request):
+
+        # This is just for testing, to be removed
+        # return HttpResponse('Unauthorized', status=401)
+        
+        return Response({"message": "User Already LoggedIn", "success":True})
