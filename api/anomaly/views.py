@@ -377,8 +377,16 @@ class RCAView(APIView):
         res = RootCauseAnalyses.abortRCA(anomalyId)
         return Response(res.json())
 
+
+# For communication between CueObserve and Search(microservices) 
 class DimensionView(APIView):
     def get(self, request):
-        """get dimension"""
+        """Get Dimension"""
         res = search.SearchUtils.getAllDimensions()
+        return Response(res.json())
+
+class MetricsView(APIView):
+    def get(self, request):
+        """ Get Metrics"""
+        res = search.SearchUtils.getAllMetrics()
         return Response(res.json())

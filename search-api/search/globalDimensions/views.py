@@ -3,7 +3,7 @@ from search import app
 import logging
 import json
 from flask import Flask, request, jsonify, make_response
-from search.globalDimensions import  createGlobalDimension, getDimensionFromCueObserve, getGlobalDimensions
+from search.globalDimensions import  createGlobalDimension, getDimensionFromCueObserve, getGlobalDimensions, getMetricsFromCueObserve
 # app = Flask(__name__)
 
 
@@ -19,6 +19,13 @@ def getDimensions():
     app.logger.info("Get dimension from CueObserve ")
     res = getDimensionFromCueObserve()
     return jsonify(res)
+
+# Use it, when need it on UI
+# @app.route("/search/metrics/", methods=['GET'])
+# def getMetrics():
+#     app.logger.info("Get all metrics from CueObserve ")
+#     res = getMetricsFromCueObserve()
+#     return jsonify(res)
 
 @app.route("/search/global-dimension/", methods=["GET"])
 def getGlobalDimensionsView():

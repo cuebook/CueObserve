@@ -5,7 +5,7 @@ services:
       context: api
       dockerfile: Dockerfile
     volumes:
-      - ./api:/app:rw
+      - ./api/anomaly:/code/anomaly:rw
     environment:
       - ENVIRONMENT
       - API_URL

@@ -413,6 +413,6 @@ class AllMeticsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Dataset
-        fields = ['id', 'name','connectionName' ,'metrics', 'granularity']
+        fields = ['id', 'name','connectionName','metrics', 'granularity']
 
 
