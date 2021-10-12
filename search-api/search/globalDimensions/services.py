@@ -1,46 +1,72 @@
-from .models import GlobalDimension, GlobalDimensionValues
 from search import app, db
 from flask import Flask, request, jsonify, make_response
 import requests
-
-def getGlobalDimensions(payloads):
-    """
-    Gets all dimensions
-    """
-    app.logger.info("payloads %s", payloads)
-    payloadDicts = []
-    for payload in payloads:
-        for dimension in payload["dimensions"]:
-            dictObjs = {}
-            dictObjs["datasetName"] = payload["name"]
-            dictObjs["datasetId"] = payload["id"]
-            dictObjs["dimension"] = dimension
-            payloadDicts.append(dictObjs)
-
-
-    app.logger.info("payload dicts %s", payloadDicts)
-    app.logger.info("payload dicts count %s", len(payloadDicts))
-    return payloadDicts
+from .models import GlobalDimension, GlobalDimensionValues
+from .serializer import GlobalDimensionSchema, GlobalDimensionValuesSchema
+from config import DIMENSION_URL
 
 def createGlobalDimension(payloads):
     """ Create global dimension"""
-    app.logger.info("payloads %s", payloads)
-    name = payloads["name"]
-    # dimensions = payloads["dimensionalValues"]
-    globalDimension = GlobalDimension(name=name)
-    db.session.add(globalDimension)
-    db.session.commit()
-    app.logger.info("globaldimension %s", globalDimension)
-    res = {"success":True}
-    return res
+    try:
+        name = payloads["name"]
+        app.logger.info("Global dimension creating with name %s", name)
+        globalDimension = GlobalDimension(name=name)
+        db.session.add(globalDimension)
+        db.session.flush()
+        app.logger.info("Global dimension objs saved ")
+        dimensions = payloads["dimensionalValues"]
+        objs = payloads["dimensionalValues"]
+        dimensionalValueObjs = []
+        for obj in objs:
+            gdValues = GlobalDimensionValues(datasetId = obj["datasetId"], dataset = obj["dataset"], dimension = obj["dimension"], globalDimensionId = globalDimension.id)
+            dimensionalValueObjs.append(gdValues)
+        app.logger.info("dimensionalValuesOBjs %s", dimensionalValueObjs)
+        db.session.bulk_save_objects(dimensionalValueObjs)
+        db.session.flush()
+        db.session.commit()
+        app.logger.info("Global Dimension Values created ")
+        res = {"success":True}
+        return res
+    except Exception as ex:
+        res = {"success":False, "message":"Global Dimension name already exists "}
+        db.session.rollback()
+        return res
+
 
 def getDimensionFromCueObserve():
     """ Get dimension from cueObserve"""
-    url = "http://localhost:8000/api/anomaly/search/dimension/"
-    response = requests.get(url)
-        # response = {"success":True}
-    app.logger.info("resopnse %s", (response.json()))
-    payloads  = response.json()["data"]
-    res = getGlobalDimensions(payloads)
-    return res
+    try:
+        url = DIMENSION_URL
+        response = requests.get(url)
+        payloads  = response.json().get("data", [])
+        payloadDicts = []
+        for payload in payloads:
+            for dimension in payload.get("dimensions", []):
+                dictObjs = {}
+                dictObjs["dataset"] = payload["name"]
+                dictObjs["datasetId"] = payload["id"]
+                dictObjs["dimension"] = dimension
+                payloadDicts.append(dictObjs)
+
+        res = payloadDicts
+        return res
+
+    except Exception as ex:
+        app.logger.error*("Failed to get dimension %s", ex)
+        return []
+
+
+def getGlobalDimensions():
+    """ Services to get Global dimension and their linked dimension"""
+    try:
+        app.logger.info("Get Global Dimension")
+        globalDimensions = GlobalDimension.query.all()
+        data = GlobalDimensionSchema(many=True).dump(globalDimensions)
+        return data
+
+    except Exception as ex:
+        app.logger.error("Failed to get global dimension %s", ex)
+        return []
+
+    
 

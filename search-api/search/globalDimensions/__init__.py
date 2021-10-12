@@ -1,1 +1,1 @@
-from .services import getGlobalDimensions, createGlobalDimension, getDimensionFromCueObserve
+from .services import createGlobalDimension, getDimensionFromCueObserve, getGlobalDimensions

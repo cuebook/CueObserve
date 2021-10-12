@@ -10,6 +10,10 @@ class GlobalDimensionService {
         const response = await apiService.post("globalDimension/create/", payload)
         return response
     }
+    async getGlobalDimension(){
+        const response = await apiService.get("global-dimension/")
+        return response
+    }
 
 }
 

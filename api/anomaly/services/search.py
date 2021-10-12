@@ -15,8 +15,6 @@ class SearchUtils:
         datasets = Dataset.objects.all() # Get all datasets
         data = AllDimensionsSerializer(datasets, many=True).data
         url = f'{ENVIRONMENT_URL}/search/global-dimension'
-        # url = 'http://127.0.0.1:8200/search/global-dimension/'
-        # res = requests.request("POST",url, json = data)
         res.update(True,"Successfully data transfer",data)
         return res
 

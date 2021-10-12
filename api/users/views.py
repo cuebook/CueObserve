@@ -35,7 +35,6 @@ class Account(APIView):
     """Account authentication"""
 
     authenticationRequired= True if settings.AUTHENTICATION_REQUIRED == "True" else False
-    authenticationRequired = True
     authentication_classes = (UnsafeSessionAuthentication,)
     @staticmethod
     def parse_user(user):
