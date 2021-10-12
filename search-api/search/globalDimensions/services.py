@@ -36,7 +36,7 @@ def createGlobalDimension(payloads):
 def getDimensionFromCueObserve():
     """ Get dimension from cueObserve"""
     try:
-        url = GET_DIMENSION_URL
+        url = DIMENSION_URL
         response = requests.get(url)
         payloads  = response.json()["data"]
         payloadDicts = []
