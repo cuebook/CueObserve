@@ -3,7 +3,7 @@ import { Button, Form, Input, message } from "antd";
 import { LeftOutlined } from '@ant-design/icons';
 
 import style from "./style.module.scss";
-import connectionService from "services/connection.js";
+import connectionService from "services/main/connection.js";
 
 export default function ViewConnection(props) {
   const [connectionTypes, setConnectionTypes] = useState([]);

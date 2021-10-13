@@ -1,17 +1,8 @@
 import {getCookie} from "./general.js"
 
 class ApiService {
-  constructor(basePath){
-    if(process.env.NODE_ENV === "development"){
-          // Development Settings
-         this.host = "http://localhost:8000";
-         this.base_url = this.host + basePath + "/api/";
-    }
-    else{
-          // Production Settings
-         this.host = "";
-         this.base_url = this.host + basePath + "/api/";
-    }
+  constructor(baseUrl){
+    this.base_url = baseUrl
   }
   
   async get(endpoint) {
@@ -86,6 +77,4 @@ class ApiService {
   };
 }
 
-let basePath = "";
-let apiService = new ApiService(basePath)
-export default apiService;
+export default ApiService

@@ -20,8 +20,8 @@ import { Form, Button, Input,
   Switch,
   Table
  } from 'antd';
-import datasetService from "services/datasets";
-import queryService from "services/querys";
+import datasetService from "services/main/datasets";
+import queryService from "services/main/querys";
 import SelectConnection from "components/Connections/SelectConnection";
 
 const { Option } = Select;

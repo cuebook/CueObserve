@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Select } from 'antd';
-import connectionService from "services/connection.js";
+import connectionService from "services/main/connection.js";
 
 const { Option } = Select;
 

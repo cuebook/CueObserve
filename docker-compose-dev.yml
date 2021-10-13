@@ -7,18 +7,18 @@ services:
     volumes:
       - ./api:/app:rw
     environment:
-      ENVIRONMENT: ${ENVIRONMENT}
-      API_URL: ${API_URL}
-      ALERT_API_URL: ${ALERT_API_URL}
-      POSTGRES_DB_HOST: ${POSTGRES_DB_HOST}
-      POSTGRES_DB_USERNAME: ${POSTGRES_DB_USERNAME}
-      POSTGRES_DB_PASSWORD: ${POSTGRES_DB_PASSWORD}
-      POSTGRES_DB_SCHEMA: ${POSTGRES_DB_SCHEMA}
-      POSTGRES_DB_PORT: ${POSTGRES_DB_PORT}
-      DJANGO_SUPERUSER_USERNAME: ${DJANGO_SUPERUSER_USERNAME}
-      DJANGO_SUPERUSER_PASSWORD: ${DJANGO_SUPERUSER_PASSWORD}
-      DJANGO_SUPERUSER_EMAIL: ${DJANGO_SUPERUSER_EMAIL}
-      IS_AUTHENTICATION_REQUIRED: ${IS_AUTHENTICATION_REQUIRED}
+      - ENVIRONMENT
+      - API_URL
+      - ALERT_API_URL
+      - POSTGRES_DB_HOST
+      - POSTGRES_DB_USERNAME
+      - POSTGRES_DB_PASSWORD
+      - POSTGRES_DB_SCHEMA
+      - POSTGRES_DB_PORT
+      - DJANGO_SUPERUSER_USERNAME
+      - DJANGO_SUPERUSER_PASSWORD
+      - DJANGO_SUPERUSER_EMAIL
+      - IS_AUTHENTICATION_REQUIRED
     network_mode: "host"
 
   cueo-alerts:
@@ -29,16 +29,7 @@ services:
       - ./alerts-api:/code:rw
     network_mode: "host"
 
-  cueo-frontend:
-    build:
-      context: ui
-      dockerfile: Dockerfile.dev
-    stdin_open: true
-    volumes:
-      - ./ui/src:/app/src:rw
-    network_mode: "host"
-
-   cueo-search:
+  cueo-search:
     build:
       context: search-api
       dockerfile: Dockerfile
@@ -47,12 +38,20 @@ services:
       - SEARCH_POSTGRES_DB_SCHEMA
       - SEARCH_POSTGRES_DB_USERNAME
       - SEARCH_POSTGRES_DB_PASSWORD
-      - SEARCH_POSTGRES_DB_HOST
       - SEARCH_POSTGRES_DB_PORT
     volumes:
-      - ${PWD}/search-api:/code:rw
+      - ./search-api:/code:rw
     network_mode: "host"
 
+  cueo-frontend:
+    build:
+      context: ui
+      dockerfile: Dockerfile.dev
+    stdin_open: true
+    volumes:
+      - ./ui/src:/app/src:rw
+    network_mode: "host"
+    
   cueo-postgresql:
     image: postgres:13
     environment:

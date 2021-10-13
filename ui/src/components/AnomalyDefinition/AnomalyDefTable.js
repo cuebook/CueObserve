@@ -6,8 +6,8 @@ import EditAnomalyDef from "./EditAnomalyDef.js"
 import RunStatus from "./RunStatus.js";
 import RunStatusAnomalies from "./RunStatusAnomalies.js";
 import { EditOutlined, DeleteOutlined, PlayCircleOutlined, CloseOutlined, EyeOutlined } from '@ant-design/icons';
-import anomalyDefService from "services/anomalyDefinitions.js"
-import scheduleService from "services/schedules"
+import anomalyDefService from "services/main/anomalyDefinitions.js"
+import scheduleService from "services/main/schedules"
 import SelectSchedule from "components/Schedule/SelectSchedule"
 import style from "./style.module.scss";
 // import { search } from "services/general.js"

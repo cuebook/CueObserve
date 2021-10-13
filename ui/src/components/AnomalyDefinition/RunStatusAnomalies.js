@@ -3,7 +3,7 @@ import style from "./style.module.scss";
 
 import { Table } from "antd";
 
-import anomalyDefService from "services/anomalyDefinitions.js";
+import anomalyDefService from "services/main/anomalyDefinitions.js";
 
 export default function RunStatusAnomalies(props) {
   

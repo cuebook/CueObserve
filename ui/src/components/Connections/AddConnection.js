@@ -3,7 +3,7 @@ import { Button, Form, Input, Switch, message } from "antd";
 import { LeftOutlined } from '@ant-design/icons';
 
 import style from "./style.module.scss";
-import connectionService from "services/connection.js";
+import connectionService from "services/main/connection.js";
 const {TextArea} = Input;
 
 export default function AddConnection(props) {
