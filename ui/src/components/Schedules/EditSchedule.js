@@ -3,7 +3,7 @@ import { Button, Form, Input, message, Select } from "antd";
 import { LeftOutlined } from '@ant-design/icons';
 
 import style from "./style.module.scss";
-import scheduleService from "services/schedules.js"
+import scheduleService from "services/main/schedules.js"
 
 
 const { Option } = Select;

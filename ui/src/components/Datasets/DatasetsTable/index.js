@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import TimeAgo from 'react-timeago';
 import _ from "lodash";
-import datasetService from "services/datasets";
+import datasetService from "services/main/datasets";
 import style from "./style.module.scss";
 import { useHistory } from "react-router-dom";
 import {

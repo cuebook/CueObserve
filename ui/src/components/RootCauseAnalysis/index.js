@@ -5,7 +5,7 @@ import { Table, Button, Spin } from "antd";
 import { CaretUpOutlined, CaretDownOutlined } from '@ant-design/icons';
 
 import AnomalyChart from "components/Anomalys/AnomalyChart";
-import rootCauseAnalysisService from "services/rootCauseAnalysis";
+import rootCauseAnalysisService from "services/main/rootCauseAnalysis";
 import RCALogs from "./rcaLogs"
 
 export default function Anomaly(props) {

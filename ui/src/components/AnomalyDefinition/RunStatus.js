@@ -4,7 +4,7 @@ import Moment from 'react-moment';
 
 import { Table } from "antd";
 
-import anomalyDefService from "services/anomalyDefinitions.js";
+import anomalyDefService from "services/main/anomalyDefinitions.js";
 var moment = require("moment");
 
 function timehumanize(temps){

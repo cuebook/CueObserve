@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Table, Button, Popconfirm, Input, message, Tooltip, Drawer, Modal} from "antd";
 import style from "./style.module.scss";
-import connectionService from "services/connection.js";
+import connectionService from "services/main/connection.js";
 import AddConnection from "./AddConnection.js";
 import ViewConnection from "./ViewConnection.js";
 import { EyeOutlined, DeleteOutlined } from '@ant-design/icons';

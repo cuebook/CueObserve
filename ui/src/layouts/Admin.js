@@ -21,7 +21,10 @@ import Login from "components/System/User/Login/index"
 
 // contexts
 import { GlobalContextProvider } from "./GlobalContext";
-import userServices from "services/user.js"
+import userServices from "services/main/user.js"
+
+// Search 
+import GlobalDimensionTable from "views/admin/GlobalDimension"
 
 export default function Admin() {
   const [ isLoggedIn, setIsLoggedIn] = useState(false)
@@ -91,6 +94,7 @@ export default function Admin() {
               <Route path="/anomalyDefinitions" exact component={AnomalyDefTable} />
               <Route path="/schedules" exact component={Schedules} />
               <Route path="/settings" exact component={Settings} />
+              <Route path="/search/global-dimension" exact component={GlobalDimensionTable} />
               <Redirect from="/" to="/anomalies" />
             </Switch>
           </div>
