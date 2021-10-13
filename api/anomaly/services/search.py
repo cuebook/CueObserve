@@ -6,7 +6,7 @@ from utils.apiResponse import ApiResponse
 from anomaly.models import Dataset
 from anomaly.services import Datasets
 from anomaly.serializers import AllDimensionsSerializer, AllMeticsSerializer
-ENVIRONMENT_URL = os.environ.get("ENVIRONMENT_URL", "http://localhost:8200")
+
 class SearchUtils:
     """ Provides service related to search """
     def getAllDimensions():

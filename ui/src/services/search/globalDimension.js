@@ -1,18 +1,37 @@
 import apiService from "./api";
+import {message} from "antd";
 
 class GlobalDimensionService {
     async getDimensions(){
         const response = await apiService.get("dimension/")
-        return response
+        if(response.success){
+            return response.data
+        }
+        else{
+            message.error(response.message)
+            return response.data
+        }
     }
 
     async AddGlobalDimension(payload){
         const response = await apiService.post("globalDimension/create/", payload)
-        return response
+        if(response.success){
+            return response.data
+        }
+        else{
+            message.error(response.message)
+            return response.data
+        }
     }
     async getGlobalDimension(){
         const response = await apiService.get("global-dimension/")
-        return response
+        if(response.success){
+            return response.data
+        }
+        else {
+            message.error(response.message)
+            return response.data
+        }
     }
 
 }

@@ -48,12 +48,12 @@ def getDimensionFromCueObserve():
                 dictObjs["dimension"] = dimension
                 payloadDicts.append(dictObjs)
 
-        res = payloadDicts
+        res = {"success":True, "data":payloadDicts}
         return res
-
     except Exception as ex:
         app.logger.error*("Failed to get dimension %s", ex)
-        return []
+        res = {"success":True, "data":[], "message":"Error occured to get dimension from cueObserve"}
+
 
 def getMetricsFromCueObserve():
     """ Service to get all metrics from cueObserve"""
@@ -67,11 +67,11 @@ def getMetricsFromCueObserve():
             dictObjs["dataset"] = payload["name"]
             dictObjs["metrics"] = payload["metrics"]
             payloadDicts.append(dictObjs)
-        return payloadDicts
+        res = {"success":True, "data":payloadDicts}
+        return res
     except Exception as ex:
         app.logger.error("Failed to get metrics from cueObserve %s", ex)
-        return []
-
+        res = {"success":True, "data":[], "message":"Error occured to get metric from cueObserve"}
 
 def getGlobalDimensions():
     """ Services to get Global dimension and their linked dimension"""
@@ -79,11 +79,13 @@ def getGlobalDimensions():
         app.logger.info("Get Global Dimension")
         globalDimensions = GlobalDimension.query.all()
         data = GlobalDimensionSchema(many=True).dump(globalDimensions)
-        return data
+        res = {"success":True, "data":data}
+        return res
 
     except Exception as ex:
         app.logger.error("Failed to get global dimension %s", ex)
-        return []
+        res = {"success":False, "data":[], "message":"Error occured to get data in global dimension"}
+        return res
 
 
 def getGlobalDimensionForIndex():

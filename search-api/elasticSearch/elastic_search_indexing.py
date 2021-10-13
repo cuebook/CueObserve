@@ -10,7 +10,6 @@ from datetime import datetime
 from config import ELASTICSEARCH_URL
 
 from search.globalDimensions.services import getGlobalDimensionForIndex, getMetricsFromCueObserve
-from search.globalDimensions.views import getMetrics
 import traceback
 
 
@@ -20,7 +19,7 @@ class ESIndexingUtils:
     and search utilities
     """
     GLOBAL_DIMENSIONS_INDEX_NAME = "global_dimensions_index_cueobserve"
-    CUBE_MEASURES_SEARCH_INDEX_NAME = "cube_measures_index_cueobserve"
+    DATASET_MEASURES_INDEX_NAME = "dataset_measures_index_cueobserve"
 
     @staticmethod
     def _getESClient() -> Elasticsearch:
@@ -243,8 +242,15 @@ class ESIndexingUtils:
 
         logging.info("Method to index cube measures")
         response = getMetricsFromCueObserve()
+        data = []
+        if (response.get("success", False)):
+            logging.info("Get measure data for indexing")
+            data = response.get("data",[])
+        else:
+            logging.error("Did not get Measure for Indexing")
+            return 
         measureToBeIndex = []
-        for res in response:
+        for res in data:
             dataset = res["dataset"]
             for measure in res.get("metrics",[]):
 
@@ -292,7 +298,7 @@ class ESIndexingUtils:
 
         ESIndexingUtils._createIndex(
             documentsToIndex=documentsToIndex,
-            indexName=ESIndexingUtils.CUBE_MEASURES_SEARCH_INDEX_NAME,
+            indexName=ESIndexingUtils.DATASET_MEASURES_INDEX_NAME,
             indexDefinition=indexDefinition,
         )
 
