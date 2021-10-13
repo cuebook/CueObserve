@@ -10,7 +10,7 @@ You write a SQL GROUP BY query with aggregate functions to roll-up your data. Yo
 
 1. Dataset must have only one timestamp column. This timestamp column is used to generate timeseries data for anomaly detection.
 2. Dataset must have at least one aggregate column. CueObserve currently supports only COUNT or SUM as aggregate functions. Aggregate columns must be mapped as measures.
-3. Dataset can have one or more dimension columns \(optional\).
+3. Dataset can have one or more dimension columns (optional).
 
 ## SQL GROUP BY Query
 
@@ -30,4 +30,3 @@ ORDER BY 1
 ```
 
 Since the last time bucket might be partial, CueObserve ignores the last time bucket when generating timeseries.
-

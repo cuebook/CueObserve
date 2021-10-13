@@ -29,4 +29,3 @@ Next CueObserve combines the actual data with the forecasted data from Prophet a
 CueObserve saves the actual data with the bands and the forecast in its database. If the latest anomalous data point is not older than a certain time threshold, CueObserve publishes it as an anomaly and saves the dimension value and its contribution. The aforementioned time threshold depends on the granularity. It is 5 days if the granularity is daily and 1 day if the granularity is hourly.
 
 Finally, CueObserve stores all the individual results of the process along with the metadata in a format for easy visual representation in the UI.
-

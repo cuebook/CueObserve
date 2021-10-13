@@ -2,21 +2,26 @@
 
 ## Install via Docker-Compose
 
+```
+wget https://raw.githubusercontent.com/cuebook/CueObserve/latest_release/docker-compose.yml -q -O cueobserve-docker-compose.yml
+docker-compose -f cueobserve-docker-compose.yml up -d
+```
+
 **Development Mode:**
 
-```text
+```
 docker-compose -f docker-compose-dev.yml up -d
 ```
 
 **OR Production Mode:**
 
-```text
+```
 docker-compose up -d
 ```
 
-**OR** Install via Docker **\(Deprecated Method\)**
+**OR** Install via Docker **(Deprecated Method)**
 
-```text
+```
 docker run -p 3000:3000 cuebook/cueobserve
 ```
 
@@ -26,7 +31,7 @@ Now visit [localhost:3000](http://localhost:3000) in your browser.
 
 Go to the Connections screen to create a connection.
 
-![](.gitbook/assets/addconnection%20%281%29.png)
+![](<.gitbook/assets/addconnection (1).png>)
 
 ## Add Dataset
 
@@ -41,4 +46,3 @@ Once you have created an anomaly job, click on the \`Run\` icon button to trigge
 ![](.gitbook/assets/anomalydefinitions.png)
 
 Once the job is successful, go to the Anomalies screen to view your anomalies.
-

@@ -122,4 +122,3 @@ WHERE CreatedTS >= DATEADD(DAY, -400, cast(GETDATE() as date)) -- limit historic
 GROUP BY format(CreatedTS,'yyyy-MM-dd 00:00:00'), City, State
 ORDER BY 1
 ```
-

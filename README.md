@@ -54,4 +54,3 @@ When an anomaly detection job runs, CueObserve does the following:
 ## Support
 
 For general help using CueLake, read the documentation, or go to [Github Discussions](https://github.com/cuebook/CueObserve/discussions). To report a bug or request a feature, open a [Github issue](https://github.com/cuebook/CueObserve/issues).
-
