@@ -91,8 +91,4 @@ class Account(APIView):
 
 class AuthView(APIView):
     def get(self, request):
-
-        # This is just for testing, to be removed
-        # return HttpResponse('Unauthorized', status=401)
-        
         return Response({"message": "User Already LoggedIn", "success":True})
