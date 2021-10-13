@@ -124,7 +124,7 @@ class DatasetSerializer(serializers.ModelSerializer):
         return obj.anomalydefinition_set.count()
 
     def get_dimensions(self, obj):
-        dimensions = json.loads(obj.dimensions) if obj.metrics else []
+        dimensions = json.loads(obj.dimensions) if obj.dimensions else []
         return dimensions if dimensions else []
 
     def get_metrics(self, obj):
@@ -366,7 +366,7 @@ class RootCauseAnalysisSerializer(serializers.ModelSerializer):
 
 class AllDimensionsSerializer(serializers.ModelSerializer):
     """
-    Serializes data related to anomaly tree 
+    Serializes data to get all dimensions
     """
     connectionName = serializers.SerializerMethodField()
     dimensions = serializers.SerializerMethodField()
@@ -378,12 +378,8 @@ class AllDimensionsSerializer(serializers.ModelSerializer):
         return obj.connection.name
 
     def get_dimensions(self, obj):
-        dimensions = json.loads(obj.dimensions) if obj.metrics else []
+        dimensions = json.loads(obj.dimensions) if obj.dimensions else []
         return dimensions if dimensions else []
-
-    # def get_metrics(self, obj):
-    #     metrics = json.loads(obj.metrics) if obj.metrics else []
-    #     return metrics if metrics else []
 
     class Meta:
         model = Dataset
@@ -392,7 +388,7 @@ class AllDimensionsSerializer(serializers.ModelSerializer):
 
 class AllMeticsSerializer(serializers.ModelSerializer):
     """
-    Serializes data related to anomaly tree 
+    Serializes data to get all metrics
     """
     connectionName = serializers.SerializerMethodField()
     metrics = serializers.SerializerMethodField()
@@ -402,10 +398,6 @@ class AllMeticsSerializer(serializers.ModelSerializer):
         Gets connection name
         """
         return obj.connection.name
-
-    # def get_dimensions(self, obj):
-    #     dimensions = json.loads(obj.dimensions) if obj.metrics else []
-    #     return dimensions if dimensions else []
 
     def get_metrics(self, obj):
         metrics = json.loads(obj.metrics) if obj.metrics else []
