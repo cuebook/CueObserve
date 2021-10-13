@@ -16,11 +16,11 @@ class GlobalDimensionService {
     async AddGlobalDimension(payload){
         const response = await apiService.post("globalDimension/create/", payload)
         if(response.success){
-            return response.data
+            return response
         }
         else{
             message.error(response.message)
-            return response.data
+            return response
         }
     }
     async getGlobalDimension(){
