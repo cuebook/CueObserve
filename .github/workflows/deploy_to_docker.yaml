@@ -1,0 +1,90 @@
+on:
+  push:
+    branches:
+      - latest_release
+  workflow_dispatch:
+    inputs:
+      tagName:
+        description: 'Tag Name'     
+        required: true
+        default: 'latest'
+
+name: Deploy to Docker
+
+jobs:
+  build-and-push-frontend:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Build, tag, and push image to Docker Hub
+      id: build-image
+      env:
+        REGISTRY: cuebook
+        REPOSITORY: cue-observe-frontend
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        cd ui
+        # Build a docker container and
+        # push it to ECR so that it can
+        # be deployed to ECS.
+        docker login -u vincue -p ${{ secrets.DOCKER_TOKEN }}
+        TAGNAME=latest
+        if [[ ${{ github.event_name == 'workflow_dispatch' }} ]]; then TAGNAME=${{ github.event.inputs.tagName }}; fi
+        docker build -t $REGISTRY/$REPOSITORY:$TAGNAME .
+        docker push $REGISTRY/$REPOSITORY --all-tags
+        echo "::set-output name=image::$REGISTRY/$REPOSITORY:$IMAGE_TAG"
+
+  build-and-push-backend:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Build, tag, and push image to Docker Hub
+      id: build-image
+      env:
+        REGISTRY: cuebook
+        REPOSITORY: cue-observe-backend
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        cd api
+        # Build a docker container and
+        # push it to ECR so that it can
+        # be deployed to ECS.
+        docker login -u vincue -p ${{ secrets.DOCKER_TOKEN }}
+        TAGNAME=latest
+        if [[ ${{ github.event_name == 'workflow_dispatch' }} ]]; then TAGNAME=${{ github.event.inputs.tagName }}; fi
+        docker build -t $REGISTRY/$REPOSITORY:$TAGNAME .
+        docker push $REGISTRY/$REPOSITORY --all-tags
+        echo "::set-output name=image::$REGISTRY/$REPOSITORY:$IMAGE_TAG"
+
+  build-and-push-alerts:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Build, tag, and push image to Docker Hub
+      id: build-image
+      env:
+        REGISTRY: cuebook
+        REPOSITORY: cue-observe-alerts
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        cd alerts-api
+        # Build a docker container and
+        # push it to ECR so that it can
+        # be deployed to ECS.
+        docker login -u vincue -p ${{ secrets.DOCKER_TOKEN }}
+        echo ${{ github.event_name }}
+        TAGNAME=latest
+        if [[ ${{ github.event_name == 'workflow_dispatch' }} ]]; then TAGNAME=${{ github.event.inputs.tagName }}; fi
+        docker build -t $REGISTRY/$REPOSITORY:$TAGNAME .
+        docker push $REGISTRY/$REPOSITORY --all-tags
+        echo "::set-output name=image::$REGISTRY/$REPOSITORY:$IMAGE_TAG"
+
