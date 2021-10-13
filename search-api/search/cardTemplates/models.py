@@ -1,18 +1,11 @@
-# from search import db
+from search import db
 
-# Model classes for reference
+class SearchCardTemplate(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    templateName = db.Column(db.String)
+    title = db.Column(db.String)
+    bodyText = db.Column(db.String)
+    supportedVariables = db.Column(db.String)
 
-# class Something(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     name = db.Column(db.String)
-#     email = db.Column(db.String)
-#     salary = db.Column(db.Numeric)
-#     references = db.Column(db.String)
-
-#     def __repr__(self):
-#         return "(%r, %r, %r)" % (self.name, self.email, self.salary)
-
-
-# class Otherthing(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     datasetId = db.Column(db.Integer)
+    def __repr__(self):
+        return self.templateName
