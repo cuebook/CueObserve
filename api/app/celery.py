@@ -4,7 +4,7 @@ from celery import Celery
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "app.settings")
 
-app = Celery("app", broker=settings.REDIS_BROKER_URL)
+app = Celery("app", broker=settings.REDIS_BROKER_URL, backend=settings.CELERY_RESULT_BACKEND)
 
 # app.config_from_object("django.conf:settings", namespace="CELERY")
 app.autodiscover_tasks()
