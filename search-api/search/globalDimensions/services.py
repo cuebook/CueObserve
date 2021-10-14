@@ -53,7 +53,7 @@ def getDimensionFromCueObserve():
         return res
     except Exception as ex:
         app.logger.error*("Failed to get dimension %s", ex)
-        res = {"success":True, "data":[], "message":"Error occured to get dimension from cueObserve"}
+        res = {"success":False, "data":[], "message":"Error occured to get dimension from cueObserve"}
 
 
 def getMetricsFromCueObserve():
@@ -72,7 +72,7 @@ def getMetricsFromCueObserve():
         return res
     except Exception as ex:
         app.logger.error("Failed to get metrics from cueObserve %s", ex)
-        res = {"success":True, "data":[], "message":"Error occured to get metric from cueObserve"}
+        res = {"success":False, "data":[], "message":"Error occured to get metric from cueObserve"}
 
 def getGlobalDimensions():
     """ Services to get Global dimension and their linked dimension"""
