@@ -1,9 +1,10 @@
+from requests.models import Response
 from search import app, db
 from flask import Flask, request, jsonify, make_response
 import requests
 from .models import GlobalDimension, GlobalDimensionValues
 from .serializer import GlobalDimensionSchema, GlobalDimensionValuesSchema
-from config import DIMENSION_URL
+from config import DIMENSION_URL, METRIC_URL
 
 def createGlobalDimension(payloads):
     """ Create global dimension"""
@@ -48,13 +49,30 @@ def getDimensionFromCueObserve():
                 dictObjs["dimension"] = dimension
                 payloadDicts.append(dictObjs)
 
-        res = payloadDicts
+        res = {"success":True, "data":payloadDicts}
         return res
-
     except Exception as ex:
         app.logger.error*("Failed to get dimension %s", ex)
-        return []
+        res = {"success":False, "data":[], "message":"Error occured to get dimension from cueObserve"}
 
+
+def getMetricsFromCueObserve():
+    """ Service to get all metrics from cueObserve"""
+    try:
+        url = METRIC_URL
+        response = requests.get(url)
+        payloads = response.json().get("data", [])
+        payloadDicts = []
+        for payload in payloads:
+            dictObjs = {}
+            dictObjs["dataset"] = payload["name"]
+            dictObjs["metrics"] = payload["metrics"]
+            payloadDicts.append(dictObjs)
+        res = {"success":True, "data":payloadDicts}
+        return res
+    except Exception as ex:
+        app.logger.error("Failed to get metrics from cueObserve %s", ex)
+        res = {"success":False, "data":[], "message":"Error occured to get metric from cueObserve"}
 
 def getGlobalDimensions():
     """ Services to get Global dimension and their linked dimension"""
@@ -62,11 +80,18 @@ def getGlobalDimensions():
         app.logger.info("Get Global Dimension")
         globalDimensions = GlobalDimension.query.all()
         data = GlobalDimensionSchema(many=True).dump(globalDimensions)
-        return data
+        res = {"success":True, "data":data}
+        return res
 
     except Exception as ex:
         app.logger.error("Failed to get global dimension %s", ex)
-        return []
+        res = {"success":False, "data":[], "message":"Error occured to get data in global dimension"}
+        return res
 
-    
 
+def getGlobalDimensionForIndex():
+    """ Service to get global dimension values for indexing """   
+    globalDimension = GlobalDimension.query.all()
+    data = GlobalDimensionSchema(many=True).dump(globalDimension)   
+    res = {"success":True, "data":data}
+    return res

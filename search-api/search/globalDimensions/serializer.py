@@ -8,10 +8,9 @@ class GlobalDimensionValuesSchema(ma.Schema):
         fields = ("id", "dimension","datasetId", "dataset")
         include_fk=True
 
-
 class GlobalDimensionSchema(ma.Schema):
     
     id= ma.Integer()
     name = ma.String()
     published = ma.Boolean()
-    values = ma.List(ma.Nested(GlobalDimensionValuesSchema(only=("dimension","dataset"))))
+    values = ma.List(ma.Nested(GlobalDimensionValuesSchema()))
