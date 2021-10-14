@@ -19,7 +19,7 @@ server {
   proxy_set_header   X-Forwarded-Proto    $scheme;
 
   location /api {
-      proxy_pass http://localhost:8000/api;
+      proxy_pass ${NGINX_API_URL}/api;
       proxy_redirect off;
       proxy_set_header Host $host;
       proxy_connect_timeout 120;
@@ -30,7 +30,7 @@ server {
 
   location /alerts {
       auth_request /auth/auth;
-      proxy_pass http://localhost:8100/alerts;
+      proxy_pass ${NGINX_ALERT_API_URL}/alerts;
       proxy_redirect off;
       proxy_set_header Host $host;
       proxy_connect_timeout 120;
@@ -40,7 +40,7 @@ server {
   }
 
   location /admin {
-      proxy_pass http://localhost:8000/admin;
+      proxy_pass ${NGINX_API_URL}/admin;
       proxy_redirect off;
       proxy_set_header Host $host;
       proxy_connect_timeout 120;
@@ -54,9 +54,9 @@ server {
   }
 
   location /auth {
-	  proxy_pass http://localhost:8000/api;
-    proxy_redirect off;
-    proxy_set_header Host $host;
+	  proxy_pass ${NGINX_API_URL}/api;
+      proxy_redirect off;
+      proxy_set_header Host $host;
 	}
 
   location / {

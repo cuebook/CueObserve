@@ -27,6 +27,8 @@ services:
     image: cuebook/cue-observe-frontend:latest
     depends_on:
       - cueo-backend
+    command:
+      bash -c "./etc/nginx/conf.d/nginx-entrypoint.sh && nginx -g 'daemon off;'"
     network_mode: "host"
 
   cueo-redis:
