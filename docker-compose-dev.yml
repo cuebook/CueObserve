@@ -12,9 +12,9 @@ services:
       context: api
       dockerfile: Dockerfile
     volumes:
-      - ./api/anomaly:/code/anomaly:rw
-      - ./api/app:/code/app:rw
-      - ./api/users:/code/users:rw
+      - ./api:/code:rw
+    command:
+      bash -c "chmod +x /code/start_server_new.sh && /code/start_server_new.sh"
     environment:
       ENVIRONMENT: ${ENVIRONMENT}
       API_URL: ${API_URL}
