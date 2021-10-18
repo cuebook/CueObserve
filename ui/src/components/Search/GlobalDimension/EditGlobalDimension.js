@@ -6,21 +6,34 @@ import globalDimensionService from "services/search/globalDimension.js"
 
 const { Option } = Select;
 
-export default function AddGlobalDimension(props) {
+export default function EditGlobalDimension(props) {
     const [form] = Form.useForm();
     const [linkedDimension, setLinkedDimension] = useState([])
-    const [globalDimension, setGlobalDimension] = useState([])
     const [dimensions, setDimensions] = useState(null)
-    const [selectedDimension, setSelectedDimension] = useState([])
+    const [selectedDimension, setEditSelectDimension] = useState()
     useEffect(()=>{
       if(props && props.linkedDimension){
         setLinkedDimension(props.linkedDimension)
+        getGlobalDimensionById(props.editDimension.id)  
       }
       if(!dimensions){
         getDimension()
-      }
-      
+            }
     }, []);
+
+    const getGlobalDimensionById = async (id) => {
+        const response = await globalDimensionService.getGlobalDimension(id)
+        let values = response.values.map((item)=>item["datasetId"]+"."+item["dataset"]+"."+item["dimension"])
+        let linkedDimension = response.values.map((item)=>item["dataset"]+"."+item["dimension"])
+        let name = response["name"]
+        let dict = {}
+        dict["name"] = response["name"]
+        dict["selectLinkedDimension"] = linkedDimension
+        dict["id"] = response["id"]
+        dict["published"] = response["published"]
+        dict["selectValues"] = values
+        setEditSelectDimension(dict)
+    }
 
     const getDimension = async () => {
         const response = await globalDimensionService.getDimensions()
@@ -28,10 +41,9 @@ export default function AddGlobalDimension(props) {
     }
 
     const onSelectChange = value => {
-      setSelectedDimension(value)
     }
 
-    const addGlobalDimensionFormSubmit = async (values) => {
+    const editGlobalDimensionFormSubmit = async (values) => {
         let payload = {
         };
         let dimensionalValues = []
@@ -43,29 +55,39 @@ export default function AddGlobalDimension(props) {
             "dimension":temp[2],
         }})
         payload["name"] = values["name"]
+        payload["id"] = selectedDimension && selectedDimension.id
         payload["dimensionalValues"] = dimensionalValues 
-        
+        payload["published"] = selectedDimension && selectedDimension.published
 
-        const response = await globalDimensionService.AddGlobalDimension(payload)
+        const response = await globalDimensionService.editGlobalDimension(payload["id"], payload)
         if(response.success){
-            props.onAddGlobalDimensionSuccess()
+            props.onEditGlobalDimensionSuccess()
         }
-        else{
-            message.error(response.message);
-        }
+        
       };
 
+    const initialName = selectedDimension && selectedDimension.name
+    const initialSelectedValue = selectedDimension && selectedDimension.selectValues
+    // selectedLinkedDimension : Dimension that is linked with current editing global dimension
+    const selectedLinkedDimension = selectedDimension && selectedDimension.selectLinkedDimension 
     let dimensionForSuggestion = []
+    let linkedDimensionArray = []
+    if(selectedDimension){
+      // linkedDimension are all ready linked with other global dimension
+      // Just below line is for removing selectedLinkedDimension from linkedDimension to selectedLinkedDimension visible in select suggestion
+    linkedDimensionArray = linkedDimension && linkedDimension.filter(item => !selectedLinkedDimension.some( item1 =>item && item == item1))
+
     dimensionForSuggestion = dimensions && dimensions.map(item =>(<Option value={item["datasetId"] + "." + item["dataset"]+ "." + item["dimension"]} key={item["dataset"] + "." + item["dimension"] } > {item["dataset"] + "." + item["dimension"]} </Option>))
    let dimensionOptions = []
    dimensionForSuggestion =
       dimensionForSuggestion &&
       dimensionForSuggestion.filter(
         item =>
-          !linkedDimension.some(
+          !linkedDimensionArray.some(
             item1 => item && item.key === item1
           )
       );
+          }
     let addGlobalDimensionParamElements = []
 
     let addGlobalDimensionFormElement = (
@@ -74,7 +96,7 @@ export default function AddGlobalDimension(props) {
             layout="vertical" 
             className="mb-2" 
             form={form} 
-            onFinish={addGlobalDimensionFormSubmit}
+            onFinish={editGlobalDimensionFormSubmit}
             name="addSchedule"
             scrollToFirstError
             hideRequiredMark
@@ -82,10 +104,10 @@ export default function AddGlobalDimension(props) {
           <div className={style.addConnectionForm}>
             <div className={style.formItem} style={{ width: "100%" }}>
 
-            <Form.Item hasFeedback name="name" rules={[{ required: true, message: 'Please input your Global Dimension Name !',whitespace: true }]}>
+            <Form.Item hasFeedback name="name" initialValue={initialName} rules={[{ required: true, message: 'Please input Global Dimension name!',whitespace: true }]}>
                 <Input className={style.inputArea} placeholder={"Global Dimension Name"}/>
               </Form.Item>
-            <Form.Item name ="dimension" rules={[{ required: true, message: 'Please select at least one dimension !' }]}>
+            <Form.Item name ="dimension"  initialValue={initialSelectedValue} >
               <Select showSearch  mode="tags" style={{width: "100%"}} placeholder="Select Dimension" onChange={onSelectChange} >
                 {dimensionForSuggestion}
               </Select>
@@ -100,7 +122,7 @@ export default function AddGlobalDimension(props) {
                 className="mr-2"
                 htmlType="submit"
             >
-                Save
+                Update
             </Button>
           </div>
         </Form>
@@ -112,7 +134,7 @@ export default function AddGlobalDimension(props) {
       <div>
         <div className="row">
             <div>
-              {addGlobalDimensionFormElement}
+              {selectedDimension? addGlobalDimensionFormElement : null}
             </div>
           
         </div>

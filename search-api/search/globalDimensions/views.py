@@ -3,7 +3,7 @@ from search import app
 import logging
 import json
 from flask import Flask, request, jsonify, make_response
-from search.globalDimensions import  createGlobalDimension, getDimensionFromCueObserve, getGlobalDimensions, getMetricsFromCueObserve
+from search.globalDimensions import  createGlobalDimension, getDimensionFromCueObserve, getGlobalDimensions, updateGlobalDimensionById, getMetricsFromCueObserve, publishGlobalDimension, getGlobalDimensionById
 # app = Flask(__name__)
 
 
@@ -33,4 +33,21 @@ def getGlobalDimensionsView():
     res = getGlobalDimensions()
     return jsonify(res)
 
+@app.route("/search/publish/global-dimension", methods=["POST"])
+def updateGlobalDimension():
+    payload = request.json
+    app.logger.info("payload %s", payload)
+    res = publishGlobalDimension(payload)
+    return jsonify(res)
 
+@app.route("/search/global-dimension/<int:id>", methods=["GET"])
+def getGlobalDimensionView(id):
+    app.logger.info("Requests for Global Dimension ", id)
+    res = getGlobalDimensionById(id)
+    return jsonify(res)
+
+@app.route("/search/update/global-dimension/<int:id>", methods=["POST"])
+def updateGlobalDimensionView(id):
+    payload = request.json
+    res = updateGlobalDimensionById(id, payload)
+    return jsonify(res)
