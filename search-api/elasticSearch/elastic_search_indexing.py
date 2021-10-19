@@ -9,7 +9,8 @@ from elasticsearch.helpers import parallel_bulk
 from datetime import datetime
 from config import ELASTICSEARCH_URL
 import threading
-from .utils import getGlobalDimensionForIndex, getMetricsFromCueObserve
+from .utils import Utils
+
 import traceback
 
 
@@ -168,7 +169,7 @@ class ESIndexingUtils:
         Method to index global dimensions data
         """
         logging.info("Fetching the global dimensions and the dimension values")
-        response = getGlobalDimensionForIndex()
+        response = Utils.getGlobalDimensionForIndex()
         logging.info("response of globaldimension value %s", response)
         if response["success"]:
             globalDimensions = response.get("data", [])
@@ -248,7 +249,7 @@ class ESIndexingUtils:
     @staticmethod
     def fetchMeasureForIndexing():
         logging.info("Method to index cube measures")
-        response = getMetricsFromCueObserve()
+        response = Utils.getMetricsFromCueObserve()
         data = []
         if (response.get("success", False)):
             logging.info("Get measure data for indexing")

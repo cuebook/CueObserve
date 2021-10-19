@@ -1,7 +1,6 @@
 import logging
 import os
 from typing import List
-
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q
 from config import ELASTICSEARCH_URL
@@ -16,7 +15,6 @@ class ESQueryingUtils:
         """
         Method to get the ES Client
         """
-        # esHost = os.environ.get("ELASTICSEARCH_URL")
         esHost = ELASTICSEARCH_URL
         esClient = Elasticsearch(hosts=[esHost])
         return esClient

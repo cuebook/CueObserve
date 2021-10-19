@@ -168,13 +168,13 @@ return (
 
     <div className={`d-flex flex-column justify-content-center text-right mb-2`}>
 
-      <Search
+      {/* <Search
         style={{ margin: "0 0 10px 0" , width:350, float: "left"}}
         placeholder="Search"
         enterButton="Search"
         // onSearch={searchInDatasets}
         className="mr-2"
-        />
+        /> */}
 
       <Button onClick={openAddGlobalDimension} type="primary" >Add Global Dimension</Button>
 </div>
