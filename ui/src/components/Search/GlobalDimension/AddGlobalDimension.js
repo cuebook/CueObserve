@@ -100,7 +100,7 @@ export default function AddGlobalDimension(props) {
                 className="mr-2"
                 htmlType="submit"
             >
-                Save
+                Save Global Dimension
             </Button>
           </div>
         </Form>

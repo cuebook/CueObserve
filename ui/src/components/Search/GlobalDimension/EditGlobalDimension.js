@@ -72,6 +72,7 @@ export default function EditGlobalDimension(props) {
     const selectedLinkedDimension = selectedDimension && selectedDimension.selectLinkedDimension 
     let dimensionForSuggestion = []
     let linkedDimensionArray = []
+    let addGlobalDimensionFormElement=[]
     if(selectedDimension){
       // linkedDimension are all ready linked with other global dimension
       // Just below line is for removing selectedLinkedDimension from linkedDimension to selectedLinkedDimension visible in select suggestion
@@ -87,10 +88,9 @@ export default function EditGlobalDimension(props) {
             item1 => item && item.key === item1
           )
       );
-          }
     let addGlobalDimensionParamElements = []
 
-    let addGlobalDimensionFormElement = (
+     addGlobalDimensionFormElement = (
       <div>
         <Form 
             layout="vertical" 
@@ -122,12 +122,13 @@ export default function EditGlobalDimension(props) {
                 className="mr-2"
                 htmlType="submit"
             >
-                Update
+                Save Global Dimension
             </Button>
           </div>
         </Form>
       </div>
     );
+    }
 
 
     return (

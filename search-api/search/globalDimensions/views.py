@@ -42,7 +42,7 @@ def updateGlobalDimension():
 
 @app.route("/search/global-dimension/<int:id>", methods=["GET"])
 def getGlobalDimensionView(id):
-    app.logger.info("Requests for Global Dimension ", id)
+    app.logger.info("Get Global Dimension of Id : %s", id)
     res = getGlobalDimensionById(id)
     return jsonify(res)
 

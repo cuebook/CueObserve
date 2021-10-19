@@ -12,7 +12,7 @@ def createGlobalDimension(payloads):
     """ Create global dimension"""
     try:
         name = payloads["name"]
-        app.logger.info("Global dimension creating with name %s", name)
+        app.logger.info("Create Global Dimension of name %s", name)
         globalDimension = GlobalDimension(name=name)
         db.session.add(globalDimension)
         db.session.flush()
@@ -29,6 +29,13 @@ def createGlobalDimension(payloads):
         db.session.commit()
         app.logger.info("Global Dimension Values created ")
         res = {"success":True}
+        try:
+            app.logger.info("Indexing starts")
+            ESIndexingUtils.indexGlobalDimension()
+            app.logger.info("Indexing completed")
+        except Exception as ex:
+            app.logger.error("Indexing Failed %s", ex)
+
         return res
     except Exception as ex:
         res = {"success":False, "message":"Global Dimension name already exists "}
@@ -79,8 +86,6 @@ def publishGlobalDimension(payload):
     try:
         published = payload.get("published", False)
         globalDimensionId = payload.get("id", None)
-        app.logger.info("published %s", published)
-        app.logger.info("id %s", globalDimensionId)
         globalDimensionObj = GlobalDimension.query.get(globalDimensionId)
         db.session.add(globalDimensionObj)
         globalDimensionObj.published = published
@@ -111,21 +116,18 @@ def getGlobalDimensionById(id):
 
 def updateGlobalDimensionById(id, payload):
     try:
-        app.logger.info("it should working")
         name = payload.get("name", "")
         objs = payload.get("dimensionalValues", [])
         published = payload.get("published", False)
         dimensionalValueObjs = []
-        # Delete
         globalDimension = GlobalDimension.query.get(id)
         newId = globalDimension.id
         db.session.delete(globalDimension)
         db.session.flush()
-        app.logger.info("flushed globaldiemension %s", globalDimension)
+        app.logger.info("flushed global dimension %s", globalDimension)
         gd = GlobalDimension(id=newId, name=name, published=published)
         db.session.add(gd)
         db.session.flush()
-        app.logger.error("created till here without erro %s", gd)
         for obj in objs:
             gdValues = GlobalDimensionValues(datasetId = obj["datasetId"], dataset = obj["dataset"], dimension = obj["dimension"], globalDimensionId = gd.id)
             dimensionalValueObjs.append(gdValues)
@@ -136,11 +138,10 @@ def updateGlobalDimensionById(id, payload):
         # Global dimension indexing on Global dimension update
         try:
             app.logger.info("Indexing starts")
-            ESIndexingUtils.indexGlobalDimensionsData()
+            ESIndexingUtils.indexGlobalDimension()
             app.logger.info("Indexing completed")
         except Exception as ex:
             app.logger.error("Indexing Failed %s", ex)
-
         res = {"success":True, "message":"Global Dimension updated successfully"}
         return res
     except Exception as ex:
