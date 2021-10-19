@@ -3,7 +3,7 @@ from search import app
 import logging
 import json
 from flask import Flask, request, jsonify, make_response
-from search.globalDimensions import  createGlobalDimension, getDimensionFromCueObserve, getGlobalDimensions, updateGlobalDimensionById, getMetricsFromCueObserve, publishGlobalDimension, getGlobalDimensionById
+from search.globalDimensions import  createGlobalDimension, getDimensionFromCueObserve, getGlobalDimensions, updateGlobalDimensionById, publishGlobalDimension, getGlobalDimensionById
 # app = Flask(__name__)
 
 

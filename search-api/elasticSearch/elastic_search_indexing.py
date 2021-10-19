@@ -9,7 +9,7 @@ from elasticsearch.helpers import parallel_bulk
 from datetime import datetime
 from config import ELASTICSEARCH_URL
 
-from search.globalDimensions.services import getGlobalDimensionForIndex, getMetricsFromCueObserve
+from .utils import getGlobalDimensionForIndex, getMetricsFromCueObserve
 import traceback
 
 

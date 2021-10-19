@@ -86,6 +86,7 @@ if(dataSource.length != 0){
         dataIndex: "published",
         width: "10%",
         key: arr => arr.id,
+        sorter: (a, b) => b.published - a.published,
         render: (text, entity) => {
           return (
             <Switch
@@ -104,6 +105,7 @@ if(dataSource.length != 0){
           title: "Global Dimension",
           dataIndex: "name",
           key: "name",
+          sorter: (a, b) => a.name.localeCompare(b.name),
           render: (text, entity) => {
             return (
               <span

@@ -1,4 +1,4 @@
-from requests.models import Response
+# from requests.models import Response
 from search import app, db
 from sqlalchemy import desc
 from flask import Flask, request, jsonify, make_response
@@ -6,6 +6,7 @@ import requests
 from .models import GlobalDimension, GlobalDimensionValues
 from .serializer import GlobalDimensionSchema, GlobalDimensionValuesSchema
 from config import DIMENSION_URL, METRIC_URL
+from elasticSearch import ESIndexingUtils
 
 def createGlobalDimension(payloads):
     """ Create global dimension"""
@@ -57,23 +58,6 @@ def getDimensionFromCueObserve():
         res = {"success":False, "data":[], "message":"Error occured to get dimension from cueObserve"}
 
 
-def getMetricsFromCueObserve():
-    """ Service to get all metrics from cueObserve"""
-    try:
-        url = METRIC_URL
-        response = requests.get(url)
-        payloads = response.json().get("data", [])
-        payloadDicts = []
-        for payload in payloads:
-            dictObjs = {}
-            dictObjs["dataset"] = payload["name"]
-            dictObjs["metrics"] = payload["metrics"]
-            payloadDicts.append(dictObjs)
-        res = {"success":True, "data":payloadDicts}
-        return res
-    except Exception as ex:
-        app.logger.error("Failed to get metrics from cueObserve %s", ex)
-        res = {"success":False, "data":[], "message":"Error occured to get metric from cueObserve"}
 
 def getGlobalDimensions():
     """ Services to get Global dimension and their linked dimension"""
@@ -89,13 +73,6 @@ def getGlobalDimensions():
         res = {"success":False, "data":[], "message":"Error occured to get data in global dimension"}
         return res
 
-
-def getGlobalDimensionForIndex():
-    """ Service to get global dimension values for indexing """   
-    globalDimension = GlobalDimension.query.all()
-    data = GlobalDimensionSchema(many=True).dump(globalDimension)   
-    res = {"success":True, "data":data}
-    return res
 
 def publishGlobalDimension(payload):
     """ Service to publish / unpublish global dimension """
@@ -155,10 +132,16 @@ def updateGlobalDimensionById(id, payload):
         app.logger.info("dimensionalValuesOBjs %s", dimensionalValueObjs)
         db.session.bulk_save_objects(dimensionalValueObjs)
         db.session.flush()
-        app.logger.info("working here !")
         db.session.commit()
-        res = {"success":True, "message":"Global Dimension updated successfully"}
+        # Global dimension indexing on Global dimension update
+        try:
+            app.logger.info("Indexing starts")
+            ESIndexingUtils.indexGlobalDimensionsData()
+            app.logger.info("Indexing completed")
+        except Exception as ex:
+            app.logger.error("Indexing Failed %s", ex)
 
+        res = {"success":True, "message":"Global Dimension updated successfully"}
         return res
     except Exception as ex:
         app.logger.error("Failed to update global dimension of Id : %s", id)
