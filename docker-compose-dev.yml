@@ -16,9 +16,7 @@ services:
     network_mode: "host"
 
   cueo-backend:
-    build:
-      context: api
-      dockerfile: Dockerfile
+    image: cuebook/cue-observe-backend:dev
     volumes:
       - ./api:/code:rw
     command:
@@ -72,3 +70,7 @@ services:
 
 volumes:
   pgdata:
+
+networks:
+  backend:
+    driver: bridge
