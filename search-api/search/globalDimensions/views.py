@@ -7,14 +7,12 @@ from .services import GlobalDimensionServices
 
 @app.route("/search/globalDimension/create/", methods=['POST'])
 def createGlobalDimensionView():
-    app.logger.info("Procedure starts for creating global dimension ")
     payloads = request.json
     res = GlobalDimensionServices.createGlobalDimension(payloads)
     return jsonify(res)
 
 @app.route("/search/dimension/", methods=['GET'])
 def getDimensions():
-    app.logger.info("Get dimension from CueObserve ")
     res = GlobalDimensionServices.getDimensionFromCueObserve()
     return jsonify(res)
 
@@ -27,20 +25,17 @@ def getDimensions():
 
 @app.route("/search/global-dimension/", methods=["GET"])
 def getGlobalDimensionsView():
-    app.logger.info("Requests for Global Dimension ")
     res = GlobalDimensionServices.getGlobalDimensions()
     return jsonify(res)
 
 @app.route("/search/publish/global-dimension", methods=["POST"])
 def updateGlobalDimension():
     payload = request.json
-    app.logger.info("payload %s", payload)
     res = GlobalDimensionServices.publishGlobalDimension(payload)
     return jsonify(res)
 
 @app.route("/search/global-dimension/<int:id>", methods=["GET"])
 def getGlobalDimensionView(id):
-    app.logger.info("Get Global Dimension of Id : %s", id)
     res = GlobalDimensionServices.getGlobalDimensionById(id)
     return jsonify(res)
 
