@@ -1,7 +1,7 @@
 import requests
 from search import app, db
-from models import SearchCardTemplate
-from serializer import SearchCardTemplateSchema
+from .models import SearchCardTemplate
+from .serializer import SearchCardTemplateSchema
 from config import DATASET_URL
 
 class SearchCardTemplateServices:
@@ -32,9 +32,20 @@ class SearchCardTemplateServices:
 
         datasetDfs = {}
 
-        for datasetId in datasetIds:
-            response = requests.post(DATASET_URL, data={"datasetId": datasetId})
-            datasetDfs[datasetId] = response.json().get("dfDict", [])
+        # for datasetId in datasetIds:
+        #     response = requests.post(DATASET_URL, data={"datasetId": datasetId})
+        #     datasetDfs[datasetId] = response.json().get("dfDict", [])
+        results = []
+        for i in range(3):
+            resDicts = {}
+            resDicts["Title"] = "card " + str(i)
+            resDicts["Text"] = "Test for card table and filter is delhi card id is : " + str(i)
+            resDicts["data"] = [1,2,3,4,5,6]
+            results.append(resDicts)
+
+        res = {"success":True, "searchCards":results}
+        return res
+
         
         
 

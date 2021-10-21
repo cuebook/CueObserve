@@ -1,12 +1,12 @@
 import React from "react";
-import GlobalDimensionTable from "components/Search/GlobalDimension/index.js"
+import SearchResultPage from "components/Search/SearchResult/SearchResultPage"
 
-export default function GlobalDimensionView() {
+export default function SearchResultsView() {
   return (
     <>
       <div className="flex flex-wrap mh-full">
         <div className="w-full mb-12 px-4">
-		      <GlobalDimensionTable />
+		      <SearchResultPage />
         </div>
       </div>
     </>

@@ -1,6 +1,8 @@
-from flask import Flask, request, jsonify, make_response
+
 from search import app
-from services import SearchCardTemplateServices
+from flask import Flask, request, jsonify, make_response
+
+from .services import SearchCardTemplateServices
 
 @app.route("/search/cardTemplates/", methods=["GET"])
 def getCardTemplates():
