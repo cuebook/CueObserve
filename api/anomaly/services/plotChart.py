@@ -14,20 +14,28 @@ class PlotChartService:
         data = anomaly.data
         anomalyData = data["anomalyData"]
         actualData = anomalyData["actual"]
-        predictedData = anomalyData["predicted"]
-        bandData = anomalyData["band"]
+        predictedData = anomalyData.get("predicted", [])
+        bandData = anomalyData.get("band", [])
+        predictedXaxis = []
+        predictedYaxis = []
+        bandXaxis = []
+        bandUpperYaxis = []
+        bandLowerYaxis = []
+        if bandData:
+            bandLowerYaxis = [ band["y"][0] for band in bandData]
+            bandUpperYaxis = [ band["y"][1] for band in bandData]
+            bandXaxis = [ band["ds"] for band in bandData]
+        if predictedData:
+            predictedDataDf = pd.DataFrame(predictedData)
+            predictedXaxis = predictedDataDf["ds"].to_list()
+            predictedYaxis = predictedDataDf["y"].to_list()
         actualDataDf = pd.DataFrame(actualData)
-        predictedDataDf = pd.DataFrame(predictedData)
-        bandLowerYaxis = [ band["y"][0] for band in bandData]
-        bandUpperYaxis = [ band["y"][1] for band in bandData]
-        bandXaxis = [ band["ds"] for band in bandData]
         anomalyDataDf = actualDataDf.loc[actualDataDf['anomaly'] == 15]
         anomalyXaxis = anomalyDataDf["ds"].to_list()
         anomalyYaxis = anomalyDataDf["y"].to_list()
         actualXaxis = actualDataDf["ds"].to_list()
         actualYaxis = actualDataDf["y"].to_list()
-        predictedXaxis = predictedDataDf["ds"].to_list()
-        predictedYaxis = predictedDataDf["y"].to_list()
+
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=actualXaxis, y=actualYaxis,
                     mode='lines',
