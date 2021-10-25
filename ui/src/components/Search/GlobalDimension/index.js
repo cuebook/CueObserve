@@ -3,6 +3,7 @@ import { Switch, Table, Button, Input, Drawer } from 'antd';
 import {EditOutlined } from '@ant-design/icons';
 
 import AddGlobalDimension from "components/Search/GlobalDimension/AddGlobalDimension.js"
+import EditGlobalDimension from "components/Search/GlobalDimension/EditGlobalDimension.js"
 import globalDimensionService from "services/search/globalDimension.js"
 import style from "./style.module.scss"
 
@@ -12,7 +13,9 @@ const ButtonGroup = Button.Group;
 export default function GlobalDimensionTable(props) {
   const [globalDimension, setGlobalDimension] = useState('')
   const [data, setData] = useState('')
-  const [isAddDrawerVisible, setIsAddDrawerVisible] = useState('')
+  const [isAddDrawerVisible, setIsAddDrawerVisible] = useState(false)
+  const [isEditDrawerVisible, setIsEditDrawerVisible] = useState(false)
+  const [editDimension, setEditDimension] = useState()
   useEffect(()=>{
     if(!data){
       getData()
@@ -22,9 +25,16 @@ export default function GlobalDimensionTable(props) {
 
 
   const getData = async () => {
-    const response = await globalDimensionService.getGlobalDimension()
+    const response = await globalDimensionService.getGlobalDimensions()
     setData(response)
 
+  }
+
+  const pubGlobalDimension = async (payload) => {
+    const response = await globalDimensionService.publishGlobalDimension(payload)
+    if(response.success){
+      getData()
+    }
   }
 
  const togglePublishState = (status, id) => {
@@ -32,22 +42,15 @@ export default function GlobalDimensionTable(props) {
       return;
     }
 
-    const { dispatch } = this.props;
-
-    // if (status) {
-    //   dispatch({
-    //     type: globalDimensionsActions.UNPUBLISH_GLOBAL_DIMENSION,
-    //     payload: id
-    //   });
-    // } else {
-    //   dispatch({
-    //     type: globalDimensionsActions.PUBLISH_GLOBAL_DIMENSION,
-    //     payload: id
-    //   });
-    // }
+    let payload = {}
+    payload["published"] = !status
+    payload["id"] = id
+    pubGlobalDimension(payload)
+    
   };
   const closeAddDrawer = () =>  {
     setIsAddDrawerVisible(false)
+    setIsEditDrawerVisible(false)
   }
   const openAddGlobalDimension = () => {
     setIsAddDrawerVisible(true)
@@ -57,12 +60,22 @@ export default function GlobalDimensionTable(props) {
 
     setIsAddDrawerVisible(false)
   }
+  const onEditGlobalDimensionSuccess = () =>{
+    getData()
+    setIsEditDrawerVisible(false)
+  }
+
+  const onClickEdit = ( val ) => {
+    setIsEditDrawerVisible(true)
+    setEditDimension(val)
+  }
+
+
 
 let dataSource = []
-  dataSource = data && data.map(items=>{return {"name":items["name"], "id":items["id"], "values":items["values"].map((item)=> item["dataset"] + "."+ item["dimension"])}})
+  dataSource = data && data.map(items=>{return {"name":items["name"], "id":items["id"],"published":items["published"] ,"values":items["values"].map((item)=> item["dataset"] + "."+ item["dimension"])}})
 let linkedDimension = []
 let linkedDimensionArray =[]
-
 if(dataSource.length != 0){
   linkedDimension = dataSource.map((items) => items["values"])
   linkedDimensionArray = [].concat.apply([],linkedDimension)
@@ -73,6 +86,7 @@ if(dataSource.length != 0){
         dataIndex: "published",
         width: "10%",
         key: arr => arr.id,
+        sorter: (a, b) => b.published - a.published,
         render: (text, entity) => {
           return (
             <Switch
@@ -91,6 +105,7 @@ if(dataSource.length != 0){
           title: "Global Dimension",
           dataIndex: "name",
           key: "name",
+          sorter: (a, b) => a.name.localeCompare(b.name),
           render: (text, entity) => {
             return (
               <span
@@ -138,7 +153,7 @@ if(dataSource.length != 0){
               <ButtonGroup className="mr-2">
                 <Button
                   icon={<EditOutlined />}
-                  onClick={e => this.onClickEdit(record.id)}
+                  onClick={e => onClickEdit(record)}
                 />
               </ButtonGroup>
             </span>
@@ -153,15 +168,15 @@ return (
 
     <div className={`d-flex flex-column justify-content-center text-right mb-2`}>
 
-      <Search
+      {/* <Search
         style={{ margin: "0 0 10px 0" , width:350, float: "left"}}
         placeholder="Search"
         enterButton="Search"
         // onSearch={searchInDatasets}
         className="mr-2"
-        />
+        /> */}
 
-      <Button onClick={openAddGlobalDimension} type="primary">Add Global Dimension</Button>
+      <Button onClick={openAddGlobalDimension} type="primary" >Add Global Dimension</Button>
 </div>
     <Table
         rowKey={"id"}
@@ -171,29 +186,35 @@ return (
         size={"small"}
         pagination={false}
       />
-
     <Drawer
           title={"Add Global Dimension"}
           width={720}
           onClose={closeAddDrawer}
           visible={isAddDrawerVisible}
         >
-          { isAddDrawerVisible 
+          { isAddDrawerVisible
             ? 
             <AddGlobalDimension onAddGlobalDimensionSuccess={onAddGlobalDimensionSuccess} linkedDimension={linkedDimensionArray} />
             :
             null
           }
     </Drawer> 
+
+    <Drawer
+          title={"Edit Global Dimension"}
+          width={720}
+          onClose={closeAddDrawer}
+          visible={isEditDrawerVisible}
+        >
+          { isEditDrawerVisible 
+            ? 
+            <EditGlobalDimension editDimension={editDimension} linkedDimension={linkedDimensionArray} onEditGlobalDimensionSuccess={onEditGlobalDimensionSuccess}/>
+            :
+            null
+          }
+    </Drawer> 
   </div>
 )
-
-
-
-
-
-
-
 
 }
 

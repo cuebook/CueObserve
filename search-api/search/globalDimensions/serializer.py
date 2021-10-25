@@ -1,6 +1,6 @@
 
 from search import ma
-from search.globalDimensions.models import GlobalDimension, GlobalDimensionValues
+from .models import GlobalDimension, GlobalDimensionValues
 
 class GlobalDimensionValuesSchema(ma.Schema):
     

@@ -3,13 +3,14 @@ import time
 import logging
 from typing import List, Dict
 from collections import deque
-
+from search import app
 from elasticsearch import Elasticsearch
 from elasticsearch.helpers import parallel_bulk
 from datetime import datetime
 from config import ELASTICSEARCH_URL
+import threading
+from .utils import Utils
 
-from search.globalDimensions.services import getGlobalDimensionForIndex, getMetricsFromCueObserve
 import traceback
 
 
@@ -153,7 +154,14 @@ class ESIndexingUtils:
             logging.debug("Document to index: %s", document)
 
         return indexingDocuments
-
+    @staticmethod
+    def indexGlobalDimension():
+        """
+        Method to spawn a thread to index global dimension into elasticsearch existing indices
+        The child thread assumes an index existing with a predefined unaltered indexDefinition
+        """
+        cardIndexer = threading.Thread(target=ESIndexingUtils.indexGlobalDimensionsData)
+        cardIndexer.start()
 
     @staticmethod
     def indexGlobalDimensionsData(joblogger=None):
@@ -161,7 +169,7 @@ class ESIndexingUtils:
         Method to index global dimensions data
         """
         logging.info("Fetching the global dimensions and the dimension values")
-        response = getGlobalDimensionForIndex()
+        response = Utils.getGlobalDimensionForIndex()
         logging.info("response of globaldimension value %s", response)
         if response["success"]:
             globalDimensions = response.get("data", [])
@@ -206,7 +214,8 @@ class ESIndexingUtils:
             indexName = ESIndexingUtils.GLOBAL_DIMENSIONS_INDEX_NAME
 
             aliasIndex = ESIndexingUtils.initializeIndex(indexName, indexDefinition)
-
+            app.logger.info("IndexName %s", indexName)
+            app.logger.info("aliasIndex %s", aliasIndex)
             for globalDimensionGroup in globalDimensions:
                 logging.info("globaldimensionGroup %s", globalDimensionGroup)
                 # globalDimensionGroup is an array
@@ -239,9 +248,8 @@ class ESIndexingUtils:
 
     @staticmethod
     def fetchMeasureForIndexing():
-
         logging.info("Method to index cube measures")
-        response = getMetricsFromCueObserve()
+        response = Utils.getMetricsFromCueObserve()
         data = []
         if (response.get("success", False)):
             logging.info("Get measure data for indexing")
