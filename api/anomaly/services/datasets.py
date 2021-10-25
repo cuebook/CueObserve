@@ -2,6 +2,7 @@ import json
 from utils.apiResponse import ApiResponse
 from anomaly.models import Dataset
 from anomaly.serializers import DatasetsSerializer, DatasetSerializer
+from access.data import Data
 
 
 class Datasets:
@@ -104,3 +105,19 @@ class Datasets:
 
         res.update(True, "Successfully created dataset")
         return res
+    
+    @staticmethod
+    def getDatasetData(payload: dict):
+        """
+        Utility service to fetch data for a payload
+        :param payload: Dict containing dataset name, and global dimension
+        """
+        res = ApiResponse("Error in fetching data")
+        dataset = Dataset.objects.get(name=payload["dataset"])
+        # sqlFilterStr = f" WHERE {payload['dimension']} = '{payload['dimVal']}' LIMIT 100" if "dimVal" in payload else " LIMIT 100"
+        dataDf = Data.fetchDatasetDataframe(dataset)
+        dataDf = dataDf[dataDf[payload["dimension"]] == payload["dimVal"]]
+        dfDict = dataDf.to_json()[:50]
+        res.update(True, "Successfully fetched data", dfDict)
+        return res
+
