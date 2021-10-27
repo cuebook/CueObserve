@@ -3,7 +3,8 @@ from search import app, db
 from .models import SearchCardTemplate
 from .serializer import SearchCardTemplateSchema
 from config import DATASET_URL
-from elasticSearch import ESQueryingUtils
+import concurrent.futures
+from elasticSearch import ESQueryingUtils, ESIndexingUtils
 
 class SearchCardTemplateServices:
     """
@@ -50,7 +51,33 @@ class SearchCardTemplateServices:
         
     def getSearchSuggestions(query):
         app.logger.debug("Calling the query ES API and fetching only the top 10 results")
-        data = ESQueryingUtils.findQueries(query)[:10]
+        data = []
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            futures = [
+                executor.submit(
+                    ESQueryingUtils.findGlobalDimensionResults,
+                    query=query,
+                    datasource=None,
+                    offset=0,
+                    limit=4,
+                ),
+                executor.submit(
+                    ESQueryingUtils.findGlobalDimensionNames,
+                    query=query,
+                    datasource=None,
+                    offset=0,
+                    limit=4,
+                ),
+            ]
+
+            for future in concurrent.futures.as_completed(futures):
+                try:
+                    data.extend(future.result())
+                    app.logger.info("data %s",data)
+                    app.logger.info("data after reverse sortign %s", data)
+                except Exception as ex:
+                    app.logger.error("Error in fetching search suggestions :%s", str(ex))
+        
         app.logger.debug("Fetched results: %s", data)
         res = {"success":True, "data":data}
         return res

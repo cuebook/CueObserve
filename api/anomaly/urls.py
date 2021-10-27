@@ -61,4 +61,5 @@ urlpatterns = [
     # Search
     path("search/dimension/", views.DimensionView.as_view(), name="dimension"),
     path("search/metrics/", views.MetricsView.as_view(), name="metrics"),
+    path("search/dimVals/", views.DimValsView.as_view(), name="dimensionalValues")
 ]

@@ -3,6 +3,7 @@ from search import app
 from flask import Flask, request, jsonify, make_response
 
 from .services import SearchCardTemplateServices
+from elasticSearch import ESIndexingUtils
 
 @app.route("/search/cardTemplates/", methods=["GET"])
 def getCardTemplates():
@@ -26,3 +27,9 @@ def getSearchSuggestionsView():
     return jsonify(res)
 
 
+@app.route("/search/runIndexing/", methods=['GET'])
+def elasticSearchIndexingView():
+    ESIndexingUtils.indexGlobalDimensionName()
+    ESIndexingUtils.indexGlobalDimensionsData()
+    res = {"success":True, "message":"indexing completed !"}
+    return jsonify(res)
