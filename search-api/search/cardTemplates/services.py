@@ -3,6 +3,7 @@ from search import app, db
 from .models import SearchCardTemplate
 from .serializer import SearchCardTemplateSchema
 from config import DATASET_URL
+from elasticSearch import ESQueryingUtils
 
 class SearchCardTemplateServices:
     """
@@ -47,5 +48,10 @@ class SearchCardTemplateServices:
         return res
 
         
-        
+    def getSearchSuggestions(query):
+        app.logger.debug("Calling the query ES API and fetching only the top 10 results")
+        data = ESQueryingUtils.findQueries(query)[:10]
+        app.logger.debug("Fetched results: %s", data)
+        res = {"success":True, "data":data}
+        return res
 

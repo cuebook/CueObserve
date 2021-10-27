@@ -30,3 +30,5 @@ class Utils:
             app.logger.error("Failed to get metrics from cueObserve %s", ex)
             res = {"success":False, "data":[], "message":"Error occured to get metric from cueObserve"}
 
+    # def indexGlobalDimensionData():
+    #     pass

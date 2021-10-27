@@ -16,3 +16,13 @@ def getSearchCards():
     payload = request.json
     res = SearchCardTemplateServices.getSearchCards(payload)
     return jsonify(res)
+
+
+@app.route("/search/searchsuggestions/", methods=['POST'])
+def getSearchSuggestionsView():
+    app.logger.info("Fetching cards for search")
+    searchQuery = request.json
+    res = SearchCardTemplateServices.getSearchSuggestions(searchQuery)
+    return jsonify(res)
+
+

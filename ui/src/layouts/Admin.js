@@ -96,7 +96,7 @@ export default function Admin() {
               <Route path="/schedules" exact component={Schedules} />
               <Route path="/settings" exact component={Settings} />
               <Route path="/search/global-dimension" exact component={GlobalDimensionTable} />
-              <Route path="/search/result" exact component={SearchResultPage} />
+              <Route path="/search/" exact component={SearchResultPage} />
               <Redirect from="/" to="/anomalies" />
             </Switch>
           </div>

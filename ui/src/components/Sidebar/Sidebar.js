@@ -61,11 +61,6 @@ export default function Sidebar(props) {
       "icon": "fa-cube"
     },
 
-    {
-      "label": "Search Results",
-      "path": "/search/result",
-      "icon": "fa-search"
-    },
   ]
 
   let menuElements = []

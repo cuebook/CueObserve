@@ -13,6 +13,11 @@ class SearchResultService {
         }
     }
 
+   async getSearchSuggestions(payload){
+        const response = await apiService.post("searchsuggestions/", payload)
+        return response
+    }
+
 }
 
 let searchResultService = new SearchResultService();

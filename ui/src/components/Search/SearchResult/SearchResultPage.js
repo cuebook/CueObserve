@@ -3,20 +3,30 @@ import React, { useState, useEffect, useRef } from "react";
 import { Switch, Table, Button, Input, Drawer, Affix } from 'antd';
 import {EditOutlined } from '@ant-design/icons';
 import style from "./style.module.scss";
+import {useHistory} from "react-router-dom"
 import searchResultService from "services/search/searchResult.js"
 // import TrackVisibility from "react-on-screen";
 
 export default function SearchResultPage(props){
+  console.log('props', props)
+  const history = useHistory()
+  console.log('history',history.location)
   const [searchCard, setSearchCard] = useState()
-  const [searchPayload, setSearchPayload] = useState({})
+  const [searchPayload, setSearchPayload] = useState()
   useEffect(()=>{
+    if(!searchPayload){
+      getSearchPayloadFromUrl()
+    }
     if(!searchCard){
-      //searchPayload will be calculated from url and pass it for further operations
-      getSearchCard(searchPayload)
+      getSearchCard({})
     }
   }, []);
 
-
+  const getSearchPayloadFromUrl = () =>{
+    let params = new URLSearchParams(history.location.search);
+    let searchQuery = JSON.parse(params.get("search"));
+    setSearchPayload(searchQuery)
+  }
 
   const getSearchCard = async (searchPayload) => {
     const response = await searchResultService.getSearchCards(searchPayload)
@@ -34,7 +44,7 @@ console.log("searchCars", searchCard)
 if(searchCard){
   console.log("searchcard in if ", searchCard)
   cardsArray = searchCard && searchCard.map(item=>
-    <div>
+    <div key={item.Title}>
       {item.Title} + {item.Text}
     </div>
   )
