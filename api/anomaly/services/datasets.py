@@ -1,4 +1,5 @@
 import json
+from django.template import Template, Context
 from utils.apiResponse import ApiResponse
 from anomaly.models import Dataset
 from anomaly.serializers import DatasetsSerializer, DatasetSerializer
@@ -114,10 +115,10 @@ class Datasets:
         """
         res = ApiResponse("Error in fetching data")
         dataset = Dataset.objects.get(name=payload["dataset"])
-        # sqlFilterStr = f" WHERE {payload['dimension']} = '{payload['dimVal']}' LIMIT 100" if "dimVal" in payload else " LIMIT 100"
-        dataDf = Data.fetchDatasetDataframe(dataset)
-        dataDf = dataDf[dataDf[payload["dimension"]] == payload["dimVal"]]
-        dfDict = dataDf.to_json()[:50]
+        payload["datasetSql"] = dataset.sql
+        customSql = Template(payload["sqlTemplate"]).render(payload)
+        dataDf = Data.fetchDatasetDataframe(dataset, customSql)
+        dfDict = dataDf.to_json()
         res.update(True, "Successfully fetched data", dfDict)
         return res
 

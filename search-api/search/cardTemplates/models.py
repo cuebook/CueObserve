@@ -5,6 +5,7 @@ class SearchCardTemplate(db.Model):
     templateName = db.Column(db.String)
     title = db.Column(db.String)
     bodyText = db.Column(db.String)
+    sql = db.Column(db.String)
     supportedVariables = db.Column(db.String)
 
     def __repr__(self):

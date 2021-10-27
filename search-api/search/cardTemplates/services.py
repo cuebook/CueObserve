@@ -43,16 +43,7 @@ class SearchCardTemplateServices:
         :param searchResults: List of dicts containing search results
         """
         async with aiohttp.ClientSession() as session:
-            result = await asyncio.gather(
-                *(
-                    SearchCardTemplateServices._sendDataRequest(session, dataUrl, {
-                        "dataset": obj["dataset"],
-                        "dimension": obj["dimension"],
-                        "dimVal": obj["value"]
-                    })
-                        for obj in searchResults
-                    )
-                )
+            result = await asyncio.gather(*(SearchCardTemplateServices._sendDataRequest(session, dataUrl, obj) for obj in searchResults))
             return result
     
     def getSearchCards(searchPayload: dict):
@@ -66,10 +57,12 @@ class SearchCardTemplateServices:
             globalDimension=searchPayload.get("globalDimension"),
             offset=searchPayload.get("offset", 0)
         )
+        
+        searchTemplate = SearchCardTemplate.query.get(1) # Temporary for testing, will loop over templates
+        for result in searchResults:
+            result.update({"sqlTemplate": searchTemplate.sql})        
 
         dataResults = asyncio.run(SearchCardTemplateServices.fetchCardsData(DATASET_URL, searchResults))
-        searchTemplate = SearchCardTemplate.query.get(1) # Temporary for testing, will loop over templates
-
         finalResults = []
 
         for i in range(len(searchResults)):
