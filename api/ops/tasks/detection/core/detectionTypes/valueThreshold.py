@@ -49,11 +49,13 @@ def valueThresholdDetect(df, granularity, operator, value1, value2):
         "between": '((df["y"] >= lowerVal) & (df["y"] <= upperVal)) * 14 + 1',
         "!between": '((df["y"] < lowerVal) | (df["y"] > upperVal)) * 14 + 1'
     }
-    today = dt.datetime.now()
+    today = dt.datetime.now().replace(minute=0, second=0, microsecond=0, tzinfo=None)
     df["ds"] = pd.to_datetime(df["ds"])
     df = df.sort_values("ds")
     df["ds"] = df["ds"].apply(lambda date: date.isoformat()[:19])
-    todayISO = today.replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=None).isoformat()[:19] if granularity == "day" else today.replace(minute=0, second=0, microsecond=0, tzinfo=None).isoformat()[:19]
+    if granularity == "day":
+        today = today.replace(hour=0)
+    todayISO = today.isoformat()[:19]
     df = df[df["ds"] < todayISO]
     df["anomaly"] = eval(operationDict[operator])
     anomalyLatest = checkLatestAnomaly(df, operationStrDict[operator])
