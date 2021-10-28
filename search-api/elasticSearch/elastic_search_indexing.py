@@ -22,6 +22,7 @@ class ESIndexingUtils:
     GLOBAL_DIMENSIONS_NAMES_INDEX_NAME = "cueobserve_global_dimensions_names_for_search_index"
     GLOBAL_DIMENSIONS_INDEX_NAME = "global_dimensions_name_index_cueobserve"
     GLOBAL_DIMENSIONS_INDEX_DATA = "cueobserve_global_dimensions_data_index"
+    GLOBAL_DIMENSIONS_INDEX_SEARCH_SUGGESTION_DATA = "cueobserve_global_dimensions_search_suggestion_data_index"
     DATASET_MEASURES_INDEX_NAME = "dataset_measures_index_cueobserve"
 
     @staticmethod
@@ -425,3 +426,127 @@ class ESIndexingUtils:
             logging.error("Error in fetching global dimensions.")
             raise RuntimeError("Error in fetching global dimensions")
 
+
+    @staticmethod
+    def fetchGlobalDimensionsValueForSearchSuggestionIndexing(globalDimensionGroup) :       
+        """
+        Method to fetch the global dimensions and the dimension values.
+        :return List of Documents to be indexed
+        """
+        indexingDocuments = []
+        logging.info("global dimension group in fetch %s", globalDimensionGroup)
+        globalDimensionName = globalDimensionGroup["name"]
+        logging.debug("Starting fetch for global dimension: %s", globalDimensionName)
+        globalDimensionId = globalDimensionGroup["id"]
+        dimensionObjs = globalDimensionGroup["values"]  # dimensional values
+        logging.info("Merging dimensions Value percentile with mulitple vlaues in list of dimensionValues")
+        for dmObj in dimensionObjs:
+            displayValue = ''
+            dimension = dmObj["dimension"]
+            dataset = dmObj["dataset"]
+            datasetId = dmObj["datasetId"]
+            res = Utils.getDimensionalValuesForDimension(datasetId, dimension)
+            dimensionValues = res.get("data", [])
+            if dimensionValues:
+                for values in dimensionValues:
+                    displayValue = values
+                    elasticsearchUniqueId = str(globalDimensionId) + "_" + str(displayValue) 
+
+                    document = {
+                        "_id": elasticsearchUniqueId,
+                        "globalDimensionValue": str(displayValue).lower(),
+                        "globalDimensionDisplayValue": str(displayValue),
+                        "globalDimensionName": str(globalDimensionName),
+                        "globalDimensionId": globalDimensionId,
+                        "dataset": dataset,
+                        "datasetId": datasetId,
+                    }
+                    indexingDocuments.append(document)
+                    logging.debug("Document to index: %s", document)
+
+        return indexingDocuments
+  
+
+  # Below function is used for search suggestion / To avoid duplicates in search dropdown(Temparory)
+
+    def indexGlobalDimensionsDataForSearchSuggestion(joblogger=None):
+        """
+        Indexing is being done for dropdown suggestion
+        """
+        logging.info("Fetching the global dimensions and the dimension values")
+        response = Utils.getGlobalDimensionForIndex()
+        logging.info("response of globaldimension value %s", response)
+        if response["success"]:
+            globalDimensions = response.get("data", [])
+            logging.debug("Global dimensions: %s", globalDimensions)
+
+            indexDefinition = {
+                "settings": {
+                    "analysis": {
+                        "analyzer": {"my_analyzer": {"tokenizer": "my_tokenizer", "filter": ["lowercase"]}},
+                        "default_search": {"type": "my_analyzer"},
+                        "tokenizer": {
+                            "my_tokenizer": {
+                                "type": "edge_ngram",
+                                "min_gram": 1,
+                                "max_gram": 10,
+                                "token_chars": ["letter", "digit"],
+                            }
+                        },
+                    }
+                },
+                "mappings": {
+                    "properties": {
+                        "globalDimensionId": {"type": "integer"},
+                        "globalDimensionDisplayValue": {"type": "text"},
+                        "globalDimensionValue": {
+                            "type": "text",
+                            "search_analyzer": "my_analyzer",
+                            "analyzer": "my_analyzer",
+                            "fields": {"ngram": {"type": "text", "analyzer": "my_analyzer"}},
+                        },
+                        "globalDimensionName": {
+                            "type": "text",
+                            "search_analyzer": "my_analyzer",
+                            "analyzer": "my_analyzer",
+                            "fields": {"ngram": {"type": "text", "analyzer": "my_analyzer"}},
+                        },
+                        "dataset": {"type": "text"},
+                        "datasetId":{"type": "integer"},
+                    }
+                },
+            }
+
+            indexName = ESIndexingUtils.GLOBAL_DIMENSIONS_INDEX_SEARCH_SUGGESTION_DATA
+
+            aliasIndex = ESIndexingUtils.initializeIndex(indexName, indexDefinition)
+            app.logger.info("IndexName %s", indexName)
+            app.logger.info("aliasIndex %s", aliasIndex)
+            for globalDimensionGroup in globalDimensions:
+                logging.info("globaldimensionGroup %s", globalDimensionGroup)
+                # globalDimensionGroup is an array
+                try:
+                    documentsToIndex = ESIndexingUtils.fetchGlobalDimensionsValueForSearchSuggestionIndexing(
+                        globalDimensionGroup
+                    )
+
+                    ESIndexingUtils.ingestIndex(documentsToIndex, aliasIndex)
+                except (Exception) as error:
+                    logging.error(str(error))
+                    if joblogger:
+                        joblogger.udpateSummary(
+                            {
+                                globalDimensionGroup[0]["globalDimension"]["name"]
+                                + " stackTrace": traceback.format_exc()
+                            }
+                        )
+                        joblogger.udpateSummary(
+                            {globalDimensionGroup[0]["globalDimension"]["name"] + " message": str(error)}
+                        )
+                    pass
+
+            ESIndexingUtils.deleteOldIndex(indexName, aliasIndex)
+
+        else:
+            logging.error("Error in fetching global dimensions.")
+            raise RuntimeError("Error in fetching global dimensions")

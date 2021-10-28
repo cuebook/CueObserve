@@ -29,6 +29,7 @@ def getSearchSuggestionsView():
 
 @app.route("/search/runIndexing/", methods=['GET'])
 def elasticSearchIndexingView():
+    ESIndexingUtils.indexGlobalDimensionsDataForSearchSuggestion() # Used for search suggestion
     ESIndexingUtils.indexGlobalDimensionName()
     ESIndexingUtils.indexGlobalDimensionsData()
     res = {"success":True, "message":"indexing completed !"}

@@ -55,11 +55,11 @@ class SearchCardTemplateServices:
         with concurrent.futures.ThreadPoolExecutor() as executor:
             futures = [
                 executor.submit(
-                    ESQueryingUtils.findGlobalDimensionResults,
+                    ESQueryingUtils.findGlobalDimensionResultsForSearchSuggestion,
                     query=query,
                     datasource=None,
                     offset=0,
-                    limit=4,
+                    limit=6,
                 ),
                 executor.submit(
                     ESQueryingUtils.findGlobalDimensionNames,
