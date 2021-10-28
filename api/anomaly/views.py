@@ -294,6 +294,15 @@ def runAnomalyDef(request: HttpRequest, anomalyDefId: int) -> Response:
     res = AnomalyDefinitions.runAnomalyDetection(anomalyDefId)
     return Response(res.json())
 
+@api_view(["POST"])
+def fetchData(request: HttpRequest) -> Response:
+    """
+    Method for fetching data
+    :param request: HttpRequest
+    """
+    res = Datasets.getDatasetData(request.data)
+    return Response(res.json())
+
 
 @api_view(["GET"])
 def runStatusAnomalies(request: HttpRequest, runStatusId: int) -> Response:

@@ -1,7 +1,10 @@
-import requests
+import asyncio
+import aiohttp
+from flask import render_template_string
 from search import app, db
 from models import SearchCardTemplate
 from serializer import SearchCardTemplateSchema
+from elasticSearch.elastic_search_querying import ESQueryingUtils
 from config import DATASET_URL
 
 class SearchCardTemplateServices:
@@ -21,20 +24,57 @@ class SearchCardTemplateServices:
         except Exception as ex:
             app.logger.error(f"Failed to get card templates {ex}")
             return []
+
+    async def _sendDataRequest(session, dataUrl, payload):
+        """
+        Async method to fetch individual search card data
+        :param session: ClientSession instance for aiohttp
+        :param dataUrl: Url endpoint to fetch data
+        :param payload: Dict containing parameters for fetching data
+        """
+        resp = await session.post(dataUrl, json=payload)
+        responseData = await resp.json()
+        return responseData
+
+    async def fetchCardsData(dataUrl, searchResults):
+        """
+        Async method to fetch data for searched cards
+        :param dataUrl: Url endpoint to fetch data
+        :param searchResults: List of dicts containing search results
+        """
+        async with aiohttp.ClientSession() as session:
+            result = await asyncio.gather(*(SearchCardTemplateServices._sendDataRequest(session, dataUrl, obj) for obj in searchResults))
+            return result
     
     def getSearchCards(searchPayload: dict):
         """
         Service to fetch and create search cards on the fly
         :param searchPayload: Dict containing the search payload
         """
-        searchResults = [] # Insert ES Querying here
-        datasetIds = list(set([result["datasetId"] for result in searchResults]))
+        searchResults = ESQueryingUtils.findGlobalDimensionResults(
+            query=searchPayload.get("query"),
+            dataset=searchPayload.get("dataset"),
+            globalDimension=searchPayload.get("globalDimension"),
+            offset=searchPayload.get("offset", 0)
+        )
+        
+        searchTemplate = SearchCardTemplate.query.get(1) # Temporary for testing, will loop over templates
+        for result in searchResults:
+            result.update({"sqlTemplate": searchTemplate.sql})        
 
-        datasetDfs = {}
+        dataResults = asyncio.run(SearchCardTemplateServices.fetchCardsData(DATASET_URL, searchResults))
+        finalResults = []
 
-        for datasetId in datasetIds:
-            response = requests.post(DATASET_URL, data={"datasetId": datasetId})
-            datasetDfs[datasetId] = response.json().get("dfDict", [])
+        for i in range(len(searchResults)):
+            finalResults.append(
+                {
+                    "title": render_template_string(searchTemplate.title, **searchResults[i]),
+                    "text" : render_template_string(searchTemplate.bodyText, **searchResults[i]),
+                    "data": dataResults[i]
+                })
+        
+        return finalResults
+
         
         
 

@@ -41,6 +41,8 @@ urlpatterns = [
         "runStatus/<int:anomalyDefId>", views.getDetectionRuns, name="getDetectionRuns"
     ),
     path("isTaskRunning/<int:anomalyDefId>", views.isTaskRunning, name="isTaskRunning"),
+    # Fetch Data
+    path("data/", views.fetchData, name="fetchData"),
     # Schedules
     path("schedules/", views.ScheduleView.as_view(), name="scheduleView"),
     path("schedules/<int:scheduleId>", views.schedule, name="getSingleSchedule"),
