@@ -308,6 +308,7 @@ class ESIndexingUtils:
         :return List of Documents to be indexed
         """
         indexingDocuments = []
+        dimension = ''
         logging.info("global dimension group in fetch %s", globalDimensionGroup)
         globalDimensionName = globalDimensionGroup["name"]
         logging.debug("Starting fetch for global dimension: %s", globalDimensionName)
@@ -332,6 +333,7 @@ class ESIndexingUtils:
                         "globalDimensionDisplayValue": str(displayValue),
                         "globalDimensionName": str(globalDimensionName),
                         "globalDimensionId": globalDimensionId,
+                        "dimension": dimension,
                         "dataset": dataset,
                         "datasetId": datasetId,
                     }
@@ -379,6 +381,13 @@ class ESIndexingUtils:
                             "fields": {"ngram": {"type": "text", "analyzer": "my_analyzer"}},
                         },
                         "globalDimensionName": {
+                            "type": "text",
+                            "search_analyzer": "my_analyzer",
+                            "analyzer": "my_analyzer",
+                            "fields": {"ngram": {"type": "text", "analyzer": "my_analyzer"}},
+                        },
+
+                        "dimension": {
                             "type": "text",
                             "search_analyzer": "my_analyzer",
                             "analyzer": "my_analyzer",

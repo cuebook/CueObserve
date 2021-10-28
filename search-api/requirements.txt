@@ -11,4 +11,4 @@ flask-marshmallow==0.14.0
 marshmallow-sqlalchemy==0.26.1
 elasticsearch==7.8.1
 elasticsearch-dsl==7.2.0
-
+aiohttp==3.7.4

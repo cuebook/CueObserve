@@ -21,7 +21,7 @@ def getSearchCards():
 
 @app.route("/search/searchsuggestions/", methods=['POST'])
 def getSearchSuggestionsView():
-    app.logger.info("Fetching cards for search")
+    app.logger.info("Fetching search suggestion data")
     searchQuery = request.json
     res = SearchCardTemplateServices.getSearchSuggestions(searchQuery)
     return jsonify(res)

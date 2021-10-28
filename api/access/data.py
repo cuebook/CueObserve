@@ -45,14 +45,15 @@ class Data:
         return dataframe
 
     @staticmethod
-    def fetchDatasetDataframe(dataset):
+    def fetchDatasetDataframe(dataset, customSql = None):
         connectionParams = {}
         for val in dataset.connection.cpvc.all():
             connectionParams[val.connectionParam.name] = val.value
+        sql = customSql if customSql else dataset.sql
         datasetDf = Data.runQueryOnConnection(
             dataset.connection.connectionType.name,
             connectionParams,
-            dataset.sql,
+            sql,
             False,
         )
         return datasetDf

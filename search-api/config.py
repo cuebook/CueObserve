@@ -18,7 +18,7 @@ if os.environ.get("SEARCH_POSTGRES_DB_HOST", None):
 else:
     SQLALCHEMY_DATABASE_URI = f"sqlite:////{BASE_DIR}/db/db.sqlite3"
 
-DATASET_URL = os.environ.get("DATASET_URL", "http://localhost:8000/api/dataset/data/")
+DATASET_URL = os.environ.get("DATASET_URL", "http://localhost:8000/api/data/")
 
 # DATABASE_CONNECT_OPTIONS = {}
 DIMENSION_URL = os.environ.get("DIMENSION_URL", "http://localhost:8000/api/anomaly/search/dimension/")

@@ -8,18 +8,11 @@ import searchResultService from "services/search/searchResult.js"
 // import TrackVisibility from "react-on-screen";
 
 export default function SearchResultPage(props){
-  console.log('props', props)
   const history = useHistory()
-  console.log('history',history.location)
   const [searchCard, setSearchCard] = useState()
   const [searchPayload, setSearchPayload] = useState()
   useEffect(()=>{
-    if(!searchPayload){
-      getSearchPayloadFromUrl()
-    }
-    if(!searchCard){
-      getSearchCard({})
-    }
+        getSearchCard()
   }, []);
 
   const getSearchPayloadFromUrl = () =>{
@@ -28,10 +21,11 @@ export default function SearchResultPage(props){
     setSearchPayload(searchQuery)
   }
 
-  const getSearchCard = async (searchPayload) => {
+  const getSearchCard = async () => {
+    let params = new URLSearchParams(history.location.search);
+    let searchPayload = JSON.parse(params.get("search"));
     const response = await searchResultService.getSearchCards(searchPayload)
     if(response.success){
-      console.log("response", response)
       setSearchCard(response.searchCards)
     }
   }
@@ -40,9 +34,9 @@ export default function SearchResultPage(props){
   let cardsArray = []
   let loading = null
   let cardTypesArray = []
-console.log("searchCars", searchCard)
+
+  // Below Code is Temporary 
 if(searchCard){
-  console.log("searchcard in if ", searchCard)
   cardsArray = searchCard && searchCard.map(item=>
     <div key={item.Title}>
       {item.Title} + {item.Text}
@@ -56,7 +50,9 @@ return (
         <div>
           <div className={`row ${style.searchResultsWrapper}`} >
             <div className="col-lg-7">
-                {/* <h4>No results found.</h4> */}
+              {cardsArray.length > 0 ? null :(
+                <h4>No results found.</h4>
+                )}
               {cardsArray}
               
             </div>

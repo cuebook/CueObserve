@@ -67,8 +67,12 @@ class ESQueryingUtils:
         for hit in response:
             obj = {
                 "value": hit.globalDimensionDisplayValue,
+                "dimension": hit.dimension,
+                "globalDimensionName": hit.globalDimensionName,
                 "user_entity_identifier": hit.globalDimensionName,
                 "id": hit.globalDimensionId,
+                "dataset": hit.dataset,
+                "datasetId": hit.datasetId,
                 "type": "GLOBALDIMENSION",
             }
             output.append(obj)

@@ -1,7 +1,9 @@
 import json
+from django.template import Template, Context
 from utils.apiResponse import ApiResponse
 from anomaly.models import Dataset
 from anomaly.serializers import DatasetsSerializer, DatasetSerializer
+from access.data import Data
 
 
 class Datasets:
@@ -104,3 +106,19 @@ class Datasets:
 
         res.update(True, "Successfully created dataset")
         return res
+    
+    @staticmethod
+    def getDatasetData(payload: dict):
+        """
+        Utility service to fetch data for a payload
+        :param payload: Dict containing dataset name, and global dimension
+        """
+        res = ApiResponse("Error in fetching data")
+        dataset = Dataset.objects.get(name=payload["dataset"])
+        payload["datasetSql"] = dataset.sql
+        customSql = Template(payload["sqlTemplate"]).render(payload)
+        dataDf = Data.fetchDatasetDataframe(dataset, customSql)
+        dfDict = dataDf.to_json()
+        res.update(True, "Successfully fetched data", dfDict)
+        return res
+

@@ -25,7 +25,6 @@ class GlobalDimensionServices:
                 dimensionalValueObjs.append(gdValues)
             app.logger.info("dimensionalValuesOBjs %s", dimensionalValueObjs)
             db.session.bulk_save_objects(dimensionalValueObjs)
-            db.session.flush()
             db.session.commit()
             app.logger.info("Global Dimension Values created ")
             try:
@@ -86,13 +85,16 @@ class GlobalDimensionServices:
         try:
             published = payload.get("published", False)
             globalDimensionId = payload.get("id", None)
-            globalDimensionObj = GlobalDimension.query.get(globalDimensionId)
-            db.session.add(globalDimensionObj)
-            globalDimensionObj.published = published
-            db.session.flush()
-            db.session.commit()
-            app.logger.info("GlobalDimension object saved")
-            res = {"success":True, "message":"Global Dimension updated successfully"}
+            res = ''
+            if globalDimensionId:
+                globalDimensionObj = GlobalDimension.query.get(globalDimensionId)
+                globalDimensionObj.published = published
+                db.session.commit()
+                res = {"success":True, "message":"Global Dimension updated successfully"}
+
+            else:
+                res = {"success":False, "message": "Id is mandatory"}
+
             return res
         except Exception as ex:
             app.logger.error("Failed to publish/unpublish global dimension %s", ex)
@@ -131,13 +133,10 @@ class GlobalDimensionServices:
             for obj in objs:
                 gdValues = GlobalDimensionValues(datasetId = obj["datasetId"], dataset = obj["dataset"], dimension = obj["dimension"], globalDimensionId = gd.id)
                 dimensionalValueObjs.append(gdValues)
-            app.logger.info("dimensionalValuesOBjs %s", dimensionalValueObjs)
             db.session.bulk_save_objects(dimensionalValueObjs)
-            db.session.flush()
             db.session.commit()
             # Global dimension indexing on Global dimension update
             try:
-                app.logger.info("Indexing starts")
                 ESIndexingUtils.indexGlobalDimension()
                 app.logger.info("Indexing completed")
             except Exception as ex:
