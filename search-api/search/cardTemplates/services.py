@@ -63,9 +63,8 @@ class SearchCardTemplateServices:
             globalDimension = globalDimensionId,
             query = globalDimensionValue
         )
-        app.logger.info("serchResults", searchResults)
         
-        searchTemplate = SearchCardTemplate.query.get(1) # Temporary for testing, will loop over templates
+        searchTemplate = SearchCardTemplate.query.get(2) # Temporary for testing, will loop over templates, set here id accordingly
         for result in searchResults:
             result.update({"sqlTemplate": searchTemplate.sql})        
 

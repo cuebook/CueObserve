@@ -94,7 +94,6 @@ class Search extends React.Component {
       .then(res => {
         if (res.success && res.data) {
           let options = res.data.map(e => {
-            // console.log('res', res.data)
             return {
               ...e,
               value: e.value + "_" + e.user_entity_identifier,
@@ -201,13 +200,11 @@ class Search extends React.Component {
             }
           }
           this.setState({ searchSuggestions: opts });
-          // console.log("opts", opts)
           return opts;
         }
       });
   };
   onChangeFilter = (selectedEntries, action) => {
-    // console.log("onchange filter", selectedEntries)
     this.selectedEntries = selectedEntries;
     if (!_.isNil(selectedEntries)) {
       const e = selectedEntries[selectedEntries.length - 1];
@@ -272,7 +269,6 @@ class Search extends React.Component {
   }
 
   onUserInteracted = e => {
-    // console.log('e.key', e.key)
     if (e.key == "Backspace") {
       if (this.state.query == "") {
         if (
@@ -304,9 +300,6 @@ class Search extends React.Component {
         this.getSearchResults();
       }
     } else if (e.key == "Enter") {
-      // console.log("value input", valueInput)
-      // console.log('value injput2', valueInput2)
-      // console.log("document.activeelment", document.activeElement)
       if (document.activeElement === valueInput) {
         if (valueInput2 && valueInput2.type) {
           valueInput2.focus();
@@ -521,7 +514,6 @@ class Search extends React.Component {
     //   (this.selectedEntries && this.selectedEntries.length) ||
     //   this.state.query
     // ) {
-      console.log("searchPayload", searchPayload)
     this.props.onSubmit(searchPayload);
     // }
   };
@@ -552,11 +544,9 @@ class Search extends React.Component {
   };
 
   render() {
-    // console.log("this.selectedEntries", this.selectedEntries)
     const DropdownIndicator = props => {
       return null;
     };
-// console.log('searchsuggestion', this.state.searchSuggestions)
     return (
       <div className={`cueapp-search ${styles.topBarSearch}`}>
         <AsyncSelect

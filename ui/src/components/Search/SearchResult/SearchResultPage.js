@@ -44,7 +44,6 @@ if(searchCard){
   )
 }
 
-console.log("cardsArray", cardsArray)
 
 return (
         <div>
