@@ -133,7 +133,6 @@ class GlobalDimensionServices:
             for obj in objs:
                 gdValues = GlobalDimensionValues(datasetId = obj["datasetId"], dataset = obj["dataset"], dimension = obj["dimension"], globalDimensionId = gd.id)
                 dimensionalValueObjs.append(gdValues)
-            app.logger.info("dimensionalValuesOBjs %s", dimensionalValueObjs)
             db.session.bulk_save_objects(dimensionalValueObjs)
             db.session.commit()
             # Global dimension indexing on Global dimension update

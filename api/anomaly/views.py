@@ -399,3 +399,9 @@ class MetricsView(APIView):
         """ Get Metrics"""
         res = search.SearchUtils.getAllMetrics()
         return Response(res.json())
+
+class DimValsView(APIView):
+    def post(self, request):
+        payload = request.data
+        res = search.SearchUtils.getDimValues(payload)
+        return Response(res.json())

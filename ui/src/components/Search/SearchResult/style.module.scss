@@ -1,0 +1,84 @@
+// @import "assets/styles/mixins.scss";
+
+.cardTypesHeader {
+  background: white;
+  padding: 10px;
+  padding-left: 0px;
+  margin-top: -20px;
+  border-bottom: 1px solid gray;
+  margin-bottom: 10px;
+  margin-right: -60px;
+}
+
+.widgetContainer {
+  /*min-height: 60px;*/
+  /*  max-height: calc(100% - 70px);
+  overflow-y: auto;
+  overflow-x: hidden;
+*/
+  padding: 0px;
+  border-left: 1px solid gray;
+  border-bottom: 1px solid gray;
+  position: fixed;
+  right: 0;
+  margin: -13px;
+  /*top: 123px;*/
+  width: calc((100% - 320px) / 3);
+  /*height: calc(100% - 70px);*/
+}
+
+.cardTypeBadge {
+  font-size: 12px;
+  background: gray;
+  padding: 10px 10px !important;
+  margin-right: 10px;
+  cursor: pointer;
+  text-transform: initial;
+
+  &:hover {
+    background: gray;
+  }
+
+  .cardTypeCounter {
+    background: white;
+    margin-left: 10px;
+    border-radius: 10px;
+    padding: 2px 6px;
+  }
+}
+
+.selectedBadge {
+  background: primary;
+  color: white;
+  &:hover {
+    background: primary;
+  }
+  .cardTypeCounter {
+    color: secondary;
+  }
+}
+
+.searchResultsWrapper {
+  margin-top: -18px;
+}
+/*
+.formalyDiv{
+  width: 85% !important;
+  display: inline-block;
+  margin-left: 72px;
+  border: 1px solid gray;
+  border-radius: 5px;
+  padding: 0;
+}
+*/
+.widgetWrapper {
+  height: 100%;
+  overflow-y: auto;
+}
+
+.separator {
+  border-bottom: 1px solid gray;
+  font-weight: 600;
+  padding: 6px 10px;
+  margin-bottom: 5px;
+}

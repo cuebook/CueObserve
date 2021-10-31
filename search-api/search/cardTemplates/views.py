@@ -1,6 +1,9 @@
-from flask import Flask, request, jsonify, make_response
+
 from search import app
-from services import SearchCardTemplateServices
+from flask import Flask, request, jsonify, make_response
+
+from .services import SearchCardTemplateServices
+from elasticSearch import ESIndexingUtils
 
 @app.route("/search/cardTemplates/", methods=["GET"])
 def getCardTemplates():
@@ -13,4 +16,21 @@ def getSearchCards():
     app.logger.info("Fetching cards for search")
     payload = request.json
     res = SearchCardTemplateServices.getSearchCards(payload)
+    return jsonify(res)
+
+
+@app.route("/search/searchsuggestions/", methods=['POST'])
+def getSearchSuggestionsView():
+    app.logger.info("Fetching search suggestion data")
+    searchQuery = request.json
+    res = SearchCardTemplateServices.getSearchSuggestions(searchQuery)
+    return jsonify(res)
+
+
+@app.route("/search/runIndexing/", methods=['GET'])
+def elasticSearchIndexingView():
+    ESIndexingUtils.indexGlobalDimensionsDataForSearchSuggestion() # Used for search suggestion
+    ESIndexingUtils.indexGlobalDimensionName()
+    ESIndexingUtils.indexGlobalDimensionsData()
+    res = {"success":True, "message":"indexing completed !"}
     return jsonify(res)

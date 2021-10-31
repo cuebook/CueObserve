@@ -25,6 +25,7 @@ DIMENSION_URL = os.environ.get("DIMENSION_URL", "http://localhost:8000/api/anoma
 METRIC_URL = os.environ.get("METRIC_URL", "http://localhost:8000/api/anomaly/search/metrics/")
 FRONTEND_URL = os.environ.get("FRONTEND_URL", "http://localhost:3000")
 ELASTICSEARCH_URL = os.environ.get("ELASTICSEARCH_URL", "http://localhost:9200/")
+DIMENSION_VALUES_URL = os.environ.get("DIMENSION_URL", "http://localhost:8000/api/anomaly/search/dimVals/")
 # # Application threads. Common assumption is
 # # to use 2 threads per available core.
 # # Handles incoming requests using one and

@@ -30,6 +30,7 @@ migrate.init_app(app, db)
 
 # from .cardTemplates import views, models  # pylint: disable=W0404
 from .globalDimensions import views, models  # pylint: disable=W0404
+from .cardTemplates import views, models
 
 # if __name__ == "app":
 #     app = create_app(env, args)

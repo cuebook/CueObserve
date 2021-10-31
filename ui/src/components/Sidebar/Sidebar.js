@@ -60,6 +60,7 @@ export default function Sidebar(props) {
       "path": "/search/global-dimension",
       "icon": "fa-cube"
     },
+
   ]
 
   let menuElements = []

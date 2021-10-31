@@ -1,6 +1,6 @@
 import requests
 from search import app
-from config import METRIC_URL
+from config import METRIC_URL, DIMENSION_URL, DIMENSION_VALUES_URL
 from search.globalDimensions.models import GlobalDimension
 from search.globalDimensions.serializer import GlobalDimensionSchema
 
@@ -30,3 +30,14 @@ class Utils:
             app.logger.error("Failed to get metrics from cueObserve %s", ex)
             res = {"success":False, "data":[], "message":"Error occured to get metric from cueObserve"}
 
+    def getDimensionalValuesForDimension(datasetId, dimension):
+        try:
+            url = DIMENSION_VALUES_URL
+            data = {"datasetId":datasetId, "dimension":dimension}
+            response = requests.post(url, data=data)
+            payloads  = response.json().get("data", [])
+            res = {"success":True, "data":payloads}
+            return res
+        except Exception as ex:
+            app.logger.error*("Failed to get dimension %s", ex)
+            res = {"success":False, "data":[], "message":"Error occured while getting dimensional values from cueObserve"}

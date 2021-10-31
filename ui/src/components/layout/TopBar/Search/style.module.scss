@@ -1,0 +1,276 @@
+// @import "assets/styles/mixins.scss";
+
+.searchContainer {
+  position: relative;
+}
+
+.searchIcon {
+  position: absolute;
+  color: "bg-gray-400";
+  font-size: 17px;
+  top: 50%;
+  transform: translateY(-50%);
+  left: 15px;
+}
+
+.searchInput {
+  border: 1px solid gray;
+  border-radius: 5px;
+  background-color: white;
+  padding-left: 45px;
+  padding-right: 20px;
+  padding-top: 6px;
+  padding-bottom: 5px;
+  width: 260px;
+}
+
+.certain-category-search.ant-select-auto-complete
+  .ant-input-affix-wrapper
+  .ant-input-suffix {
+  right: 12px;
+}
+
+.certain-category-search-dropdown .ant-select-dropdown-menu-item-group-title {
+  color: #666;
+  font-weight: bold;
+}
+
+.certain-category-search-dropdown .ant-select-dropdown-menu-item-group {
+  border-bottom: 1px solid #f6f6f6;
+}
+
+.certain-category-search-dropdown .ant-select-dropdown-menu-item {
+  padding-left: 16px;
+}
+
+.certain-category-search-dropdown .ant-select-dropdown-menu-item.show-all {
+  text-align: center;
+  cursor: default;
+}
+
+.certain-category-search-dropdown .ant-select-dropdown-menu {
+  max-height: 400px;
+}
+
+.certain-search-item-count {
+  position: absolute;
+  color: #999;
+  font-size: 8px;
+  float: right;
+}
+
+.certain-category-search.ant-select-focused .certain-category-icon {
+  color: #108ee9;
+}
+
+.certain-category-icon {
+  color: #6e6e6e;
+  transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+  font-size: 16px;
+}
+
+.selectoptions {
+  color: #6e6e6e;
+  font-size: 15px;
+  margin: -3px 0;
+}
+
+.selectoptionsRight {
+  float: right;
+  margin-right: -8px;
+  margin-top: -2px;
+}
+
+.valueInput {
+  outline: none;
+  border: none;
+}
+
+.numValueInput {
+  outline: none;
+  border: none;
+  border-bottom: 1px dashed gray;
+  padding: 0px 5px;
+  margin-left: 5px;
+  margin-right: -2px;
+  margin-top: 2px;
+}
+
+.Select__menu-list {
+  max-height: 120px !important;
+}
+
+.searchButton {
+  margin: -5px;
+}
+
+.selectedOption {
+  background-color: "bg-gray-100";
+  padding: 0 4px;
+}
+
+.topBarSearch {
+  height: 40px;
+  min-width: 726px;
+  position: relative;
+}
+
+.searchBtnWrapper {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+}
+
+.starScore {
+  padding-left: 4px;
+  font-size: 14px;
+  text-align: center;
+}
+
+.fireIcon {
+  height: 14px;
+  width: 14px;
+  top: -2px;
+  position: relative;
+  display: inline-block;
+}
+
+.svgFireIcon {
+  position: absolute;
+  height: 22px;
+}
+
+
+
+// temprory use
+
+
+.selectedOption {
+  background-color: white;
+}
+
+.optionWrapper {
+  display: inline-block;
+  width: 100%;
+  height: 22px;
+}
+
+.subText {
+  font-size: 10px;
+  color: gray;
+  display: inline-block;
+  margin: 0;
+  position: relative !important;
+  top: -18px;
+  border-radius: 5px;
+  padding: 0px 3px;
+  float: right ;
+}
+
+.option {
+  margin: 0;
+}
+
+.filterWrapper {
+  display: inline-block;
+  width: 100%;
+  position: relative;
+}
+
+.filterLabel {
+  width: 100px;
+  color:gray;
+  position: absolute;
+  float: left;
+  height: 38px;
+  padding: 7px 12px;
+  border-radius: 0 0 0 5px;
+  z-index: 99;
+
+  i {
+    margin-right: 5px;
+  }
+}
+
+.cuelFilterLabel {
+  width: 100px;
+  background: "primary";
+  color: gray;
+  float: left;
+  height: 38px;
+  padding: 9px 20px;
+  border-radius: 5px 0 0 0;
+
+  i {
+    margin-right: 5px;
+  }
+}
+
+.filterEditor {
+  width: 100%;
+  margin-bottom: 2px;
+  display: block;
+
+}
+
+.cuelSqlRadio {
+  margin-top: 6px;
+  margin-bottom: 10px;
+  font-size: 12px;
+  position: absolute;
+  right: 0px;
+  top: -14px;
+
+  .cuelSqlRadioElement{
+    height: 24px;
+    line-height: 22px;
+  }
+}
+.actions{
+  text-align: right;
+  font-size: 18px;
+  &>span{
+      margin-right: 8px;
+      cursor: pointer;
+      &:hover{
+          color: skyblue;
+      }
+  }
+}
+
+.selectEditor{
+  width: 100%;
+  margin-bottom: 2px;
+}
+
+.scheduleText{
+  display: inline-block;
+
+  .icon{
+      cursor: pointer;
+      display:none;
+      margin-left: 5px;
+  }
+  &:hover{
+      .icon{
+          color: #1890ff;
+          display: inline-block;
+      }
+  }
+}
+
+.runLogTable{
+  width: 100%;
+}
+
+.logsDiv{
+  overflow: auto;
+}
+
+.linkText{
+  color: #1890ff;
+}
+
+.linkText:hover{
+  text-decoration: underline;
+}
