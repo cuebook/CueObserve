@@ -82,9 +82,9 @@ export default function Admin() {
         <Sidebar Logout={logout} authRequire={isLogout}/>
         <ReactNotification />
         <div className="relative md:ml-64 bg-gray-200">
-          <AdminNavbar />
+          {/* <AdminNavbar /> */}
           <HeaderStats />
-          <div className="px-0 md:px-0 mx-auto w-full" style={{minHeight: "calc(100vh - 0px)", padding: "1rem 0rem 0 0rem"}}>
+          <div className="px-0 md:px-0 mx-auto w-full" style={{minHeight: "calc(100vh - 0px)", padding: "0.5rem 0rem 0 0rem"}}>
             <Switch>
               <Route path="/anomaly/:anomalyId" exact component={Anomaly} />
               <Route path="/anomalies" exact component={Anomalys} />

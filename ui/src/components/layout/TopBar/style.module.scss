@@ -1,14 +1,14 @@
-// @import "assets/styles/mixins.scss";
 
 .topbar {
-  background: transparent;
-  min-height: 64px;
-  border-bottom: 1px solid border;
-  padding: 16px 16px 16px 16px;
+  background: #fff;
+  min-height: 4.3rem;
+  border-bottom:  1px solid #dee0e3;
+  padding: 1rem ;
   display: flex;
   flex-direction: row;
   align-items: center;
   flex-wrap: nowrap;
+  overflow: hidden;
 }
 
 .searchbar {

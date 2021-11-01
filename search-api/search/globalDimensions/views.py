@@ -5,11 +5,17 @@ import json
 from flask import Flask, request, jsonify, make_response
 from .services import GlobalDimensionServices
 
-@app.route("/search/globalDimension/create/", methods=['POST'])
+@app.route("/search/global-dimension/create/", methods=['POST'])
 def createGlobalDimensionView():
     payloads = request.json
     res = GlobalDimensionServices.createGlobalDimension(payloads)
     return jsonify(res)
+
+@app.route("/search/global-dimension/delete/<int:id>", methods=['DELETE'])
+def deleteGlobalDimensionView(id):
+    res = GlobalDimensionServices.deleteGlobalDimension(id)
+    return jsonify(res)
+
 
 @app.route("/search/dimension/", methods=['GET'])
 def getDimensions():
@@ -28,7 +34,7 @@ def getGlobalDimensionsView():
     res = GlobalDimensionServices.getGlobalDimensions()
     return jsonify(res)
 
-@app.route("/search/publish/global-dimension", methods=["POST"])
+@app.route("/search/global-dimension/publish", methods=["POST"])
 def updateGlobalDimension():
     payload = request.json
     res = GlobalDimensionServices.publishGlobalDimension(payload)
@@ -39,7 +45,7 @@ def getGlobalDimensionView(id):
     res = GlobalDimensionServices.getGlobalDimensionById(id)
     return jsonify(res)
 
-@app.route("/search/update/global-dimension/<int:id>", methods=["POST"])
+@app.route("/search/global-dimension/update/<int:id>", methods=["POST"])
 def updateGlobalDimensionView(id):
     payload = request.json
     res = GlobalDimensionServices.updateGlobalDimensionById(id, payload)

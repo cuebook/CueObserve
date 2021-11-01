@@ -41,6 +41,17 @@ class GlobalDimensionServices:
             db.session.rollback()
             return res
 
+    def deleteGlobalDimension(id):
+        try:
+            globalDimension = GlobalDimension.query.get(id)
+            db.session.delete(globalDimension)
+            db.session.commit()
+            res = {"success":True}
+            return res
+        except Exception as ex:
+            app.logger.error("Error occured while delete global dimension of Id : ",id)
+            db.session.rollback()
+            res = {"success":False, "message": "Error occured while deleting global dimension "}
 
     def getDimensionFromCueObserve():
         """ Get dimension from cueObserve"""
