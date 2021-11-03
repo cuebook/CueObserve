@@ -24,6 +24,7 @@ export default function SearchResultPage(props){
   const getSearchCard = async () => {
     let params = new URLSearchParams(history.location.search);
     let searchPayload = JSON.parse(params.get("search"));
+    console.log("searchPayload",searchPayload)
     const response = await searchResultService.getSearchCards(searchPayload)
     if(response.success){
       setSearchCard(response.searchCards)

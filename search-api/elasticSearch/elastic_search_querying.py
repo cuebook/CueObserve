@@ -114,7 +114,7 @@ class ESQueryingUtils:
         for hit in response:
             obj = {
                 "value": hit.globalDimensionName,
-                "user_entity_identifier": "DIMENSION",
+                "user_entity_identifier": hit.globalDimensionName,
                 "id": hit.globalDimensionId,
                 "type": "DIMENSION",
             }

@@ -100,7 +100,6 @@ class Search extends React.Component {
               label: e.value,
               type: e.user_entity_identifier,
               searchType: e.type,
-              // score: e.score
             };
           });
 
@@ -350,171 +349,13 @@ class Search extends React.Component {
   };
 
   getSearchResults = () => {
-    let globalDimensionValuesPayload = [];
-    let selectedMeasures = [];
-    let globalDimensionsPayload = [];
-    let cardTypes = [];
-    let tags = [];
-    let cubeId = null;
-    let dimensionValues = {};
-    let names = []; // for ui only
-    let drillObjFilter = {}; // for ui only
-
-    // generating names to display next time
-    names =
-      this.selectedEntries &&
-      this.selectedEntries.map(x => {
-        if (x.searchType === SearchTypeConstants.OPERATION) {
-          if (x.operation === "BETWEEN" || x.operation === "NOT BETWEEN") {
-            return x.label + " " + x.value1 + " AND " + x.value2;
-          } else if (
-            x.operation === "IS NULL" ||
-            x.operation === "IS NOT NULL"
-          ) {
-            return x.label;
-          } else return x.operation + " " + x.value1;
-        } else return x.label;
-      });
-
-    this.selectedEntries &&
-      this.selectedEntries.forEach((e, index) => {
-        if (e.searchType === SearchTypeConstants.PREVIOUSSEARCHPAYLOAD) {
-          // if we have a searchpayload already in option(retrieved from url)
-          // copy object into variables
-          let searchPayload = JSON.parse(JSON.stringify(e.searchPayload));
-          globalDimensionValuesPayload = searchPayload[
-            "globalDimensionValuesPayload"
-          ]
-            ? searchPayload["globalDimensionValuesPayload"]
-            : globalDimensionValuesPayload;
-          selectedMeasures = searchPayload["selectedMeasures"]
-            ? [searchPayload["selectedMeasures"]]
-            : selectedMeasures;
-          globalDimensionsPayload = searchPayload["globalDimensionsPayload"]
-            ? searchPayload["globalDimensionsPayload"]
-            : globalDimensionsPayload;
-          cardTypes = searchPayload["cardTypes"]
-            ? searchPayload["cardTypes"]
-            : cardTypes;
-          tags = searchPayload["tags"] ? searchPayload["tags"] : tags;
-          cubeId = searchPayload["cubeId"] ? searchPayload["cubeId"] : cubeId;
-          dimensionValues = searchPayload["dimensionValues"]
-            ? searchPayload["dimensionValues"]
-            : dimensionValues;
-          drillObjFilter = searchPayload["drillObjFilter"]
-            ? searchPayload["drillObjFilter"]
-            : drillObjFilter;
-        } else if (e.searchType === SearchTypeConstants.DRILLOBJECTFILTER) {
-          // when drill object is passed for cueDrill use to show initial option
-          drillObjFilter = e.drillObjFilter;
-        } else if (e.searchType === SearchTypeConstants.GLOBALDIMENSION) {
-          globalDimensionValuesPayload.push({
-            globalDimensionId: e.id,
-            globalDimensionName: e.type,
-            globalDimensionValue: {
-              name: e.label,
-              similarDimVals: e.similarDimVals
-            }
-          });
-        } else if (e.searchType === SearchTypeConstants.MEASURE) {
-          let selectedMeasure = {
-            measureAlias: e.label,
-            allMeasureNames: e.id
-          };
-          if (
-            this.selectedEntries[index + 1] &&
-            this.selectedEntries[index + 1].searchType ==
-              SearchTypeConstants.OPERATION &&
-            (this.selectedEntries[index + 1].value1 ||
-              this.selectedEntries[index + 1].value2)
-          ) {
-            let boundFilter = this.selectedEntries[index + 1];
-            if (this.selectedEntries[index + 1].value1) {
-              boundFilter.value1 = parseFloat(
-                this.selectedEntries[index + 1].value1
-              );
-            }
-            if (this.selectedEntries[index + 1].value2) {
-              boundFilter.value2 = parseFloat(
-                this.selectedEntries[index + 1].value2
-              );
-            }
-            selectedMeasures.push({
-              measureAlias: e.label,
-              allMeasureNames: e.id,
-              measureValue: {
-                boundFilter: boundFilter,
-                name: this.getBoundFilterName(boundFilter)
-              }
-            });
-          } else {
-            selectedMeasures.push({
-              measureAlias: e.label,
-              allMeasureNames: e.id
-            });
-          }
-        } else if (e.searchType === SearchTypeConstants.DIMENSION) {
-          if (
-            this.selectedEntries[index + 1] &&
-            this.selectedEntries[index + 1].searchType ==
-              SearchTypeConstants.OPERATION
-          ) {
-            let boundFilter = this.selectedEntries[index + 1];
-            if (this.selectedEntries[index + 1].value1) {
-              boundFilter.value1 = parseFloat(
-                this.selectedEntries[index + 1].value1
-              );
-            }
-            if (this.selectedEntries[index + 1].value2) {
-              boundFilter.value2 = parseFloat(
-                this.selectedEntries[index + 1].value2
-              );
-            }
-            globalDimensionValuesPayload.push({
-              globalDimensionId: e.id,
-              globalDimensionName: e.label,
-              globalDimensionValue: {
-                boundFilter: boundFilter,
-                name: this.getBoundFilterName(boundFilter)
-              }
-            });
-          } else {
-            globalDimensionsPayload.push({
-              globalDimensionName: e.label,
-              globalDimensionId: e.id
-            });
-          }
-        } else if (e.searchType === SearchTypeConstants.TAG) {
-          let selectedTag = {
-            tagtext: e.label,
-            tagId: e.id
-          };
-          tags.push(selectedTag);
-        } else if (e.searchType === SearchTypeConstants.ANOMALIES) {
-          cardTypes.push("anomaly");
-        } else if (e.searchType === SearchTypeConstants.REGULAR) {
-          cardTypes.push("regular");
-        }
-      });
-    const searchPayload = {
-      globalDimensionValuesPayload: globalDimensionValuesPayload,
-      measureSearchPayload: selectedMeasures.length
-        ? selectedMeasures[0]
-        : null,
-      globalDimensionsPayload: globalDimensionsPayload,
-      cardTypes: cardTypes,
-      tags: tags,
-      searchQuery: this.state.query,
-      cubeId: cubeId,
-      dimensionValues: dimensionValues,
-      names: names, // only for ui,
-      drillObjFilter: drillObjFilter // only for ui
-    };
+    console.log("this.selectedEntries", this.selectedEntries)
+    
     // if (
     //   (this.selectedEntries && this.selectedEntries.length) ||
     //   this.state.query
     // ) {
-    this.props.onSubmit(searchPayload);
+    this.props.onSubmit(this.selectedEntries);
     // }
   };
 
