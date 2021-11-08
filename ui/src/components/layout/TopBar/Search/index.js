@@ -110,94 +110,8 @@ class Search extends React.Component {
               type: ""
             }
           ];
-
-          let customKeywordOptions = [
-            {
-              label: SearchTypeConstants.ANOMALIES,
-              value: SearchTypeConstants.ANOMALIES,
-              type: SearchTypeConstants.ANOMALIES,
-              searchType: SearchTypeConstants.ANOMALIES
-            }
-          ];
-          let numberOperations = [
-            "=",
-            "!=",
-            ">",
-            ">=",
-            "<",
-            "<=",
-            "BETWEEN",
-            "NOT BETWEEN"
-          ];
-          let stringOperations = ["IS NULL", "IS NOT NULL"];
-          let numberOperationKeywords = numberOperations
-            .filter(n => {
-              if (searchQuery && !n.includes(searchQuery)) {
-                return false;
-              }
-              return true;
-            })
-            .map(n => {
-              return {
-                label: n,
-                value: n,
-                searchType: SearchTypeConstants.OPERATION,
-                type: SearchTypeConstants.OPERATION,
-                dataType: "number",
-                operation: n
-              };
-            });
-          let stringOperationKeywords = stringOperations.map(n => {
-            return {
-              label: n,
-              value: n,
-              searchType: SearchTypeConstants.OPERATION,
-              type: SearchTypeConstants.OPERATION,
-              dataType: "string",
-              operation: n
-            };
-          });
-
-          let compareInterval = ["Quarter on Quarter", "Year on Year"];
-          let compareIntervalKeyword = compareInterval.map(n => {
-            return {
-              label: n,
-              value: n
-            };
-          });
-
-          // show anomalies only when the user starts typing for them.
-          // don't show these entries always.
-          const filteredKeywords = customKeywordOptions.filter(e =>
-            e.label.toUpperCase().startsWith(searchQuery.toUpperCase())
-          );
-
           let opts = [...options];
-          if (this.props.placeholder == "Compare") {
-            opts = [...options, ...compareIntervalKeyword];
-          }
-          if (!this.props.isCueDrill) {
-            opts = [...opts, ...staticOptions];
-          }
-          if (
-            this.selectedEntries.length > 0 &&
-            [
-              SearchTypeConstants.DIMENSION,
-              SearchTypeConstants.MEASURE
-            ].indexOf(
-              this.selectedEntries[this.selectedEntries.length - 1].type
-            ) !== -1
-          ) {
-            if (
-              this.selectedEntries[this.selectedEntries.length - 1].isNumeric ||
-              this.selectedEntries[this.selectedEntries.length - 1].type ==
-                SearchTypeConstants.MEASURE
-            ) {
-              opts = [...numberOperationKeywords, ...opts];
-            } else {
-              opts = [...stringOperationKeywords, ...opts];
-            }
-          }
+          
           this.setState({ searchSuggestions: opts });
           return opts;
         }
@@ -349,8 +263,6 @@ class Search extends React.Component {
   };
 
   getSearchResults = () => {
-    console.log("this.selectedEntries", this.selectedEntries)
-    
     // if (
     //   (this.selectedEntries && this.selectedEntries.length) ||
     //   this.state.query
