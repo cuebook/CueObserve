@@ -4,14 +4,14 @@ import React, { createContext, useState } from 'react';
 // https://redux.js.org/api/createstore
 
 // const [databases, setDatabases] = useState([])
-let schemaData = {}
-const updateSchemaData = x => schemaData = x
+let searchCardData = {}
+const updateSearchCardData = x => searchCardData = x
 
 export const GlobalContext = createContext();
 
 export const GlobalContextProvider = ({ children }) => {
 	return (
-		<GlobalContext.Provider value={{schemaData, updateSchemaData}} >
+		<GlobalContext.Provider value={{searchCardData, updateSearchCardData}} >
 			{children}
 		</GlobalContext.Provider>
 		)

@@ -1,11 +1,16 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import { message, Select, Table } from "antd";
 
 import style from "./style.module.scss";
 
 import TableCard from "components/Search/Card/Table";
 
+import { GlobalContext } from "layouts/GlobalContext"
+
+
 export default function CardPanel(props) {
+
+    const { searchCardData, updateSearchCardData } = useContext(GlobalContext)
 
 	const data = [
 	    {
@@ -153,6 +158,10 @@ export default function CardPanel(props) {
 	const title = "Data for dataset xyz where CITY = DELHI"
 	const text = "Data for dataset xyz where CITY = DELI"
 
+	const handleCardClick = () => {
+		updateSearchCardData({data: data, title: title, text: text})
+	} 
+
 	return (
 		<div>
 		  <div className={style.searchSnippet}>
@@ -162,6 +171,7 @@ export default function CardPanel(props) {
           </div>
           <div className={style.contentSnippet}>
             <a
+              onClick={handleCardClick}
               className={`header mb-0 ${style.cardLink}`}
               href={
                 "#/search/card"
