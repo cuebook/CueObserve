@@ -1,5 +1,17 @@
 // @import "assets/styles/mixins.scss";
 
+
+.searchResultsWrapper {
+  /*background: white;*/
+
+}
+
+.cardPanelWrapper {
+  padding-bottom: 5px;
+  /*margin-bottom: 40px;*/
+}
+
+/*
 .cardTypesHeader {
   background: white;
   padding: 10px;
@@ -11,20 +23,19 @@
 }
 
 .widgetContainer {
-  /*min-height: 60px;*/
-  /*  max-height: calc(100% - 70px);
+  min-height: 60px;
+  max-height: calc(100% - 70px);
   overflow-y: auto;
   overflow-x: hidden;
-*/
   padding: 0px;
   border-left: 1px solid gray;
   border-bottom: 1px solid gray;
   position: fixed;
   right: 0;
   margin: -13px;
-  /*top: 123px;*/
+  top: 123px;
   width: calc((100% - 320px) / 3);
-  /*height: calc(100% - 70px);*/
+  height: calc(100% - 70px);
 }
 
 .cardTypeBadge {
@@ -61,7 +72,7 @@
 .searchResultsWrapper {
   margin-top: -18px;
 }
-/*
+
 .formalyDiv{
   width: 85% !important;
   display: inline-block;
@@ -70,7 +81,7 @@
   border-radius: 5px;
   padding: 0;
 }
-*/
+
 .widgetWrapper {
   height: 100%;
   overflow-y: auto;
@@ -82,3 +93,4 @@
   padding: 6px 10px;
   margin-bottom: 5px;
 }
+*/

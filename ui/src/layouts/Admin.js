@@ -26,6 +26,7 @@ import userServices from "services/main/user.js"
 // Search 
 import GlobalDimensionTable from "views/admin/GlobalDimension"
 import SearchResultPage from "views/admin/SearchResults"
+import SearchCardPage from "views/admin/SearchCard"
 
 export default function Admin() {
   const [ isLoggedIn, setIsLoggedIn] = useState(false)
@@ -97,6 +98,7 @@ export default function Admin() {
               <Route path="/settings" exact component={Settings} />
               <Route path="/search/global-dimension" exact component={GlobalDimensionTable} />
               <Route path="/search/" exact component={SearchResultPage} />
+              <Route path="/search/card" exact component={SearchCardPage} />
               <Redirect from="/" to="/anomalies" />
             </Switch>
           </div>
