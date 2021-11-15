@@ -14,7 +14,7 @@ class GlobalDimensionService {
     }
 
     async AddGlobalDimension(payload){
-        const response = await apiService.post("globalDimension/create/", payload)
+        const response = await apiService.post("global-dimension/create/", payload)
         if(response.success){
             return response
         }
@@ -44,7 +44,7 @@ class GlobalDimensionService {
         }
     }
     async publishGlobalDimension(payload){
-        const response = await apiService.post("publish/global-dimension", payload)
+        const response = await apiService.post("global-dimension/publish", payload)
         if(response.success){
             return response
         }
@@ -52,11 +52,10 @@ class GlobalDimensionService {
             message.error(response.message)
             return response
         }
-
     }
 
     async editGlobalDimension(id, payload){
-        const response = await apiService.post("update/global-dimension/"+id, payload)
+        const response = await apiService.post("global-dimension/update/"+id, payload)
         if (response.success){
             return response
         }
@@ -65,7 +64,17 @@ class GlobalDimensionService {
             return response
         }
     }
-
+    async deleteGlobalDimension(id){
+        const response = await apiService.delete("global-dimension/delete/"+id)
+        if(response.success){
+            return response
+        }
+        else {
+            message.error(response.message)
+            return response
+        }
+    
+    }
 
 }
 

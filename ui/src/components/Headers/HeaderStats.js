@@ -1,15 +1,17 @@
 import React from "react";
+import { Affix } from "antd";
 import TopBar from "components/layout/TopBar"
-
-// components
+import style from "./style.module.scss"
 
 export default function HeaderStats() {
   return (
     <>
       {/* Header */}
-      <div className="relative bg-blue-600 md:pt-12 pb-8 pt-12">
+      <Affix>
+      <div style={{zIndex:9999}}>
         <TopBar />
       </div>
+      </Affix>
     </>
   );
 }

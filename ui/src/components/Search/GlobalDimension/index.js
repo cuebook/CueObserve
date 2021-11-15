@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Switch, Table, Button, Input, Drawer } from 'antd';
-import {EditOutlined } from '@ant-design/icons';
+import { Switch, Table, Button, Input, Drawer,Popconfirm , Tooltip} from 'antd';
+import {EditOutlined, DeleteOutlined } from '@ant-design/icons';
 
 import AddGlobalDimension from "components/Search/GlobalDimension/AddGlobalDimension.js"
 import EditGlobalDimension from "components/Search/GlobalDimension/EditGlobalDimension.js"
@@ -57,7 +57,6 @@ export default function GlobalDimensionTable(props) {
   }
   const onAddGlobalDimensionSuccess = () =>{
     getData()
-
     setIsAddDrawerVisible(false)
   }
   const onEditGlobalDimensionSuccess = () =>{
@@ -70,7 +69,10 @@ export default function GlobalDimensionTable(props) {
     setEditDimension(val)
   }
 
-
+const deleteGlobalDimension = async (val) => {
+  const response = await globalDimensionService.deleteGlobalDimension(val.id)
+  getData()
+}
 
 let dataSource = []
   dataSource = data && data.map(items=>{return {"name":items["name"], "id":items["id"],"published":items["published"] ,"values":items["values"].map((item)=> item["dataset"] + "."+ item["dimension"])}})
@@ -149,14 +151,23 @@ if(dataSource.length != 0){
           key: "actions",
           className: "text-right",
           render: (text, record) => (
-            <span className={style.actionButton}>
-              <ButtonGroup className="mr-2">
-                <Button
-                  icon={<EditOutlined />}
-                  onClick={e => onClickEdit(record)}
-                />
-              </ButtonGroup>
-            </span>
+            <div className={style.actions}>
+
+           <Tooltip title={"Edit Global Dimension"}>
+              <EditOutlined onClick={(e) => onClickEdit(record)} />
+            </Tooltip>
+
+            <Popconfirm
+                title={"Are you sure to delete "+ record.name +" ?"}
+                onConfirm={(e) => deleteGlobalDimension(record)}
+                okText="Yes"
+                cancelText="No"
+            >
+                <Tooltip title={"Delete Global Dimension"}>
+                    <DeleteOutlined />
+                </Tooltip>
+            </Popconfirm>
+            </div>
           )
     
         } 
@@ -167,14 +178,6 @@ return (
   <div>
 
     <div className={`d-flex flex-column justify-content-center text-right mb-2`}>
-
-      {/* <Search
-        style={{ margin: "0 0 10px 0" , width:350, float: "left"}}
-        placeholder="Search"
-        enterButton="Search"
-        // onSearch={searchInDatasets}
-        className="mr-2"
-        /> */}
 
       <Button onClick={openAddGlobalDimension} type="primary" >Add Global Dimension</Button>
 </div>
