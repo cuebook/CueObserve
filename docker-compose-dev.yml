@@ -4,17 +4,23 @@ services:
     container_name: "cueo-nginx"
     image: nginx:1.17
     volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./ui/nginx-dev.conf.template:/etc/nginx/conf.d/nginx-dev.conf.template
+      - ./ui/nginx-entrypoint.sh:/etc/nginx/conf.d/nginx-entrypoint.sh
+    command:
+      bash -c "./etc/nginx/conf.d/nginx-entrypoint.sh && nginx -g 'daemon off;'"
+    environment:
+      ENVIRONMENT:
+      NGINX_API_URL:
+      NGINX_ALERT_API_URL:
+      NGINX_UI_URL:
     network_mode: "host"
 
   cueo-backend:
-    build:
-      context: api
-      dockerfile: Dockerfile
+    image: cuebook/cue-observe-backend:dev
     volumes:
-      - ./api/anomaly:/code/anomaly:rw
-      - ./api/app:/code/app:rw
-      - ./api/users:/code/users:rw
+      - ./api:/code:rw
+    command:
+      bash -c "chmod +x /code/start_server_new.sh && /code/start_server_new.sh"
     environment:
       ENVIRONMENT: ${ENVIRONMENT}
       API_URL: ${API_URL}
@@ -64,3 +70,7 @@ services:
 
 volumes:
   pgdata:
+
+networks:
+  backend:
+    driver: bridge

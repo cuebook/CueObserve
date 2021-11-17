@@ -1,9 +1,7 @@
-version: '3.3'
+version: '3.1'
 services:
   cueo-backend:
-    build:
-      context: api
-      dockerfile: Dockerfile
+    image: cuebook/cue-observe-backend:0.3.1
     environment:
       ENVIRONMENT: ${ENVIRONMENT}
       API_URL: ${API_URL}
@@ -22,14 +20,10 @@ services:
       - sqliteDB:/code/db:rw
 
   cueo-alerts:
-    build:
-      context: alerts-api
-      dockerfile: Dockerfile
+    image: cuebook/cue-observe-alerts:0.3.1
 
   cueo-frontend:
-    build:
-      context: ui
-      dockerfile: Dockerfile
+    image: cuebook/cue-observe-frontend:0.3.1
     env_file:
       - .env
     depends_on:
