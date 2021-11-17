@@ -42,7 +42,6 @@ services:
       - "cueo-alerts"
       - "cueo-backend"
       - "cueo-redis"
-      - "cueo-postgresql"
       
   cueo-redis:
     image: redis
