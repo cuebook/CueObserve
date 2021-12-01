@@ -16,7 +16,9 @@ services:
     network_mode: "host"
 
   cueo-backend:
-    image: cuebook/cue-observe-backend:dev
+    build:
+      context: api
+      dockerfile: Dockerfile
     volumes:
       - ./api:/code:rw
     command:
