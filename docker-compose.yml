@@ -20,6 +20,7 @@ services:
       REDIS_BROKER_URL:
     volumes:
       - sqliteDB:/code/db:rw
+      - djangoStaticFiles:/home/staticfiles:rw
 
   cueo-alerts:
     build:
@@ -42,12 +43,15 @@ services:
       - "cueo-alerts"
       - "cueo-backend"
       - "cueo-redis"
+    volumes:
+      - djangoStaticFiles:/home/staticfiles:rw
       
   cueo-redis:
     image: redis
 
 volumes:
   sqliteDB:
+  djangoStaticFiles:
 
 
     
