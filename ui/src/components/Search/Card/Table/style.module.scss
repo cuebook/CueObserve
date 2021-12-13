@@ -1,0 +1,11 @@
+// @import "assets/styles/mixins.scss";
+
+
+.antdTable {
+  height: 100%;
+  border: none;
+  overflow: auto;
+  td{
+    padding: 2px !important;
+  }
+}

@@ -7,6 +7,8 @@ import {useHistory} from "react-router-dom"
 import searchResultService from "services/search/searchResult.js"
 // import TrackVisibility from "react-on-screen";
 
+import CardSnippet from "components/Search/Card/CardSnippet";
+
 export default function SearchResultPage(props){
   const history = useHistory()
   const [searchCard, setSearchCard] = useState()
@@ -47,13 +49,15 @@ if(searchCard){
 
 return (
         <div>
-          <div className={`row ${style.searchResultsWrapper}`} >
-            <div className="col-lg-7">
+          <div className="row" >
+            <div className={`xl:w-8/12 ${style.searchResultsWrapper}`}>
               {cardsArray.length > 0 ? null :(
                 <h4>No results found.</h4>
                 )}
               {cardsArray}
-              
+              <div className={style.cardPanelWrapper}> < CardSnippet /> </div>
+              <div className={style.cardPanelWrapper}> < CardSnippet /> </div>
+              <div className={style.cardPanelWrapper}> < CardSnippet /> </div>
             </div>
           </div>
       </div>

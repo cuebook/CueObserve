@@ -1,4 +1,5 @@
 # from requests.models import Response
+import traceback
 from search import app, db
 from sqlalchemy import desc
 import requests
@@ -35,11 +36,11 @@ class GlobalDimensionServices:
                 app.logger.error("Indexing Failed %s", ex)
 
             res = {"success":True}
-            return res
         except Exception as ex:
-            res = {"success":False, "message":"Global Dimension name already exists "}
+            res = {"success":False, "message":"Global Dimension name already exists."}
+            app.logger.error("Exception occured: " + str(ex))
             db.session.rollback()
-            return res
+        return res
 
     def deleteGlobalDimension(id):
         try:
@@ -69,11 +70,10 @@ class GlobalDimensionServices:
                     payloadDicts.append(dictObjs)
 
             res = {"success":True, "data":payloadDicts}
-            return res
         except Exception as ex:
             app.logger.error*("Failed to get dimension %s", ex)
             res = {"success":False, "data":[], "message":"Error occured to get dimension from cueObserve"}
-
+        return res
 
 
     def getGlobalDimensions():
@@ -83,12 +83,10 @@ class GlobalDimensionServices:
             globalDimensions = GlobalDimension.query.order_by(desc(GlobalDimension.id)).all()
             data = GlobalDimensionSchema(many=True).dump(globalDimensions)
             res = {"success":True, "data":data}
-            return res
-
         except Exception as ex:
             app.logger.error("Failed to get global dimension %s", ex)
             res = {"success":False, "data":[], "message":"Error occured to get data in global dimension"}
-            return res
+        return res
 
 
     def publishGlobalDimension(payload):
@@ -102,16 +100,13 @@ class GlobalDimensionServices:
                 globalDimensionObj.published = published
                 db.session.commit()
                 res = {"success":True, "message":"Global Dimension updated successfully"}
-
             else:
                 res = {"success":False, "message": "Id is mandatory"}
-
-            return res
         except Exception as ex:
             app.logger.error("Failed to publish/unpublish global dimension %s", ex)
             db.session.rollback()
             res = {"success":False, "message": "Error occured while updating global dimension"}
-            return res
+        return res
 
     def getGlobalDimensionById(id):
         """ Service to get global dimension of given id """
@@ -120,12 +115,11 @@ class GlobalDimensionServices:
             data = GlobalDimensionSchema().dump(globalDimensionObj)
             app.logger.info("data %s", data)
             res = {"success":True, "data": data }
-            return res
         except Exception as ex:
             app.logger.error("Failed to get global dimension of id %s", id)
             app.logger.error("Error %s", ex)
             res = {"success":True, "data": [], "message":"Failed to get global dimension of id : " + id }
-            return res
+        return res
 
     def updateGlobalDimensionById(id, payload):
         try:
@@ -153,11 +147,10 @@ class GlobalDimensionServices:
             except Exception as ex:
                 app.logger.error("Indexing Failed %s", ex)
             res = {"success":True, "message":"Global Dimension updated successfully"}
-            return res
         except Exception as ex:
             app.logger.error("Failed to update global dimension of Id : %s", id)
             app.logger.error("Traces of failure %s", ex)
             db.session.rollback()
             res = {"success":False, "message":"Error occured while updating global dimension"}
-            return res
+        return res
 

@@ -2980,3 +2980,16 @@ video {
     padding: 0px 8px !important;
     overflow-wrap: break-word;
 }
+
+.cardTable .ant-table-tbody > tr > td {
+  padding: 0px 8px !important;
+  overflow-wrap: break-word;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.cardTable .ant-table-thead > tr > th {
+  padding: 0px 8px !important;
+  overflow-wrap: break-word;
+  line-height: 1;
+}
