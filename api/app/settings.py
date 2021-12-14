@@ -190,7 +190,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static_root")
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 REDIS_BROKER_URL = os.environ.get("REDIS_BROKER_URL", "redis://localhost:6379/0")
-CELERY_RESULT_BACKEND = "redis"
+CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND", "redis://localhost:6379/1")
 CELERY_IMPORTS = ("ops.tasks",)
 CELERY_TASK_ROUTES = {"ops.tasks.anomalyDetectionTasks._anomalyDetectionSubTask": {"queue": "anomalySubTask"}}
 
