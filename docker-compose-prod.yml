@@ -15,10 +15,13 @@ services:
       DJANGO_SUPERUSER_PASSWORD: ${DJANGO_SUPERUSER_PASSWORD}
       DJANGO_SUPERUSER_EMAIL: ${DJANGO_SUPERUSER_EMAIL}
       IS_AUTHENTICATION_REQUIRED: ${IS_AUTHENTICATION_REQUIRED}
-      REDIS_BROKER_URL:
+      REDIS_BROKER_URL: ${REDIS_BROKER_URL}
+      CELERY_RESULT_BACKEND: ${CELERY_RESULT_BACKEND}
     volumes:
       - sqliteDB:/code/db:rw
       - djangoStaticFiles:/home/staticfiles:rw
+    depends_on:
+      - cueo-redis
 
   cueo-alerts:
     image: cuebook/cue-observe-alerts:0.3.1
