@@ -13,6 +13,7 @@ import Admin from "layouts/Admin.js";
 import {firebaseConfig} from "telemetry/index.js"
 
 firebase.initializeApp(firebaseConfig)
+
 ReactDOM.render(
     <HashRouter>
       <Switch>
