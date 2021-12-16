@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # start-server.sh
 export DEBUG=false
+export LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libgomp.so.1:/$LD_PRELOAD
 python manage.py migrate
 python manage.py loaddata seeddata/*.json
 if  [ -n "$DJANGO_SUPERUSER_USERNAME" ] && [ -n "$DJANGO_SUPERUSER_EMAIL" ] && [ -n "$DJANGO_SUPERUSER_PASSWORD" ] ; then
