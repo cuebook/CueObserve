@@ -13,6 +13,7 @@
     "lodash": "^4.17.21",
     "node-sass": "^4.14.1",
     "re-resizable": "^6.9.0",
+    "firebase":"9.6.1",
     "react": "^17.0.2",
     "react-ace": "^9.4.1",
     "react-dom": "^17.0.2",
