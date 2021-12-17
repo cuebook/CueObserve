@@ -27,7 +27,7 @@
     "tailwindcss": "^2.2.16"
   },
   "scripts": {
-    "start": "PORT=3030 react-scripts start",
+    "start": "PORT=3030 node --max-old-space-size=8192 && react-scripts start",
     "build": "node --max-old-space-size=8192 && react-scripts build && gulp licenses",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
