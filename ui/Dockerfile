@@ -1,12 +1,12 @@
 # Build frontend
-FROM node:12-slim as builder
+FROM node:12.10.0-slim as builder
 
 WORKDIR /app
 ENV PATH /app/node_modules/.bin:$PATH
 
-COPY package.json /app/
+COPY package.json /app/package.json
 RUN npm install --silent
-COPY . /app/
+COPY . /app
 RUN npm run build
 
 # Build a static version in a separate image
