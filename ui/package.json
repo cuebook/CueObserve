@@ -8,12 +8,12 @@
     "ace-builds": "^1.4.12",
     "antd": "^4.15.0",
     "bizcharts": "^4.1.10",
+    "firebase": "^9.6.1",
     "gulp": "4.0.2",
     "gulp-append-prepend": "^1.0.9",
     "lodash": "^4.17.21",
     "node-sass": "^4.14.1",
     "re-resizable": "^6.9.0",
-    "firebase": "^9.6.1",
     "react": "^17.0.2",
     "react-ace": "^9.4.1",
     "react-dom": "^17.0.2",
@@ -27,8 +27,9 @@
     "tailwindcss": "^2.2.16"
   },
   "scripts": {
-    "start": "PORT=3030 node --max-old-space-size=8192 && react-scripts start",
-    "build": "node --max-old-space-size=8192 && react-scripts build && gulp licenses",
+    "fix-memory-limit": "cross-env LIMIT=8192 increase-memory-limit",
+    "start": "PORT=3030 react-scripts start",
+    "build": "react-scripts build && gulp licenses",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "install:clean": "rm -rf node_modules/ && rm -rf package-lock.json && npm install && npm run build:tailwind && npm start",
@@ -55,5 +56,8 @@
     "@types/react": "16.9.49",
     "typescript": "4.0.3"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "increase-memory-limit": "^1.0.3",
+    "cross-env": "^5.0.5"
+  }
 }
