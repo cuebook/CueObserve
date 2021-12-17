@@ -27,9 +27,8 @@
     "tailwindcss": "^2.2.16"
   },
   "scripts": {
-    "fix-memory-limit": "cross-env LIMIT=8192 increase-memory-limit",
-    "start": "PORT=3030 react-scripts start",
-    "build": "react-scripts build && gulp licenses",
+    "start": "PORT=3030 node --max-old-space-size=10240 --optimize_for_size  && react-scripts start",
+    "build": "node --max-old-space-size=10240 --optimize_for_size && react-scripts build && gulp licenses",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "install:clean": "rm -rf node_modules/ && rm -rf package-lock.json && npm install && npm run build:tailwind && npm start",
@@ -57,7 +56,5 @@
     "typescript": "4.0.3"
   },
   "devDependencies": {
-    "increase-memory-limit": "^1.0.3",
-    "cross-env": "^5.0.5"
   }
 }
