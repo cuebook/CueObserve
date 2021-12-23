@@ -27,5 +27,32 @@ Next, create two channels in Slack. Add the app to these two channels.
 
 ![](.gitbook/assets/screenshot-from-2021-08-26-17-52-09.png)
 
+## Webhook URL
+
+CueObserve supports Webhook URL for receiving alert messages. There are two type of alerts :
+
+1.  Anomaly alerts, which are sent when an anomaly is detected in data. The response will have json data (as below) and _base64_ encoded image.
 
 
+
+    ```
+    {
+      "subject": subject,
+      "message": message,
+      "details": details,
+      "AnomalyDefinitionId": anomalyDefId,
+      "AnomalyId": anomalyId,
+    }
+    ```
+2.  App Monitoring alerts, which are sent when an anomaly detection job fails. The response will have json data as formatted:
+
+
+
+    ```
+    {
+      "subject": subject,
+      "message": message
+    }
+    ```
+
+To subscribe to these alerts, configure your Webhook URL in CueObserve _settings screen_.

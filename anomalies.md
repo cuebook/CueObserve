@@ -13,4 +13,3 @@ Anomaly cards follow a template. If you want, you can modify the templates.
 ![Hourly Anomaly card](.gitbook/assets/anomalycard_hourly_cropped.png)
 
 ![Daily Anomaly card](.gitbook/assets/anomalycard_daily_cropped.png)
-

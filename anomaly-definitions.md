@@ -6,14 +6,14 @@ To define an anomaly job, you
 
 1. Select a dataset
 2. Select a measure from the dataset
-3. Select a dimension to split the measure _\(optional\)_
+3. Select a dimension to split the measure _(optional)_
 4. Select an anomaly rule
 
 ![](.gitbook/assets/anomalydefinitions.png)
 
 ## Split Measure by Dimension
 
-`Measure` \[`Dimension` `Limit` \] \[`High/Low`\]
+`Measure` \[`Dimension` `Limit` ] \[`High/Low`]
 
 To split a measure by a dimension, select the dimension and then limit the number of unique dimension values you want to split into.
 
@@ -47,7 +47,7 @@ Minimum Average Value limits the number of dimension values based on the measure
 
 ![](.gitbook/assets/minavgvalue.png)
 
-In the example above, only states where _average\(Orders\) &gt;= 10_ will be selected. If your granularity is daily, this means daily average orders. If your granularity is hourly, this means hourly average orders.
+In the example above, only states where _average(Orders) >= 10_ will be selected. If your granularity is daily, this means daily average orders. If your granularity is hourly, this means hourly average orders.
 
 ## Anomaly Detection Algorithms
 
@@ -60,9 +60,9 @@ CueObserve offers the following algorithms for anomaly detection.
 
 ### Prophet
 
-This algorithm uses the open-source [Prophet](https://github.com/facebook/prophet) procedure to generate a forecast for the timeseries. It then compares the actual value with the forecasted value. If the actual value is outside the forecast's confidence range \(_grey band in the image below_\), it marks the actual value as an anomalous data point.
+This algorithm uses the open-source [Prophet](https://github.com/facebook/prophet) procedure to generate a forecast for the timeseries. It then compares the actual value with the forecasted value. If the actual value is outside the forecast's confidence range (_grey band in the image below_), it marks the actual value as an anomalous data point.
 
-The metric's percentage deviation \(_45% in the image below_\) is calculated with respect to the threshold of the forecast's confidence range.
+The metric's percentage deviation (_45% in the image below_) is calculated with respect to the threshold of the forecast's confidence range.
 
 ![](.gitbook/assets/anomalydeviation.png)
 
@@ -84,7 +84,5 @@ _Anomaly when Value greater than `X`_
 
 _Anomaly when Value not between `X` and `Y`_
 
-\_\_
-
-
+__
 

@@ -19,4 +19,3 @@ Since the data consumer can choose which metrics to monitor and how deep to moni
 ## One-click Root Cause Analysis
 
 Data consumers can do root cause analysis on anomalies with just one click. This reduces time to action.
-
