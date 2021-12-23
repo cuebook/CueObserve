@@ -10,6 +10,7 @@ def test_connections(client, mocker):
     """
     Test case for connections
     """
+
     # Add Connection
     connectionType = mixer.blend("anomaly.connectionType")
     ConnectionParam = mixer.blend("anomaly.ConnectionParam", connectionType = connectionType, name="file")

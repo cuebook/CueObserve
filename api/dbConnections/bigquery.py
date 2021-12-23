@@ -14,12 +14,14 @@ class BigQuery:
     """
 
     @staticmethod
-    def checkConnection(file: str):
+    def checkConnection(params: str):
         """
         Connection for bigQuery database
         :param file: credential file from bigquery to connection
         """
         res = True
+        file = params.get("file", {})
+
         try:
             file = json.loads(file)
             service_account_info = file
@@ -35,7 +37,7 @@ class BigQuery:
         return res
 
     @staticmethod
-    def fetchDataframe(file: str, sql: str, limit: bool = False):
+    def fetchDataframe(params: str, sql: str, limit: bool = False):
         """
         Fetches data using given config file and sql
         :param file: connection file
@@ -44,6 +46,7 @@ class BigQuery:
         :returns: dataframe
         """
         dataframe = None
+        file = params.get("file", {})
         try:
             if limit:
                 sql = limitSql(sql)

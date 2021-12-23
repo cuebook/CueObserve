@@ -37,6 +37,7 @@ export default function Dataset(props) {
   const [datasetColumns, setDatasetColumns] = useState([])
   const [datasetColumnType, setDatasetColumnType] = useState({})
   const [datasetGranularity, setDatasetGranlarity] = useState(null)
+  const [isNonRollup, setIsNonRollup] = useState(false)
   const [viewOnlyMode, setViewOnlyMode] = useState(false)
 
   const [isDataReceived, setIsDataReceived] = useState(false);
@@ -69,7 +70,6 @@ export default function Dataset(props) {
       setDatasetColumnType(tempColumnTypes)
       let columns = data.metrics.concat(data.dimensions).concat([data.timestampColumn])
       setDatasetColumns(columns)
-      console.log(columns)
     } 
   }
 
@@ -98,6 +98,11 @@ export default function Dataset(props) {
       return 
     }
 
+    if(isNonRollup && dimensions.length > 1){
+      message.error("Non roll-up dataset can have maximum one dimension")
+      return 
+    }
+
     const payload = {
       name: datasetName,
       sql: datasetSql,
@@ -106,6 +111,7 @@ export default function Dataset(props) {
       dimensions: dimensions,
       timestamp: timestamps[0],
       granularity: datasetGranularity,
+      isNonRollup: isNonRollup
     }
     if (params.datasetId)
       await datasetService.updateDataset(params.datasetId, payload)
@@ -189,6 +195,10 @@ export default function Dataset(props) {
   ]
   const selectFieldTypeTable = <Table columns={typeSelectorColumns} dataSource={datasetColumns} pagination={false} size="small" />
 
+  if (params.datasetId && _.isEmpty(datasetDetails)){
+    return null
+  }
+
   return (
     <>
       <div className={`xl:w-9/12 ${style.dataset}`}>
@@ -206,6 +216,9 @@ export default function Dataset(props) {
             <Button type="primary" onClick={runDatasetQuery} loading={loadingQueryData}>Run SQL</Button>
           </div>
         </div>
+        <div className={style.buttons}>
+          <Switch checked={isNonRollup} onChange={val => setIsNonRollup(val)} /> &nbsp; Non Roll-up Dataset
+        </div>
         <div className={`compact-table ${style.dataTable}`}>
           {queryDataTable}
         </div>
@@ -213,7 +226,9 @@ export default function Dataset(props) {
           !datasetColumns.length ? null :
             <>
               <div className={`xl:w-8/12 ${style.typeSelectorTable}`}>
-                <p>Select type for columns: </p>
+                <p><b>
+                Map Dataset Schema: 
+                </b></p>
                 {selectFieldTypeTable}
               </div>
               <div className={style.granularity}>

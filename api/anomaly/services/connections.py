@@ -1,7 +1,7 @@
 import logging
 from typing import List
 from utils.apiResponse import ApiResponse
-from dbConnections import BigQuery
+from dbConnections import BigQuery, Redshift, Snowflake, Druid, MySQL, Postgres, MSSQL, ClickHouse
 from anomaly.models import (
     Connection,
     ConnectionParam,
@@ -42,6 +42,17 @@ class Connections:
         return res
 
     @staticmethod
+    def getConnectionParams(connection_id):
+        """
+        Gets connection details of given connection_id
+        """
+        connection = Connection.objects.get(id=connection_id)
+        params = {}
+        for val in connection.cpvc.all():
+            params[val.connectionParam.name] = val.value
+        return connection.connectionType.name, params
+
+    @staticmethod
     def addConnection(payload):
         """
         Add connection or build new connection
@@ -54,39 +65,32 @@ class Connections:
 
         # Do this verification using Querys service
 
-        # now it's only for BigQuery connection
         if connectionName == "BigQuery":
-            file = payload["params"].get("file", {})
-            connectionResponse = BigQuery.checkConnection(file)
-
-            if connectionResponse:
-                connection = Connection.objects.create(
-                    name=payload["name"],
-                    description=payload["description"],
-                    connectionType=connectionType,
-                )
-
-                for param in payload["params"]:
-                    cp = ConnectionParam.objects.get(
-                        name=param, connectionType=connectionType
-                    )
-                    ConnectionParamValue.objects.create(
-                        connectionParam=cp,
-                        value=payload["params"][param],
-                        connection=connection,
-                    )
-
-                res.update(True, "Connection added successfully")
-            else:
-                logger.error("DB connection failed :")
-                res.update(False, "Connection Failed")
-
+            connectionResponse = BigQuery.checkConnection(payload["params"])
+        elif connectionName == "Redshift":
+            connectionResponse = Redshift.checkConnection(payload["params"])
+        elif connectionName == "Snowflake":
+            connectionResponse = Snowflake.checkConnection(payload["params"])
+        elif connectionName == "Druid":
+            connectionResponse = Druid.checkConnection(payload["params"])
+        elif connectionName == "MySQL":
+            connectionResponse = MySQL.checkConnection(payload["params"])
+        elif connectionName == "Postgres":
+            connectionResponse = Postgres.checkConnection(payload["params"])
+        elif connectionName == "MSSQL":
+            connectionResponse = MSSQL.checkConnection(payload["params"])
+        elif connectionName == "ClickHouse":
+            connectionResponse = ClickHouse.checkConnection(payload["params"])
         else:
+            connectionResponse = True
+
+        if connectionResponse:
             connection = Connection.objects.create(
                 name=payload["name"],
                 description=payload["description"],
                 connectionType=connectionType,
             )
+
             for param in payload["params"]:
                 cp = ConnectionParam.objects.get(
                     name=param, connectionType=connectionType
@@ -96,7 +100,11 @@ class Connections:
                     value=payload["params"][param],
                     connection=connection,
                 )
+
             res.update(True, "Connection added successfully")
+        else:
+            logger.error("DB connection failed :")
+            res.update(False, "Connection Failed")
 
         return res
 
@@ -111,7 +119,9 @@ class Connections:
             Connection.objects.get(id=connection_id).delete()
             res.update(True, "Connection deleted successfully")
         else:
-            res.update(False, "Cannot delete connection because it is linked with datasets")
+            res.update(
+                False, "Cannot delete connection because it is linked with datasets"
+            )
         return res
 
     @staticmethod

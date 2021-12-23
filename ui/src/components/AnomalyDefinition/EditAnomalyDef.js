@@ -2,9 +2,11 @@ import React, { useState, useEffect } from "react";
 import style from "./style.module.scss";
 import { components } from "react-select";
 import CreatableSelect from "react-select/creatable";
-import { Modal, Select, Spin, Switch, Button, Radio, notification, Drawer } from "antd";
+import { Modal, Select, Spin, Switch, Button, Radio, message, Drawer } from "antd";
 import datasetService from "services/datasets";
 import anomalyDefService from "services/anomalyDefinitions.js";
+import PercentageChange from "components/DetectionRuleParamSelector/PercentageChange";
+import ValueThreshold from "components/DetectionRuleParamSelector/ValueThreshold";
 import  _ from "lodash";
 
 const { Option } = Select;
@@ -33,20 +35,23 @@ function getSelectedOptions(anomalyDef){
             color: "#12b1ff",
             isFixed: true
           });
-          temp.push({
-            value: "Top",
-            label: "Top",
-            optionType: "Top",
-            color: "#ff6767",
-            isFixed: true
-          });
-          temp.push({
-            value: anomalyDef.top,
-            label: anomalyDef.top,
-            optionType: "Dimension Values",
-            color: "#ff6767",
-            isFixed: true
-          });
+          if(anomalyDef.operation){
+
+            temp.push({
+              value: anomalyDef.operation,
+              label: anomalyDef.operation,
+              optionType: "Top",
+              color: "#12b1ff",
+              isFixed: true
+            });
+            temp.push({
+              value: anomalyDef.value,
+              label: anomalyDef.value,
+              optionType: "Dimension Values",
+              color: "#12b1ff",
+              isFixed: true
+            });
+          }
           
     }
     if(anomalyDef.highOrLow){
@@ -155,10 +160,11 @@ function getHelpText(selectedOption) {
 }
 
 export default function EditAnomalyDef(props){
-  const [allDatasets, setAllDatasets] = useState([]);
   const [selectedOption, setSelectedOption] = useState([]);
   const [isFocused, setIsFocused] = useState(false);
   const [initialDataset, setInitialDataset] = useState([])
+  const [detectionRule, setDetectionRule] = useState()
+  const [updatedParams, setUpdatedParams] = useState({})
   const [anomalyDefId, setAnomalyDefId] = useState(0)
 
   useEffect(()=>{
@@ -167,8 +173,9 @@ export default function EditAnomalyDef(props){
     if(props)
     {
         let anomalyDef = props.editAnomalyDef["anomalyDef"]
-        let dataset = props.editAnomalyDef["dataset"]
-        setInitialDataset(dataset["name"])
+        let datasetName = props.editAnomalyDef["datasetName"]
+        setDetectionRule(props.editAnomalyDef.detectionRule)
+        setInitialDataset(datasetName)
         let selected = getSelectedOptions(anomalyDef)
         setSelectedOption(selected)
         setAnomalyDefId(anomalyDef["id"])
@@ -188,13 +195,23 @@ export default function EditAnomalyDef(props){
       if (item.optionType === "High Or Low") {
         payload.highOrLow = item.value;
       }
-      if (item.optionType === "Dimension") {
-        payload.dimension = item.value;
-      }
-      if (item.optionType === "Dimension Values"){
-        payload.top = item.value
-      }
     });
+
+    let paramsUpdated = true
+    for(let param in detectionRule.params)
+    {
+      if(!updatedParams[param])
+      {
+        paramsUpdated = false
+      }
+    }
+
+    if(!paramsUpdated)
+    {
+      message.error("Update parameter values for detection rule");
+      return
+    }
+    payload.detectionRuleParams = updatedParams
 
     getEditAnomaly(payload)
 
@@ -284,12 +301,44 @@ export default function EditAnomalyDef(props){
     setIsFocused(val)
   }
 
-    var datasetOption = [];
-    datasetOption = allDatasets && allDatasets.map(dataset => (
-      <Option value={dataset.id} key={dataset.id}>
-        {dataset.name}
-      </Option>
-    ));
+
+    let detectionRuleElem = null
+
+    if(detectionRule)
+    {
+      let paramSelector = null
+      //add values in param selector
+      if(detectionRule.detectionRuleType.name == "Percentage Change")
+      {
+        paramSelector = <PercentageChange submitParams={setUpdatedParams} defaultParams={detectionRule.params} />
+      }
+      if(detectionRule.detectionRuleType.name == "Value Threshold")
+      {
+        paramSelector = <ValueThreshold submitParams={setUpdatedParams} defaultParams={detectionRule.params} />
+      }
+
+      detectionRuleElem = (
+        <div className="mb-6">
+          <Select
+            className={`${style.selectEditor}`}
+            showSearch
+            disabled
+            placeholder="Create a detection rule"
+            value={detectionRule.detectionRuleType.name}
+            optionFilterProp="children"
+            filterOption={(input, option) =>
+              option.props.children
+                .toLowerCase()
+                .indexOf(input.toLowerCase()) >= 0
+            }
+          >
+          </Select>
+          <span style={{opacity: 0.6, paddingLeft: 5}}>{detectionRule.detectionRuleType.description}</span>
+          {paramSelector}
+        </div>
+      )
+    }
+
 
     return (
       <div>
@@ -322,7 +371,7 @@ export default function EditAnomalyDef(props){
                       .indexOf(input.toLowerCase()) >= 0
                   }
                 >
-                  {datasetOption}
+                  {/* {datasetOption} */}
                 </Select>
               </div>
               <div className="mb-6">
@@ -350,10 +399,11 @@ export default function EditAnomalyDef(props){
                   MultiValueContainer: multiValueContainer
                 }}
                 options={options}
-                placeholder={`Measure [Dimension Top N] [High/Low] `}
+                placeholder={`Measure [Dimension] [Top N / Min % Contribution X / Min Avg Value Y] [High/Low] `}
               />
 
             </div>
+            {detectionRuleElem}
             <div className="mb-6">
             <Button
                 key="save"

@@ -250,6 +250,367 @@
             "width": "100%"
           }
         }
-      }
+      },
 
+      {
+        "model": "anomaly.connectionparam",
+        "pk": 14,
+        "fields": {
+          "name": "endPoint",
+          "label": "Endpoint",
+          "isEncrypted": false,
+          "connectionType": 4,
+          "properties": {
+            "rules": [ 
+              {
+              "required": true,
+              "message": "Endpoint details can't be empty !"
+              }
+            ],
+            "type": "text",
+            "width": "100%"
+          }
+        }
+      },
+      {
+        "model": "anomaly.connectionparam",
+        "pk": 15,
+        "fields": {
+          "name": "username",
+          "label": "Username",
+          "isEncrypted": false,
+          "connectionType": 4,
+          "properties": {
+            "rules": [
+              {
+                "required": true,
+                "message": "Username  can't be empty"
+              }
+            ],
+            "type": "text",
+            "width": "50%"
+          }
+        }
+      },
+      {
+        "model": "anomaly.connectionparam",
+        "pk": 16,
+        "fields": {
+          "name": "password",
+          "label": "Password",
+          "isEncrypted": true,
+          "connectionType": 4,
+          "properties": {
+            "rules": [
+              {
+                "required": true,
+                "message": "Password  can't be empty"
+              }
+            ],
+            "type": "text",
+            "width": "50%"
+          }
+        }
+      },
+
+      {
+        "model": "anomaly.connectionparam",
+        "pk": 17,
+        "fields": {
+          "name": "account",
+          "label": "Account",
+          "isEncrypted": false,
+          "connectionType": 5,
+          "properties": {
+            "rules": [ 
+              {
+              "required": true,
+              "message": "Account details can't be empty !"
+              }
+            ],
+            "type": "text",
+            "width": "100%"
+          }
+        }
+      },
+      {
+        "model": "anomaly.connectionparam",
+        "pk": 18,
+        "fields": {
+          "name": "username",
+          "label": "Username",
+          "isEncrypted": false,
+          "connectionType": 5,
+          "properties": {
+            "rules": [
+              {
+                "required": true,
+                "message": "Username  can't be empty"
+              }
+            ],
+            "type": "text",
+            "width": "50%"
+          }
+        }
+      },
+      {
+        "model": "anomaly.connectionparam",
+        "pk": 19,
+        "fields": {
+          "name": "password",
+          "label": "Password",
+          "isEncrypted": true,
+          "connectionType": 5,
+          "properties": {
+            "rules": [
+              {
+                "required": true,
+                "message": "Password  can't be empty"
+              }
+            ],
+            "type": "text",
+            "width": "50%"
+          }
+        }
+      },
+      {
+        "model": "anomaly.connectionparam",
+        "pk": 20,
+        "fields": {
+          "name": "host",
+          "label": "Host",
+          "isEncrypted": false,
+          "connectionType": 6,
+          "properties": {
+            "rules": [
+              {
+                "required": true,
+                "message": "Host name can't be empty"
+              }
+            ],
+            "type": "text",
+            "width": "100%"
+          }
+        }
+      },
+      {
+        "model": "anomaly.connectionparam",
+        "pk": 21,
+        "fields": {
+          "name": "port",
+          "label": "Port",
+          "isEncrypted": false,
+          "connectionType": 6,
+          "properties": {
+            "rules": [
+              {
+                "required": true,
+                "message": "Port  can't be empty"
+              }
+            ],
+            "type": "text",
+            "width": "25%"
+          }
+        }
+      },
+      {
+        "model": "anomaly.connectionparam",
+        "pk": 22,
+        "fields": {
+          "name": "username",
+          "label": "Username",
+          "isEncrypted": false,
+          "connectionType": 7,
+          "properties": {
+            "rules": [
+              {
+                "required": true,
+                "message": "Username  can't be empty"
+              }
+            ],
+            "type": "text",
+            "width": "50%"
+          }
+        }
+      },
+      {
+        "model": "anomaly.connectionparam",
+        "pk": 23,
+        "fields": {
+          "name": "password",
+          "label": "Password",
+          "isEncrypted": true,
+          "connectionType": 7,
+          "properties": {
+            "rules": [
+              {
+                "required": true,
+                "message": "Password  can't be empty"
+              }
+            ],
+            "type": "text",
+            "width": "50%"
+          }
+        }
+      },
+      {
+        "model": "anomaly.connectionparam",
+        "pk": 24,
+        "fields": {
+          "name": "host",
+          "label": "Host",
+          "isEncrypted": false,
+          "connectionType": 7,
+          "properties": {
+            "rules": [
+              {
+                "required": true,
+                "message": "Host name can't be empty"
+              }
+            ],
+            "type": "text",
+            "width": "100%"
+          }
+        }
+      },
+      {
+        "model": "anomaly.connectionparam",
+        "pk": 25,
+        "fields": {
+          "name": "url",
+          "label": "ClickHouse DSN",
+          "isEncrypted": false,
+          "connectionType": 8,
+          "properties": {
+            "rules": [
+              {
+                "required": false,
+                "message": "look to https://clickhouse-driver.readthedocs.io/en/latest"
+              }
+            ],
+            "type": "text",
+            "width": "100%"
+          }
+        }
+      },
+      {
+        "model": "anomaly.connectionparam",
+        "pk": 26,
+        "fields": {
+          "name": "host",
+          "label": "ClickHouse Host",
+          "isEncrypted": false,
+          "connectionType": 8,
+          "properties": {
+            "rules": [
+              {
+                "required": false,
+                "message": "ClickHouse host"
+              }
+            ],
+            "type": "text",
+            "width": "50%"
+          }
+        }
+      },
+      {
+        "model": "anomaly.connectionparam",
+        "pk": 27,
+        "fields": {
+          "name": "port",
+          "label": "ClickHouse TCP Port",
+          "isEncrypted": false,
+          "connectionType": 8,
+          "properties": {
+            "rules": [
+              {
+                "required": false,
+                "message": "ClickHouse TCP Native protocol"
+              }
+            ],
+            "type": "text",
+            "width": "50%"
+          }
+        }
+      },
+      {
+        "model": "anomaly.connectionparam",
+        "pk": 28,
+        "fields": {
+          "name": "user",
+          "label": "ClickHouse User",
+          "isEncrypted": false,
+          "connectionType": 8,
+          "properties": {
+            "rules": [
+              {
+                "required": false,
+                "message": "ClickHouse User"
+              }
+            ],
+            "type": "text",
+            "width": "50%"
+          }
+        }
+      },
+      {
+        "model": "anomaly.connectionparam",
+        "pk": 29,
+        "fields": {
+          "name": "password",
+          "label": "ClickHouse Password",
+          "isEncrypted": true,
+          "connectionType": 8,
+          "properties": {
+            "rules": [
+              {
+                "required": false,
+                "message": "ClickHouse Password"
+              }
+            ],
+            "type": "text",
+            "width": "50%"
+          }
+        }
+      },
+      {
+        "model": "anomaly.connectionparam",
+        "pk": 30,
+        "fields": {
+          "name": "database",
+          "label": "ClickHouse Database",
+          "isEncrypted": false,
+          "connectionType": 8,
+          "properties": {
+            "rules": [
+              {
+                "required": false,
+                "message": "ClickHouse default Database which used for table names lookup"
+              }
+            ],
+            "type": "text",
+            "width": "50%"
+          }
+        }
+      },
+      {
+        "model": "anomaly.connectionparam",
+        "pk": 31,
+        "fields": {
+          "name": "timeout",
+          "label": "Timeout for connect and send/receive in seconds",
+          "isEncrypted": false,
+          "connectionType": 8,
+          "properties": {
+            "rules": [
+              {
+                "required": false,
+                "message": "Timeout in seconds"
+              }
+            ],
+            "type": "text",
+            "width": "50%"
+          }
+        }
+      }
 ]

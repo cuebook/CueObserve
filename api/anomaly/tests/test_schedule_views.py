@@ -1,21 +1,21 @@
 import pytest
+from django_celery_beat.models import CrontabSchedule
 from django.urls import reverse
 from conftest import populate_seed_data
 from anomaly.models import CustomSchedule as Schedule
 
 @pytest.mark.django_db(transaction=True)
 def test_schedules(client, populate_seed_data, mocker):
-
     # Create schedule test
     path = reverse('scheduleView')
     data = {'name': 'Schedule at 3 AM ',
              'crontab': '0 3 * * *',
              'timezone':'Asia/Kolkata' }
-
     response = client.post(path, data=data, content_type="application/json")
     assert response.status_code == 200
     assert response.data['data']
     scheduleId = response.data["data"]
+    crontabId = Schedule.objects.get(id= scheduleId).cronSchedule_id
 
     # Update schedule test
     path = reverse('scheduleView')
@@ -45,3 +45,4 @@ def test_schedules(client, populate_seed_data, mocker):
     response = client.delete(path)
     assert response.status_code == 200
     assert Schedule.objects.filter(id=scheduleId).count() == 0
+    assert CrontabSchedule.objects.filter(id=crontabId).count() == 0

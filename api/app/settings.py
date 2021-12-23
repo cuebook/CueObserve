@@ -24,8 +24,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-y7^!ee%k(xh7+xdyug$65v1@8@q-ui8=s5f2ucquxof&-i&g_u"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get("DEBUG", True)
-
+DEBUG = os.environ.get("DEBUG", False)
+SITE_ID = 1
 
 CSRF_TRUSTED_ORIGINS = ["localhost"]
 CORS_ORIGIN_WHITELIST = ["http://localhost:3000"]
@@ -33,6 +33,27 @@ CORS_ALLOW_CREDENTIALS = True
 ALLOWED_HOSTS = ["*", "localhost"]
 CORS_ORIGIN_ALLOW_ALL = True
 HTTP_HTTPS = "http://"
+ROOT_URLCONF = "app.urls"
+INFO = os.environ.get("LOG_LEVEL", "INFO")
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "file": {
+            "format": "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] [%(threadName)s] %(message)s",
+            "datefmt": "%d/%b/%Y %H:%M:%S",
+        },
+        "console": {"format": "%(asctime)s [%(name)s:%(lineno)s] %(levelname)-8s %(message)s"},
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "console",
+            "level": INFO,
+        }
+    },
+    "loggers": {"": {"level": INFO, "handlers": ["console"]}},
+}
 
 # Application definition
 INSTALLED_APPS = [
@@ -43,10 +64,17 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "corsheaders",
+    "allauth",
+    "django.contrib.sites",
+    "allauth.account",
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.google",
     "django_celery_beat",
     "anomaly",
+    "users",
     "rest_framework",
 ]
+AUTH_USER_MODEL = "users.CustomUser"
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
@@ -57,10 +85,24 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "app.middlewares.DisableCsrfCheck",
+    "app.middlewares.LoginRequiredMiddleware",
+    # "app.middlewares.RestrictApiMiddleware"
 ]
+AUTHENTICATION_BACKENDS = (
+    # Needed to login by username in Django admin, regardless of `allauth`
+    "django.contrib.auth.backends.ModelBackend",
+    # `allauth` specific authentication methods, such as login by e-mail
+    "allauth.account.auth_backends.AuthenticationBackend",
+)
 
-ROOT_URLCONF = "app.urls"
+AUTHENTICATION_REQUIRED = os.environ.get("IS_AUTHENTICATION_REQUIRED", False)
 
+ACCOUNT_AUTHENTICATION_METHOD = "email"
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -99,7 +141,7 @@ else:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
+            "NAME": BASE_DIR / "db/db.sqlite3",
         }
     }
 
@@ -141,10 +183,21 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = "/static/"
+STATIC_ROOT = os.path.join(BASE_DIR, "static_root")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 REDIS_BROKER_URL = os.environ.get("REDIS_BROKER_URL", "redis://localhost:6379/0")
-CELERY_RESULT_BACKEND = "redis"
+CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND", "redis://localhost:6379/1")
+CELERY_IMPORTS = ("ops.tasks",)
+CELERY_TASK_ROUTES = {"ops.tasks.anomalyDetectionTasks._anomalyDetectionSubTask": {"queue": "anomalySubTask"}}
+
+# EMAIL 
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = os.environ.get("EMAIL_HOST","")
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER","")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD","")

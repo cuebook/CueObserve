@@ -6,7 +6,6 @@ class DatasetService {
         return apiService.get("anomaly/datasets")
         .then(response => {
             if(response.success == true){
-                console.log(response)
                 return response.data
             } else {
                 message.error(response.message);
@@ -30,7 +29,7 @@ class DatasetService {
             }
         })
         .catch(response => {
-            message.error(response.message)
+            // message.error(response.message)
             return null
         })
     }

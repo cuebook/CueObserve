@@ -19,6 +19,40 @@
         "fields": {
             "name": "BigQuery"
         }
+    },
+    {
+        "model": "anomaly.connectiontype",
+        "pk": 4,
+        "fields": {
+            "name": "Redshift"
+        }
+    },
+    {
+        "model": "anomaly.connectiontype",
+        "pk": 5,
+        "fields": {
+            "name": "Snowflake"
+        }
+    },
+    {
+        "model": "anomaly.connectiontype",
+        "pk": 6,
+        "fields": {
+            "name": "Druid"
+        }
+    },
+    {
+        "model": "anomaly.connectiontype",
+        "pk": 7,
+        "fields": {
+            "name": "MSSQL"
+        }
+    },
+    {
+        "model": "anomaly.connectiontype",
+        "pk": 8,
+        "fields": {
+            "name": "ClickHouse"
+        }
     }
-
 ]

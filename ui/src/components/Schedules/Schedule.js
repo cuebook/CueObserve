@@ -76,6 +76,13 @@ const [isViewConnectionDrawerVisible, setIsViewConnectionDrawerVisible] = useSta
       sorter:(a,b)=>{return a.schedule.localeCompare(b.schedule)},
     },
     {
+      title: "Assigned Anomaly Definition",
+      dataIndex: "assignedSchedule",
+      key: "assignedSchedule",
+      align:"center",
+      sorter:(a,b)=>  b.assignedSchedule - a.assignedSchedule,
+    },
+    {
       title: "",
       dataIndex: "",
       key: "",
@@ -94,7 +101,7 @@ const [isViewConnectionDrawerVisible, setIsViewConnectionDrawerVisible] = useSta
               okText="Yes"
               cancelText="No"
           >
-              <Tooltip title={"Delete Connection"}>
+              <Tooltip title={"Delete Schedule"}>
                   <DeleteOutlined />
               </Tooltip>
           </Popconfirm>
@@ -102,7 +109,6 @@ const [isViewConnectionDrawerVisible, setIsViewConnectionDrawerVisible] = useSta
       )
     }
   ];
-
   return (
     <div>
         <div className={`d-flex flex-column justify-content-center text-right mb-2`}>
@@ -121,7 +127,8 @@ const [isViewConnectionDrawerVisible, setIsViewConnectionDrawerVisible] = useSta
             size={"small"}
             dataSource={schedules}
             pagination={{
-              pageSize: 20,
+              defaultPageSize: 50,
+              total: schedules ? schedules.length : 50
             }}
         />
         <Drawer

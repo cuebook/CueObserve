@@ -5,9 +5,9 @@ from django.test import TestCase
 from django.urls import reverse
 from mixer.backend.django import mixer
 
+
 @pytest.mark.django_db(transaction=True)
 def test_datasets(client, mocker):
-
     # Get dataset when no entry
     path = reverse('datasets')
     response = client.get(path)
@@ -26,20 +26,20 @@ def test_datasets(client, mocker):
         "metrics": ["Amount", "Quantity"],
         "dimensions": ["Category", "Region"],
         "timestamp": "CreatedAt",
-        "granularity": "day"
+        "granularity": "day",
+        "isNonRollup": False
     }
     response = client.post(path, data=data, content_type="application/json")
 
     assert response.status_code == 200
     assert response.data['success'] 
 
-
     # Get datasets
     path = reverse('datasets')
     response = client.get(path)
     assert response.status_code == 200
     assert response.data['data']
-    assert set(response.data['data'][0].keys()) == set(['anomalyDefinitionCount', 'connection', 'granularity', 'name', 'id'])
+    assert set(response.data['data'][0].keys()) == set(['anomalyDefinitionCount', 'connection', 'granularity', 'name', 'id','connectionName'])
 
     dataset = response.data['data'][0]
 
@@ -51,7 +51,7 @@ def test_datasets(client, mocker):
     assert response.status_code == 200
     assert response.data['data']
     assert response.data['data']['name'] == "something"
-    assert set(response.data['data'].keys()) == set(['id', 'name', 'sql', 'connection', 'dimensions', 'metrics', 'granularity', 'timestampColumn', 'anomalyDefinitionCount'])
+    assert set(response.data['data'].keys()) == set(['id', 'name', 'sql', 'connection', 'dimensions', 'metrics', 'granularity', 'timestampColumn', 'anomalyDefinitionCount', 'isNonRollup'])
 
 
     # Update dataset
@@ -62,7 +62,8 @@ def test_datasets(client, mocker):
         "metrics": ["Amount", "Quantity"],
         "dimensions": ["Category", "Region"],
         "timestamp": "CreatedAt",
-        "granularity": "day"
+        "granularity": "day",
+        "isNonRollup": False
     }
     path = reverse("dataset", kwargs={"datasetId": dataset['id']})
     response = client.post(path, data=data, content_type="application/json")

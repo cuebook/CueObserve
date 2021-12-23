@@ -1,0 +1,78 @@
+version: '3.3'
+services:
+  cueo-nginx:
+    container_name: "cueo-nginx"
+    image: nginx:1.17
+    volumes:
+      - ./ui/nginx-dev.conf.template:/etc/nginx/conf.d/nginx-dev.conf.template
+      - ./ui/nginx-entrypoint.sh:/etc/nginx/conf.d/nginx-entrypoint.sh
+    command:
+      bash -c "./etc/nginx/conf.d/nginx-entrypoint.sh && nginx -g 'daemon off;'"
+    environment:
+      ENVIRONMENT:
+      NGINX_API_URL:
+      NGINX_ALERT_API_URL:
+      NGINX_UI_URL:
+    network_mode: "host"
+
+  cueo-backend:
+    build:
+      context: api
+      dockerfile: Dockerfile
+    volumes:
+      - ./api:/code:rw
+    command:
+      bash -c "chmod +x /code/start_server_new.sh && /code/start_server_new.sh"
+    environment:
+      ENVIRONMENT: ${ENVIRONMENT}
+      API_URL: ${API_URL}
+      ALERT_API_URL: ${ALERT_API_URL}
+      POSTGRES_DB_HOST: ${POSTGRES_DB_HOST}
+      POSTGRES_DB_USERNAME: ${POSTGRES_DB_USERNAME}
+      POSTGRES_DB_PASSWORD: ${POSTGRES_DB_PASSWORD}
+      POSTGRES_DB_SCHEMA: ${POSTGRES_DB_SCHEMA}
+      POSTGRES_DB_PORT: ${POSTGRES_DB_PORT}
+      DJANGO_SUPERUSER_USERNAME: ${DJANGO_SUPERUSER_USERNAME}
+      DJANGO_SUPERUSER_PASSWORD: ${DJANGO_SUPERUSER_PASSWORD}
+      DJANGO_SUPERUSER_EMAIL: ${DJANGO_SUPERUSER_EMAIL}
+      IS_AUTHENTICATION_REQUIRED: ${IS_AUTHENTICATION_REQUIRED}
+    network_mode: "host"
+
+  cueo-alerts:
+    build:
+      context: alerts-api
+      dockerfile: Dockerfile
+    volumes:
+      - ./alerts-api:/code:rw
+    network_mode: "host"
+
+  cueo-frontend:
+    build:
+      context: ui
+      dockerfile: Dockerfile.dev
+    stdin_open: true
+    volumes:
+      - ./ui/src:/app/src:rw
+    network_mode: "host"
+
+  cueo-postgresql:
+    image: postgres:13
+    environment:
+      - PGDATA=/pg_data
+      - POSTGRES_DB=cue_observe
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - pgdata:/pg_data
+    network_mode: "host"
+
+  cueo-redis:
+    image: redis
+    network_mode: "host"
+
+volumes:
+  pgdata:
+
+networks:
+  backend:
+    driver: bridge

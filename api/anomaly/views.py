@@ -5,7 +5,18 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.http import HttpRequest
 
-from anomaly.services import Datasets, Connections, Querys, AnomalyDefinitions, Anomalys, ScheduleService
+from anomaly.services import (
+    Datasets,
+    Connections,
+    Querys,
+    AnomalyDefinitions,
+    Anomalys,
+    ScheduleService,
+    AnomalyDefJobServices,
+    Settings,
+    DetectionRules,
+    RootCauseAnalyses,
+)
 
 
 class AnomalysView(APIView):
@@ -13,9 +24,21 @@ class AnomalysView(APIView):
     Provides views on datasets(many)
     """
 
+    publishedOnly = False
+
     def get(self, request):
         """get request"""
-        res = Anomalys.getAnomalys()
+        offset = int(request.GET.get("offset", 0))
+        limit = int(request.GET.get("limit", 50))
+        searchQuery = request.GET.get("searchText", "")
+        sorter = json.loads(request.GET.get("sorter", "{}"))
+        res = Anomalys.getAnomalys(
+            publishedOnly=self.publishedOnly,
+            offset=offset,
+            limit=limit,
+            searchQuery=searchQuery,
+            sorter=sorter,
+        )
         return Response(res.json())
 
 
@@ -130,14 +153,8 @@ class QueryView(APIView):
         data = request.data
         sql = data["sql"]
         connectionId = data["connectionId"]
-        connectionRes = Connections.getConnection(connectionId).json()
-        if not connectionRes["success"]:
-            return Response(connectionRes)
-
-        connectionData = connectionRes["data"]
-        res = Querys.runQuery(
-            connectionData["connectionType"], connectionData["params"], sql
-        )
+        connectionType, connectionParams = Connections.getConnectionParams(connectionId)
+        res = Querys.runQuery(connectionType, connectionParams, sql)
         return Response(res.json())
 
 
@@ -147,17 +164,33 @@ class AnomalyDefView(APIView):
     """
 
     def get(self, request):
-        res = AnomalyDefinitions.getAllAnomalyDefinition()
+        offset = int(request.GET.get("offset", 0))
+        limit = int(request.GET.get("limit", 50))
+        searchQuery = request.GET.get("searchText", "")
+        sorter = json.loads(request.GET.get("sorter", "{}"))
+        res = AnomalyDefinitions.getAllAnomalyDefinition(
+            offset=offset, limit=limit, searchQuery=searchQuery, sorter=sorter
+        )
         return Response(res.json())
 
     def post(self, request):
         datasetId = int(request.data.get("datasetId", 0))
         metric = request.data.get("measure", None)
         highOrLow = request.data.get("highOrLow", None)
-        top = int(request.data.get("top", 0))
+        operation = request.data.get("operation", None)
+        value = request.data.get("operationValue", 0)
         dimension = request.data.get("dimension", None)
+        detectionRuleTypeId = request.data.get("detectionRuleTypeId", 1)
+        detectionRuleParams = request.data.get("detectionRuleParams", {})
         res = AnomalyDefinitions.addAnomalyDefinition(
-            metric, dimension, highOrLow, top, datasetId
+            metric,
+            dimension,
+            operation,
+            highOrLow,
+            value,
+            datasetId,
+            detectionRuleTypeId,
+            detectionRuleParams,
         )
         return Response(res.json())
 
@@ -168,13 +201,16 @@ class AnomalyDefView(APIView):
     def put(self, request):
         anomalyDefId = request.data.get("anomalyDefId", 0)
         highOrLow = request.data.get("highOrLow", None)
-        res = AnomalyDefinitions.editAnomalyDefinition(anomalyDefId, highOrLow)
+        detectionRuleParams = request.data.get("detectionRuleParams", {})
+        res = AnomalyDefinitions.editAnomalyDefinition(anomalyDefId, highOrLow, detectionRuleParams)
         return Response(res.json())
+
 
 class ScheduleView(APIView):
     """
     Class to get and add available crontab schedules
     """
+
     def get(self, request):
         res = ScheduleService.getSchedules()
         return Response(res.json())
@@ -185,14 +221,17 @@ class ScheduleView(APIView):
         timezone = request.data["timezone"]
         res = ScheduleService.addSchedule(cron=cron, timezone=timezone, name=name)
         return Response(res.json())
-    
-    def put(self,request):
+
+    def put(self, request):
         id = request.data["id"]
         name = request.data["name"]
         crontab = request.data["crontab"]
         timezone = request.data["timezone"]
-        res = ScheduleService.updateSchedule(id=id, crontab=crontab, timezone=timezone, name=name)
+        res = ScheduleService.updateSchedule(
+            id=id, crontab=crontab, timezone=timezone, name=name
+        )
         return Response(res.json())
+
 
 @api_view(["GET", "PUT", "DELETE"])
 def schedule(request: HttpRequest, scheduleId: int) -> Response:
@@ -208,10 +247,131 @@ def schedule(request: HttpRequest, scheduleId: int) -> Response:
         res = ScheduleService.deleteSchedule(scheduleId)
         return Response(res.json())
 
+
 class TimzoneView(APIView):
     """
     Class to get standard pytz timezones
     """
+
     def get(self, request):
         res = ScheduleService.getTimezones()
+        return Response(res.json())
+
+
+class AnomalyDefJob(APIView):
+    """
+    Class to get, add and update a NotebookJob details
+    The put and post methods only require request body and not path parameters
+    The get method requires the notebookJobId as the path parameter
+    """
+
+    # def get(self, request, notebookId=None):
+    #     offset = int(request.GET.get("offset", 0))
+    #     res = AnomalyDefJobServices.getNotebookJobDetails(notebookId=notebookId, runStatusOffset=offset)
+    #     return Response(res.json())
+
+    def post(self, request):
+        anomalyDefId = request.data["anomalyDefId"]
+        scheduleId = request.data["scheduleId"]
+        res = AnomalyDefJobServices.addAnomalyDefJob(
+            anomalyDefId=anomalyDefId, scheduleId=scheduleId
+        )
+        return Response(res.json())
+
+    def delete(self, request, anomalyDefId=None):
+        res = AnomalyDefJobServices.deleteAnomalyDefJob(anomalyDefId=anomalyDefId)
+        return Response(res.json())
+
+
+@api_view(["POST"])
+def runAnomalyDef(request: HttpRequest, anomalyDefId: int) -> Response:
+    """
+    Method for run anomaly detection for a given anomaly definition
+    :param request: HttpRequest
+    :param anomalyDefId: ID of the anomaly definition
+    """
+    res = AnomalyDefinitions.runAnomalyDetection(anomalyDefId)
+    return Response(res.json())
+
+
+@api_view(["GET"])
+def runStatusAnomalies(request: HttpRequest, runStatusId: int) -> Response:
+    """
+    Method for fetch anomalies of a RunStatus and their urls
+    :param request: HttpRequest
+    :param anomalyDefId: ID of the anomaly definition
+    """
+    res = AnomalyDefinitions.runStatusAnomalies(runStatusId)
+    return Response(res.json())
+
+
+@api_view(["GET"])
+def getDetectionRuns(request: HttpRequest, anomalyDefId: int) -> Response:
+    """
+    Method for fetching run statuses for a given anomaly definition
+    :param request: HttpRequest
+    :param anomalyDefId: ID of the anomaly definition
+    """
+    offset = int(request.GET.get("offset", 0))
+    res = AnomalyDefinitions.getDetectionRuns(anomalyDefId, offset)
+    return Response(res.json())
+
+
+@api_view(["GET"])
+def isTaskRunning(request: HttpRequest, anomalyDefId: int) -> Response:
+    """
+    Method for checking whether anomaly task is running
+    :param request: HttpRequest
+    :param anomalyDefId: ID of the anomaly definition
+    """
+    res = AnomalyDefinitions.isTaskRunning(anomalyDefId)
+    return Response(res.json())
+
+
+class SettingsView(APIView):
+    """
+    Provides views on settings
+    """
+
+    def get(self, request):
+        """get request"""
+        res = Settings.getSettings()
+        return Response(res.json())
+
+    def post(self, request):
+        """post request"""
+        data = request.data
+        res = Settings.updateSettings(data)
+        return Response(res.json())
+
+
+class DetectionRuleTypeView(APIView):
+    """
+    Provides views on Detection Rule Types
+    """
+
+    def get(self, request):
+        """get request"""
+        res = DetectionRules.getDetectionRuleTypes()
+        return Response(res.json())
+
+
+class RCAView(APIView):
+    """
+    Provides views on RCA (Root Cause Analysis)
+    """
+
+    def get(self, request, anomalyId: int):
+        """get rca"""
+        res = RootCauseAnalyses.getRCA(anomalyId)
+        return Response(res.json())
+
+    def post(self, request, anomalyId: int):
+        """make RCA request"""
+        res = RootCauseAnalyses.calculateRCA(anomalyId)
+        return Response(res.json())
+
+    def delete(self, request, anomalyId: int):
+        """make RCA request"""
+        res = RootCauseAnalyses.abortRCA(anomalyId)
         return Response(res.json())

@@ -2397,6 +2397,10 @@ video {
   width: 50%;
 }
 
+.w-3\/12 {
+  width: 25%;
+}
+
 .w-6\/12 {
   width: 50%;
 }
@@ -2707,6 +2711,10 @@ video {
     width: 16rem;
   }
 
+  .md\:w-3\/12 {
+    width: 25%;
+  }
+
   .md\:w-4\/12 {
     width: 33.333333%;
   }
@@ -2961,3 +2969,14 @@ video {
     margin: 0px 0px !important;
   }
   
+
+
+.rcaTable .ant-table-tbody > tr > td {
+    padding: 0px 8px !important;
+    overflow-wrap: break-word;
+}
+
+.rcaTableSub .ant-table-tbody > tr > td {
+    padding: 0px 8px !important;
+    overflow-wrap: break-word;
+}
