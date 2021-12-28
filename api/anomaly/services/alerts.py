@@ -1,6 +1,7 @@
 import logging
 import os
 from email.mime.image import MIMEImage
+import re
 import requests
 from anomaly.services.settings import ANOMALY_ALERT_SLACK_ID, APP_ALERTS_SLACK_ID, SLACK_BOT_TOKEN, SEND_EMAIL_TO, WEBHOOK_URL
 from anomaly.models import Setting
@@ -11,6 +12,7 @@ from django.core.mail import EmailMultiAlternatives
 
 logger = logging.getLogger(__name__)
 ALERT_API_URL = os.environ.get("ALERT_API_URL", "http://localhost:8100")
+ALERTMANAGER_API_URL = os.environ.get("ALERTMANAGER_API_URL", "http://localhost:9093/api/v1/alerts")
 
 
 
@@ -24,36 +26,81 @@ class SlackAlert:
         anomalyAlertChannelId = ""
         appAlertChannelId = ""
         try:
-            settings = Setting.objects.all()
-            for setting in settings.values():
-                if setting["name"] == ANOMALY_ALERT_SLACK_ID:
-                    anomalyAlertChannelId = setting["value"]
-                elif setting["name"] == APP_ALERTS_SLACK_ID:
-                    appAlertChannelId = setting["value"]
-                elif setting["name"] == SLACK_BOT_TOKEN:
-                    token = setting["value"]
+
+            # settings = Setting.objects.all()
+            # for setting in settings.values():
+            #     if setting["name"] == ANOMALY_ALERT_SLACK_ID:
+            #         anomalyAlertChannelId = setting["value"]
+            #     elif setting["name"] == APP_ALERTS_SLACK_ID:
+            #         appAlertChannelId = setting["value"]
+            #     elif setting["name"] == SLACK_BOT_TOKEN:
+            #         token = setting["value"]
             # Anomaly Detection Alert
             if name == "anomalyAlert":
-                url = f'{ALERT_API_URL}/alerts/anamoly-alert'
-                fileImg = PlotChartService.anomalyChartToImgStr(anomalyId)
-                payload = {
-                    "token": token,
-                    "anomalyAlertChannelId": anomalyAlertChannelId,
-                    "title": title,
-                    "message": message,
-                    "details": details,
-                }
-                requests.post(url, data=payload, files={'fileImg': fileImg})
+                # url = f'{ALERTMANAGER_API_URL}/alerts/anamoly-alert'
+                # fileImg = PlotChartService.anomalyChartToImgStr(anomalyId)
+                # payload = {
+                #     "token": token,
+                #     "anomalyAlertChannelId": anomalyAlertChannelId,
+                #     "title": title,
+                #     "message": message,
+                #     "details": details,
+                # }
+                # requests.post(url, data=payload, files={'fileImg': fileImg})
+                url = "http://localhost:9093/api/v1/alerts"
+                testdata = [
+                                {
+                                    "status": "firing",
+                                    "labels": {
+                                    "alertname": "anomalyAlert",
+                                    "service": "api",
+                                    "severity": "warning",
+                                    "instance": "0"
+                                    },
+                                    "annotations": {
+                                    "summary": title,
+                                    "description": message+details
+                                    },
+                                    "generatorURL": "http://prometheus.int.example.net/<generating_expression>",
+                                    "startsAt": "2020-07-23T01:05:36+00:00"
+                                }
+                                ]
+
+                requests.request("POST", url ,json=testdata)
+                
             # AppAlert
             if name == "appAlert":
-                url = f'{ALERT_API_URL}/alerts/app-alert'
+                # url = f'{ALERTMANAGER_API_URL}/alerts/app-alert'
+                url = "http://localhost:9093/api/v1/alerts"
+                logger.info("url %s", url)
+                print("url", url )
+                # breakpoint()
+                testdata = [
+                                {
+                                    "status": "firing",
+                                    "labels": {
+                                    "alertname": "App Alert",
+                                    "service": "curl",
+                                    "severity": "warning",
+                                    "instance": "0"
+                                    },
+                                    "annotations": {
+                                    "summary": title,
+                                    "description": message
+                                    },
+                                    "generatorURL": "http://prometheus.int.example.net/<generating_expression>",
+                                    "startsAt": "2020-07-23T01:05:36+00:00"
+                                }
+                                ]
                 payload = {
                     "token": token,
                     "appAlertChannelId": appAlertChannelId,
                     "title": title,
                     "message": message
                 }
-                requests.request("POST", url, data=payload)
+
+                # requests.request("POST", url, data=payload)
+                requests.request("POST", url ,json=testdata)
 
         except Exception as ex:
             logger.error("Slack URL not given or wrong URL given:%s", str(ex))

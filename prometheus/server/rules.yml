@@ -1,0 +1,60 @@
+groups:
+- name: targets
+  rules:
+  - alert: monitor_service_down
+    expr: up == 0
+    for: 30s
+    labels:
+      severity: critical
+    annotations:
+      summary: "Monitor service non-operational"
+      description: "Service {{ $labels.instance }} is down."
+
+- name: host
+  rules:
+  - alert: high_cpu_usage
+    expr: (100 - (avg by (instance) (irate(node_cpu{name="node-exporter",mode="idle"}[5m])) * 100)) > 80
+    for: 30s
+    labels:
+      severity: warning
+    annotations:
+      summary: "{{$labels.instance}}: High CPU usage detected"
+      description: "{{$labels.instance}}: CPU usage is above 80% (current value is: {{ $value }})"
+
+  - alert: high_storage_load
+    expr: (node_filesystem_size_bytes{fstype="aufs"} - node_filesystem_free_bytes{fstype="aufs"}) / node_filesystem_size_bytes{fstype="aufs"}  * 100 > 85
+    for: 30s
+    labels:
+      severity: warning
+    annotations:
+      summary: "Server storage is almost full"
+      description: "Docker host storage usage is {{ humanize $value}}%. Reported by instance {{ $labels.instance }} of job {{ $labels.job }}."
+
+- name: containers
+  rules:
+  - alert: test_container_down
+    expr: absent(container_memory_usage_bytes{name="test_container"})
+    for: 30s
+    labels:
+      severity: critical
+    annotations:
+      summary: "Test container down"
+      description: "Test container is down for more than 30 seconds."
+
+  - alert: test_container_high_cpu
+    expr: sum(rate(container_cpu_usage_seconds_total{name="monitoring_cadvisor_1"}[1m])) / count(node_cpu_seconds_total{mode="system"}) * 100 > 10
+    for: 30s
+    labels:
+      severity: warning
+    annotations:
+      summary: "test containerhigh CPU usage"
+      description: "test container CPU usage is {{ humanize $value}}%."
+
+  - alert: test_container_high_memory
+    expr: sum(container_memory_usage_bytes{name="monitoring_cadvisor_1"}) > 1200000000
+    for: 30s
+    labels:
+      severity: warning
+    annotations:
+      summary: "test container high memory usage"
+      description: "test container memory consumption is at {{ humanize $value}}."
