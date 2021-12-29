@@ -15,7 +15,7 @@ To get these alerts, enter your Slack Bot User OAuth Access Token. To create a S
 4. On the next screen, go to Scopes section, click on `Add on OAuth Scope` and  add `files:write` and `chat:write` permissions, now click on `Install to Workspace` to create the `Bot User OAuth Token` .
 5. Copy `Bot User OAuth Token` and paste it in the CueObserve Settings screen.
 
-Next, create two channels in Slack. Add the app to these two channels. 
+Next, create two channels in Slack. Add the app to these two channels.&#x20;
 
 1. To find your Slack channel's ID, right-click the channel in Slack and then click on `Open channel details` . You'll find the channel ID at the bottom. Copy and paste it in the CueObserve Settings screen.
 2. Click on the `Save` button.
@@ -25,7 +25,7 @@ Next, create two channels in Slack. Add the app to these two channels.
 1. Make sure you have enabled email alert while installation.
 2. Add email Id to `Send Email To` input field, If you have to add more than one email Id, make it comma separated in input field as shown below.
 
-![](.gitbook/assets/screenshot-from-2021-08-26-17-52-09.png)
+![](<.gitbook/assets/Screenshot from 2021-08-26 17-52-09.png>)
 
 ## Webhook URL
 
