@@ -4,7 +4,6 @@
 
 [![](https://api.codeclimate.com/v1/badges/a70e071b59d5dbc38846/maintainability)](https://codeclimate.com/github/cuebook/CueObserve/maintainability) [![](https://api.codeclimate.com/v1/badges/a70e071b59d5dbc38846/test\_coverage)](https://codeclimate.com/github/cuebook/CueObserve/test\_coverage) [![Test Coverage](https://github.com/cuebook/cueobserve/actions/workflows/pr\_checks.yml/badge.svg) ](https://github.com/cuebook/cueobserve/actions/workflows/pr\_checks.yml)[![License](https://img.shields.io/github/license/cuebook/cueobserve)](https://github.com/cuebook/cueobserve/blob/main/LICENSE.md)
 
-\
 
 
 CueObserve helps you monitor your metrics. Know when, where, and why a metric isn't right.
