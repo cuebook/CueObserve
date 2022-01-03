@@ -3,8 +3,17 @@ import { message , notification} from "antd"
 
 class Installation {
     async getInstallationId(){
-        const response = await apiService.get("anomaly/installationId")
-        return response
+        return  apiService.get("anomaly/installationId")
+        .then(response => {
+            if(response.success == true){
+                return response
+            } else {
+                return response
+            }
+        })
+        .catch(response => {
+            return null
+        })
     }
 }
 let installation = new Installation();

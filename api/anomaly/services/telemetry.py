@@ -10,13 +10,46 @@ analytics.write_key = 'euY80DdHK2wT3LuehjDlQEzsriLQkZG6'
 
 logger = logging.getLogger(__name__)
 
+
+def getInstallationId():
+    """ Function to get installation, if exists or create one"""
+    try:
+        res = ApiResponse()
+        userId = ''.join(random.choices(string.ascii_uppercase + string.digits, k=16))
+
+        if not InstallationTable.objects.all().exists():
+            userId = ''.join(random.choices(string.ascii_uppercase + string.digits, k=16))
+            dbType = ""
+            if os.environ.get("POSTGRES_DB_HOST", False):
+                dbType = "postgres"
+            else:
+                dbType = "sqlite"
+            userObj = InstallationTable.objects.create(installationId = userId, databaseType = dbType)
+            
+            data = {"installationId": userObj.installationId}
+            res.update(True, "Installation Id created and fetched successfully", data)
+        else:
+            installId = InstallationTable.objects.all()[0].installationId
+            data = {"installationId": installId}
+            res.update(True, "Installation Id fetched successfully", data)
+        return res
+
+    except Exception as ex:
+        logger.error("Exception occured while creating installtion userId %s", str(ex))
+        data = {"installationId": "UnIdentified"}
+        res.update(False, "Error while fetching installation Id", data)
+        return res
+
+
 def event_logs(anomalyDef_id,status, publishedCount, totalCount):
     """Event logs on anomaly definition Run"""
     userId = "UnIdentified"
     try:
-        userObject = InstallationTable.objects.all()[0]
-        userId = userObject.installationId
-        traits = update_traits(userObject)
+        # userObject = InstallationTable.objects.all()[0]
+        # userId = userObject.installationId
+        res = getInstallationId()
+        userId = res.data.get("installationId","UnIdentified")
+        traits = update_traits()
         adf = AnomalyDefinition.objects.get(id=anomalyDef_id)
         datasetConnection = adf.dataset.connection.connectionType.name
         datasetGranularity = adf.dataset.granularity
@@ -59,10 +92,10 @@ def event_logs(anomalyDef_id,status, publishedCount, totalCount):
 
 
 
-def update_traits(userObject):
+def update_traits():
     """ Update user traits on every event log"""
     try:
-        # userObject = InstallationTable.objects.all()[0]
+        userObject = InstallationTable.objects.all()[0]
         userId = userObject.installationId
         createdAt = userObject.createdAt
         connCount = Connection.objects.all().count()
@@ -92,9 +125,9 @@ def rca_event_log(status):
     """Event log on RCA run"""
     userId = "UnIdentified"
     try:
-        userObject = InstallationTable.objects.all()[0]
-        userId = userObject.installationId
-        traits = update_traits(userObject)
+        res = getInstallationId()
+        userId = res.data.get("installationId","UnIdentified")
+        traits = update_traits()
         analytics.track(userId, "RCARan",{
             "runStatus": status
         })
@@ -104,35 +137,7 @@ def rca_event_log(status):
         })
 
 
-def getInstallationId():
-    """ Function to get installation, if exists or create one"""
-    try:
-        res = ApiResponse()
-        from anomaly.models import InstallationTable
-        userId = ''.join(random.choices(string.ascii_uppercase + string.digits, k=16))
 
-        if not InstallationTable.objects.all().exists():
-            userId = ''.join(random.choices(string.ascii_uppercase + string.digits, k=16))
-            dbType = ""
-            if os.environ.get("POSTGRES_DB_HOST", False):
-                dbType = "postgres"
-            else:
-                dbType = "sqlite"
-            userObj = InstallationTable.objects.create(installationId = userId, databaseType = dbType)
-            
-            data = {"installationId": userObj.installationId}
-            res.update(True, "Installation Id created and fetched successfully", data)
-        else:
-            installId = InstallationTable.objects.all()[0].installationId
-            data = {"installationId": installId}
-            res.update(True, "Installation Id fetched successfully", data)
-        return res
-
-    except Exception as ex:
-        logger.error("Exception occured while creating installtion userId %s", str(ex))
-        data = {"installationId": "UnIdentified"}
-        res.update(False, "Error while fetching installation Id", data)
-        return res
 
 
 

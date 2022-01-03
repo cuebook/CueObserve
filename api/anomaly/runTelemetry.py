@@ -3,28 +3,22 @@ import string
 import os
 import logging
 from django_celery_beat.models import PeriodicTask, CrontabSchedule
-from anomaly.services.telemetry import update_traits
+from anomaly.models import InstallationTable
+from anomaly.services.telemetry import update_traits, getInstallationId
 from ops.tasks.telemetryTask import telemetryJob
 
 logger = logging.getLogger(__name__)
 
+
+
 def create_installation_userId():
     """ Create a random user while installation """
     try:
-        from anomaly.models import InstallationTable
-        userId = ''.join(random.choices(string.ascii_uppercase + string.digits, k=16))
-
-        if not InstallationTable.objects.all().exists():
-            userId = ''.join(random.choices(string.ascii_uppercase + string.digits, k=16))
-            dbType = ""
-            if os.environ.get("POSTGRES_DB_HOST", False):
-                dbType = "postgres"
-            else:
-                dbType = "sqlite"
-            userObj = InstallationTable.objects.create(installationId = userId, databaseType = dbType)
-            update_traits(userObj)
-            # job creation
-            create_celery_job(userId)
+        res = getInstallationId()
+        userId = res.data.get("installationId", "UnIdentified")
+        update_traits()
+        # job creation
+        create_celery_job(userId)
 
     except Exception as ex:
         logger.error("Exception occured while creating installtion userId %s", str(ex))
@@ -46,5 +40,3 @@ def create_celery_job(userId):
         ptask = PeriodicTask.objects.update_or_create(name = "UserTelemetry" ,defaults={"crontab" : cronSchedule, "task" : telemetryJob.name})
     except Exception as ex:
         logger.error("Exception occured while creating celery job %s",str(ex))
-
-create_installation_userId()
