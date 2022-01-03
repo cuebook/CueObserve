@@ -57,4 +57,6 @@ urlpatterns = [
     path("detectionRuleTypes", views.DetectionRuleTypeView.as_view(), name="detectionRuleTypes"),
     # Root Cause Analysis
     path("rca/<int:anomalyId>", views.RCAView.as_view(), name="rca"),
+    # Installtion
+    path("installationId", views.InstallationView.as_view(), name="installationId" )
 ]
