@@ -5,7 +5,7 @@ import os
 import json
 import logging
 from utils.apiResponse import ApiResponse
-from anomaly.models import AnomalyDefinition, Dataset, InstallationTable, Connection
+from anomaly.models import AnomalyDefinition, Dataset, InstallationTable, Connection, Setting
 analytics.write_key = 'euY80DdHK2wT3LuehjDlQEzsriLQkZG6'
 
 logger = logging.getLogger(__name__)
@@ -68,6 +68,7 @@ def update_traits(userObject):
         connCount = Connection.objects.all().count()
         datasetCount = Dataset.objects.all().count()
         anomalyObjs = AnomalyDefinition.objects.all()
+        settings = Setting.objects.exclude(value="").count()
         anomalyDefCount = anomalyObjs.count()
         anomalyDefinitionScheduleCount = 0
         for obj in anomalyObjs:
@@ -81,6 +82,7 @@ def update_traits(userObject):
         "datasets": datasetCount,
         "anomalyDefinitions": anomalyDefCount,
         "anomalyDefinitionsScheduled": anomalyDefinitionScheduleCount,
+        "settings": settings,
         })
         return True
     except Exception as ex:
