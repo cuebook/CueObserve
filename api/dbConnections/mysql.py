@@ -1,7 +1,7 @@
 import json
 import logging
 import pandas as pd
-from MySQLdb import connect
+# from MySQLdb import connect
 from dbConnections.utils import limitSql
 
 logger = logging.getLogger(__name__)
@@ -18,14 +18,14 @@ class MySQL:
             database = params.get("database", "")
             username= params.get("username","")
             password = params.get("password", "")
-            conn = connect(
-            host=host,
-            port=port,
-            db=database,
-            user=username,
-            password=password
-            )
-            curs = conn.cursor()
+            # conn = connect(
+            # host=host,
+            # port=port,
+            # db=database,
+            # user=username,
+            # password=password
+            # )
+            # curs = conn.cursor()
         except Exception as ex:
             logger.error("Can't connect to db with this credentials ")
             res = False
@@ -39,18 +39,18 @@ class MySQL:
             database = params.get("database", "")
             username= params.get("username","")
             password = params.get("password", "")
-            conn = connect(
-            host=host,
-            port=port,
-            db=database,
-            user=username,
-            password=password
-            )
-            curs = conn.cursor()
-            if limit:
-                sql = limitSql(sql)
-            chunksize =  None
-            dataframe = pd.read_sql(sql, conn, chunksize=chunksize)
+            # conn = connect(
+            # host=host,
+            # port=port,
+            # db=database,
+            # user=username,
+            # password=password
+            # )
+            # curs = conn.cursor()
+            # if limit:
+            #     sql = limitSql(sql)
+            # chunksize =  None
+            # dataframe = pd.read_sql(sql, conn, chunksize=chunksize)
             
         except Exception as ex:
             logger.error("Can't connect to db with this credentials %s", str(ex))
