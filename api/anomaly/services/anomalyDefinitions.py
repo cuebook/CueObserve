@@ -1,7 +1,6 @@
 import logging
 from typing import List
 from utils.apiResponse import ApiResponse
-from dbConnections import BigQuery
 from anomaly.models import AnomalyDefinition, Dataset, CustomSchedule as Schedule, DetectionRule, DetectionRuleParam, DetectionRuleParamValue, RunStatus
 from anomaly.serializers import AnomalyDefinitionSerializer, RunStatusSerializer
 from django_celery_beat.models import PeriodicTask, PeriodicTasks, CrontabSchedule

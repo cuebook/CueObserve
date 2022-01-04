@@ -1,14 +1,5 @@
-from dbConnections import (
-    BigQuery,
-    Druid,
-    Redshift,
-    Snowflake,
-    Druid,
-    MySQL,
-    Postgres,
-    MSSQL,
-    ClickHouse,
-)
+
+import dbConnections
 from anomaly.serializers import ConnectionDetailSerializer
 
 
@@ -18,29 +9,29 @@ class Data:
         dataframe = None
         if connectionType == "BigQuery":
             params = connectionParams
-            dataframe = BigQuery.fetchDataframe(params, query, limit=limit)
+            dataframe = dbConnections.BigQuery.fetchDataframe(params, query, limit=limit)
         if connectionType == "Druid":
             params = connectionParams
-            dataframe = Druid.fetchDataframe(params, query, limit=limit)
+            dataframe = dbConnections.Druid.fetchDataframe(params, query, limit=limit)
         if connectionType == "MySQL":
             params = connectionParams
-            dataframe = MySQL.fetchDataframe(params, query, limit=limit)
+            dataframe = dbConnections.MySQL.fetchDataframe(params, query, limit=limit)
         if connectionType == "Postgres":
             params = connectionParams
-            dataframe = Postgres.fetchDataframe(params, query, limit=limit)
+            dataframe = dbConnections.Postgres.fetchDataframe(params, query, limit=limit)
         if connectionType == "MSSQL":
             params = connectionParams
-            dataframe = MSSQL.fetchDataframe(params, query, limit=limit)
+            dataframe = dbConnections.MSSQL.fetchDataframe(params, query, limit=limit)
 
         if connectionType == "Redshift":
             params = connectionParams
-            dataframe = Redshift.fetchDataframe(params, query, limit=limit)
+            dataframe = dbConnections.Redshift.fetchDataframe(params, query, limit=limit)
         if connectionType == "Snowflake":
             params = connectionParams
-            dataframe = Snowflake.fetchDataframe(params, query, limit=limit)
+            dataframe = dbConnections.Snowflake.fetchDataframe(params, query, limit=limit)
         if connectionType == "ClickHouse":
             params = connectionParams
-            dataframe = ClickHouse.fetchDataframe(params, query, limit=limit)
+            dataframe = dbConnections.ClickHouse.fetchDataframe(params, query, limit=limit)
 
         return dataframe
 
