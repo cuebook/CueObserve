@@ -13,19 +13,21 @@ export const analytics = Analytics({
   ]
 })
 
-export const telemetry = () => {
+export const telemetry = (title) => {
 
   let installationId = null
   const initiateTelemetry = async() => {
     const response = await installationServices.getInstallationId()
     if (response && response.success == true){
       installationId = response.data["installationId"]
-      analytics.identify({
-        "installationId":installationId,
+      analytics.page({
+        title:title,
+        "installationId": installationId,
       })
     }
     else if (response && response.success == false){
-      analytics.identify({
+      analytics.page({
+        title:"CueObserve",
         "installationId":"UnIdentified",
       })
     }

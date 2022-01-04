@@ -15,7 +15,7 @@ import {
 } from "antd";
 import { EyeOutlined } from '@ant-design/icons';
 import PopconfirmButton from "components/Utils/PopconfirmButton";
-
+import { telemetry } from "telemetry/index.js";
 const {Search} = Input
 
 const granularity = {
@@ -74,6 +74,7 @@ export default function AnomalysTable(props) {
       setAnomalys(data.anomalies);
       setTotal(data.count)
     }
+    telemetry("Anomalies")
   }
   const viewAnomaly = async (anomaly) => {
     history.push('/anomaly/' + anomaly.id)
