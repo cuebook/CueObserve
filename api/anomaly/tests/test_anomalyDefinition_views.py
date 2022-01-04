@@ -104,7 +104,6 @@ def test_anomalyDefinition(client, mocker):
     sorter = {"columnKey":"lastRunStatus", "order":"ascend"}
     res = AnomalyDefinitions.getAllAnomalyDefinition(offset=0,limit=50,searchQuery=None,sorter=sorter)
     res.success == True
-    
 
     # Delete anomalys
     path = reverse('anomalyDef', kwargs={"anomalyId": anomaly["id"]})
