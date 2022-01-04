@@ -14,7 +14,6 @@ import {
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import PopconfirmButton from "components/Utils/PopconfirmButton";
 import { search } from "services/general.js";
-import { analytics, telemetry } from "telemetry/index.js";
  const {Search} = Input
 
 export default function DatasetsTable(props) {
@@ -34,7 +33,6 @@ export default function DatasetsTable(props) {
     if (data && data.length){
       setDatasets(data);
     }
-    telemetry("Datasets")
   }
 
   const deleteDataset = async (record) => {

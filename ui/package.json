@@ -10,7 +10,6 @@
     "analytics": "^0.7.21",
     "antd": "^4.15.0",
     "bizcharts": "^4.1.10",
-    "firebase": "^9.6.1",
     "gulp": "4.0.2",
     "gulp-append-prepend": "^1.0.9",
     "lodash": "^4.17.21",

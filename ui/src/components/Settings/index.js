@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Form, Input, Button } from 'antd';
 import style from "./style.module.scss";
-import { telemetry } from "telemetry/index.js";
 import settingService from "services/settings";
 const {TextArea} = Input;
 
@@ -21,7 +20,6 @@ export default function Schedule(){
 		if (data){
 			setSettings(data)
 		}
-		telemetry("Settings")
 	}
 
 	const onFinish = (values) => {

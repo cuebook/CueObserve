@@ -11,7 +11,6 @@ import anomalyDefService from "services/anomalyDefinitions.js"
 import scheduleService from "services/schedules"
 import SelectSchedule from "components/Schedule/SelectSchedule"
 import style from "./style.module.scss";
-import { telemetry, analytics } from "telemetry/index.js";
 // import { search } from "services/general.js"
 
 
@@ -64,7 +63,6 @@ export default function Connection() {
       setData(response.data.anomalyDefinition)
       setTotal(response.data.count)
     }
-    telemetry("Anomaly Definitions")
   }
 
 const getDeleteAnomalyDef = async (id) =>{

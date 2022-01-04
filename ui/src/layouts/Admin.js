@@ -22,6 +22,7 @@ import Login from "components/System/User/Login/index"
 // contexts
 import { GlobalContextProvider } from "./GlobalContext";
 import userServices from "services/user.js"
+import { telemetry } from "telemetry/index.js";
 
 export default function Admin() {
   const [ isLoggedIn, setIsLoggedIn] = useState(false)
@@ -71,6 +72,12 @@ export default function Admin() {
     }
 
   }
+
+  let title = window.location.hash
+  title = title.replace("#/","")
+  let url = window.location.href
+  telemetry(title, url)
+
   return (
     <>
     { ( isAuthRequired && isLoggedIn )  ?

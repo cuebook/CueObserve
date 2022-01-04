@@ -13,7 +13,7 @@ export const analytics = Analytics({
   ]
 })
 
-export const telemetry = (title) => {
+export const telemetry = (title, url) => {
 
   let installationId = null
   const initiateTelemetry = async() => {
@@ -22,6 +22,7 @@ export const telemetry = (title) => {
       installationId = response.data["installationId"]
       analytics.page({
         title:title,
+        url: url,
         "installationId": installationId,
       })
     }

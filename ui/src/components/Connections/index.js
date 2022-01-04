@@ -5,7 +5,6 @@ import connectionService from "services/connection.js";
 import AddConnection from "./AddConnection.js";
 import ViewConnection from "./ViewConnection.js";
 import { EyeOutlined, DeleteOutlined } from '@ant-design/icons';
-import { telemetry } from "telemetry/index.js";
 const { Search } = Input;
 const ButtonGroup = Button.Group;
 
@@ -24,7 +23,6 @@ export default function Connection() {
   const fetchConnections = async () => {
     const response = await connectionService.getConnections();
     setConnections(response.data)
-    telemetry("Connections")
   }
 
   const deleteConnection = async (connection) => {
