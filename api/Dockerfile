@@ -1,6 +1,6 @@
 FROM python:3.9-slim-buster AS compile-image
 
-RUN apt-get update && ACCEPT_EULA=Y apt-get install -y --no-install-recommends build-essential gcc default-libmysqlclient-dev libodbc1 unixodbc unixodbc-dev
+RUN apt-get update && ACCEPT_EULA=Y apt-get install -y --no-install-recommends build-essential gcc g++ default-libmysqlclient-dev libodbc1 unixodbc unixodbc-dev
 
 
 RUN python -m venv /opt/venv
