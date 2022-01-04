@@ -24,6 +24,7 @@ from access.data import Data
 from access.utils import prepareAnomalyDataframes
 
 from ops.tasks.detection.core.anomalyDetection import anomalyService
+from anomaly.services.telemetry import event_logs
 
 ANOMALY_DETECTION_RUNNING = "RUNNING"
 ANOMALY_DETECTION_SUCCESS = "SUCCESS"
@@ -155,8 +156,9 @@ def anomalyDetectionJob(anomalyDef_id: int, manualRun: bool = False):
     :param anomalyDef_id: ID of the anomaly definition
     :param manualRun: Boolean determining whether task was manually initiated
     """
+    totalAnomalyPublished = 0
+    totalAnomalyCount = 0
     from anomaly.services.alerts import SlackAlert
-
     runType = "Manual" if manualRun else "Scheduled"
     anomalyDefinition = AnomalyDefinition.objects.get(id=anomalyDef_id)
     anomalyDefinition.anomaly_set.update(published=False)
@@ -191,6 +193,9 @@ def anomalyDetectionJob(anomalyDef_id: int, manualRun: bool = False):
             [anomaly for anomaly in result if anomaly.get("published")]
         )
         logs["numAnomalySubtasks"] = len(dimValsData)
+        totalAnomalyPublished = logs["numAnomaliesPulished"]
+        totalAnomalyCount = logs["numAnomalySubtasks"]
+
         logs["log"] = json.dumps(
             {anomaly["dimVal"]: anomaly for anomaly in result}
         )
@@ -211,6 +216,7 @@ def anomalyDetectionJob(anomalyDef_id: int, manualRun: bool = False):
     ################################################# Slack Alert ########################################################
     title = "CueObserve Alerts"
     if runStatusObj.status == ANOMALY_DETECTION_SUCCESS:
+        event_logs(anomalyDef_id,runStatusObj.status,totalAnomalyPublished,totalAnomalyCount)
         if logs.get("numAnomaliesPulished", 0) > 0:
             numPublished = logs["numAnomaliesPulished"]
             message = f"{numPublished} {'anomalies' if numPublished > 1 else 'anomaly'} published. \n"
@@ -286,6 +292,7 @@ def anomalyDetectionJob(anomalyDef_id: int, manualRun: bool = False):
         )
         message = message + str(logs["log"])
         name = "appAlert"
+        event_logs(anomalyDef_id,runStatusObj.status, totalAnomalyPublished ,totalAnomalyCount )
         SlackAlert.slackAlertHelper(title, message, name)
         
         ############ Webhook Alert ############

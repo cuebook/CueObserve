@@ -47,3 +47,4 @@ SQLAlchemy==1.4.20
 sqlparse==0.4.1
 slack-sdk==3.9.1
 aiohttp==3.7.4.post0
+analytics-python==1.4.0

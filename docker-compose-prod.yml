@@ -1,0 +1,56 @@
+version: '3.1'
+services:
+  cueo-backend:
+    image: cuebook/cue-observe-backend:0.3.1
+    environment:
+      ENVIRONMENT: ${ENVIRONMENT}
+      API_URL: ${API_URL}
+      ALERT_API_URL: ${ALERT_API_URL}
+      POSTGRES_DB_HOST: ${POSTGRES_DB_HOST}
+      POSTGRES_DB_USERNAME: ${POSTGRES_DB_USERNAME}
+      POSTGRES_DB_PASSWORD: ${POSTGRES_DB_PASSWORD}
+      POSTGRES_DB_SCHEMA: ${POSTGRES_DB_SCHEMA}
+      POSTGRES_DB_PORT: ${POSTGRES_DB_PORT}
+      DJANGO_SUPERUSER_USERNAME: ${DJANGO_SUPERUSER_USERNAME}
+      DJANGO_SUPERUSER_PASSWORD: ${DJANGO_SUPERUSER_PASSWORD}
+      DJANGO_SUPERUSER_EMAIL: ${DJANGO_SUPERUSER_EMAIL}
+      IS_AUTHENTICATION_REQUIRED: ${IS_AUTHENTICATION_REQUIRED}
+      REDIS_BROKER_URL: ${REDIS_BROKER_URL}
+      CELERY_RESULT_BACKEND: ${CELERY_RESULT_BACKEND}
+      DETECTION_SERVICE_PLATFORM: 
+      AWS_LAMBDA_URL: 
+    volumes:
+      - sqliteDB:/code/db:rw
+      - djangoStaticFiles:/home/staticfiles:rw
+    depends_on:
+      - cueo-redis
+
+  cueo-alerts:
+    image: cuebook/cue-observe-alerts:0.3.1
+
+  cueo-frontend:
+    image: cuebook/cue-observe-frontend:0.3.1
+    env_file:
+      - .env
+    depends_on:
+      - cueo-backend
+    command:
+      bash -c "./etc/nginx/conf.d/nginx-entrypoint.sh && nginx -g 'daemon off;'"
+    ports:
+      - "3000:3000"
+    links:
+      - "cueo-alerts"
+      - "cueo-backend"
+      - "cueo-redis"
+    volumes:
+      - djangoStaticFiles:/home/staticfiles:ro
+      
+  cueo-redis:
+    image: redis
+
+volumes:
+  sqliteDB:
+  djangoStaticFiles:
+
+
+    

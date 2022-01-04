@@ -175,6 +175,75 @@ def test_plotChart():
     webhookAlertMessageFormat(numPublished, adf)
     assert len(img_str) > 0
 
+    data1 = {'anomalyData': {
+        'actual': [{'y': 145, 'ds': '2021-07-06T00:00:00', 'anomaly': 1},
+        {'y': 180, 'ds': '2021-07-07T00:00:00', 'anomaly': 1},
+        {'y': 198, 'ds': '2021-07-08T00:00:00', 'anomaly': 1},
+        {'y': 145, 'ds': '2021-07-09T00:00:00', 'anomaly': 1},
+        {'y': 202, 'ds': '2021-07-10T00:00:00', 'anomaly': 1},
+        {'y': 123, 'ds': '2021-07-11T00:00:00', 'anomaly': 1},
+        {'y': 143, 'ds': '2021-07-12T00:00:00', 'anomaly': 1},
+        {'y': 214, 'ds': '2021-07-13T00:00:00', 'anomaly': 1},
+        {'y': 160, 'ds': '2021-07-14T00:00:00', 'anomaly': 1},
+        {'y': 142, 'ds': '2021-07-15T00:00:00', 'anomaly': 1},
+        {'y': 190, 'ds': '2021-07-16T00:00:00', 'anomaly': 1},
+        {'y': 169, 'ds': '2021-07-17T00:00:00', 'anomaly': 1},
+        {'y': 124, 'ds': '2021-07-18T00:00:00', 'anomaly': 1},
+        {'y': 124, 'ds': '2021-07-19T00:00:00', 'anomaly': 1},
+        {'y': 150, 'ds': '2021-07-20T00:00:00', 'anomaly': 1},
+        {'y': 162, 'ds': '2021-07-21T00:00:00', 'anomaly': 1},
+        {'y': 154, 'ds': '2021-07-22T00:00:00', 'anomaly': 1},
+        {'y': 153, 'ds': '2021-07-23T00:00:00', 'anomaly': 1},
+        {'y': 157, 'ds': '2021-07-24T00:00:00', 'anomaly': 1},
+        {'y': 199, 'ds': '2021-07-25T00:00:00', 'anomaly': 1},
+        {'y': 146, 'ds': '2021-07-26T00:00:00', 'anomaly': 1},
+        {'y': 184, 'ds': '2021-07-27T00:00:00', 'anomaly': 1},
+        {'y': 200, 'ds': '2021-07-28T00:00:00', 'anomaly': 1},
+        {'y': 190, 'ds': '2021-07-29T00:00:00', 'anomaly': 1},
+        {'y': 199, 'ds': '2021-07-30T00:00:00', 'anomaly': 1},
+        {'y': 187, 'ds': '2021-07-31T00:00:00', 'anomaly': 1},
+        {'y': 70, 'ds': '2021-08-01T00:00:00', 'anomaly': 15},
+        {'y': 247, 'ds': '2021-08-02T00:00:00', 'anomaly': 1},
+        {'y': 219, 'ds': '2021-08-03T00:00:00', 'anomaly': 1},
+        {'y': 290, 'ds': '2021-08-04T00:00:00', 'anomaly': 1},
+        {'y': 193, 'ds': '2021-08-05T00:00:00', 'anomaly': 1},
+        {'y': 319, 'ds': '2021-08-06T00:00:00', 'anomaly': 1},
+        {'y': 274, 'ds': '2021-08-07T00:00:00', 'anomaly': 1},
+        {'y': 273, 'ds': '2021-08-08T00:00:00', 'anomaly': 1},
+        {'y': 312, 'ds': '2021-08-09T00:00:00', 'anomaly': 1},
+        {'y': 472, 'ds': '2021-08-10T00:00:00', 'anomaly': 15},
+        {'y': 368, 'ds': '2021-08-11T00:00:00', 'anomaly': 1},
+        {'y': 568, 'ds': '2021-08-12T00:00:00', 'anomaly': 15},
+        {'y': 584, 'ds': '2021-08-13T00:00:00', 'anomaly': 15},
+        {'y': 930, 'ds': '2021-08-14T00:00:00', 'anomaly': 15},
+        {'y': 984, 'ds': '2021-08-15T00:00:00', 'anomaly': 15},
+        {'y': 990, 'ds': '2021-08-16T00:00:00', 'anomaly': 15},
+        {'y': 1437, 'ds': '2021-08-17T00:00:00', 'anomaly': 15},
+        {'y': 1789, 'ds': '2021-08-18T00:00:00', 'anomaly': 15},
+        {'y': 509, 'ds': '2021-08-19T00:00:00', 'anomaly': 15}],
+        },
+        'contribution': 9.25,
+        'anomalyLatest': {'value': 509.0,
+        'percent': 22,
+        'highOrLow': 'high',
+        'anomalyTime': 1629331200000.0,
+        'contribution': 9.25,
+        'anomalyTimeISO': '2021-08-19T00:00:00'}}
+    anomaly1 = mixer.blend("anomaly.anomaly", anomalyDefinition=adf,data = data1, lastRun=None)
+
+    anomalyTemplate1 = mixer.blend("anomaly.AnomalyCardTemplate", templateName = "Anomaly Hourly Template Lifetime", title="test", bodyText = "Test")
+    img_str1 = PlotChartService.anomalyChartToImgStr(anomaly1.id)
+    message = "Hi there !"
+    details = "Email alert on anomaly detection "
+    subject = "Email alert"
+    EmailAlert.sendEmail(message, details, subject, anomaly1.id)
+    numPublished = 4 # Random number
+    webhookAlertMessageFormat(numPublished, adf)
+    assert len(img_str1) > 0
+
+
+
+
 
 
 

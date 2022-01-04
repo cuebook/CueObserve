@@ -1,11 +1,28 @@
 version: '3.3'
 services:
+  cueo-nginx:
+    container_name: "cueo-nginx"
+    image: nginx:1.17
+    volumes:
+      - ./ui/nginx-dev.conf.template:/etc/nginx/conf.d/nginx-dev.conf.template
+      - ./ui/nginx-entrypoint.sh:/etc/nginx/conf.d/nginx-entrypoint.sh
+    command:
+      bash -c "./etc/nginx/conf.d/nginx-entrypoint.sh && nginx -g 'daemon off;'"
+    environment:
+      ENVIRONMENT:
+      NGINX_API_URL:
+      NGINX_ALERT_API_URL:
+      NGINX_UI_URL:
+    network_mode: "host"
+
   cueo-backend:
     build:
       context: api
       dockerfile: Dockerfile
     volumes:
-      - ./api:/app:rw
+      - ./api:/code:rw
+    command:
+      bash -c "chmod +x /code/start_server_new.sh && /code/start_server_new.sh"
     environment:
       ENVIRONMENT: ${ENVIRONMENT}
       API_URL: ${API_URL}
@@ -19,6 +36,9 @@ services:
       DJANGO_SUPERUSER_PASSWORD: ${DJANGO_SUPERUSER_PASSWORD}
       DJANGO_SUPERUSER_EMAIL: ${DJANGO_SUPERUSER_EMAIL}
       IS_AUTHENTICATION_REQUIRED: ${IS_AUTHENTICATION_REQUIRED}
+      CELERY_RESULT_BACKEND: ${CELERY_RESULT_BACKEND}
+      DETECTION_SERVICE_PLATFORM:
+      AWS_LAMBDA_URL:
     network_mode: "host"
 
   cueo-alerts:
@@ -70,3 +90,7 @@ services:
 
 volumes:
   pgdata:
+
+networks:
+  backend:
+    driver: bridge

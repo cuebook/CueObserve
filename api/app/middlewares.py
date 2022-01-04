@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.shortcuts import redirect
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, HttpResponse
 from django.contrib.auth import logout
 from django.utils.deprecation import MiddlewareMixin
 from django.contrib.auth.decorators import login_required
@@ -41,6 +41,7 @@ class LoginRequiredMiddleware:
         except:
             pass
         authenticationRequired= True if settings.AUTHENTICATION_REQUIRED == "True" else False
+
         if not authenticationRequired:
             return 
         if getattr(view_func, "login_exempt", False):
@@ -54,7 +55,7 @@ class LoginRequiredMiddleware:
                 logout(request)
             return
 
-        return login_required(view_func)(request, *view_args, **view_kwargs)
+        return HttpResponse('Unauthorized', status=401)
 
 
 

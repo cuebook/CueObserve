@@ -1,6 +1,8 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { Table, Button, Popconfirm, Input, message, Tooltip, Drawer, Modal } from "antd";
+import { getAnalytics, logEvent } from "firebase/analytics";
+
 import AddAnomalyDef from "./AddAnomalyDef.js"
 import EditAnomalyDef from "./EditAnomalyDef.js"
 import RunStatus from "./RunStatus.js";
@@ -51,6 +53,8 @@ export default function Connection() {
   const searchTextRef = useRef(searchText);
   searchTextRef.current = searchText;
   useEffect(() => {
+    const analytics = getAnalytics();
+    logEvent(analytics, 'users in Anomaly Definition Page');
     if (!data) {
         fetchData();
     }

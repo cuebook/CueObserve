@@ -1,7 +1,9 @@
 version: '3.3'
 services:
   cueo-backend:
-    image: cuebook/cue-observe-backend:latest
+    build:
+      context: api
+      dockerfile: Dockerfile
     environment:
       ENVIRONMENT: ${ENVIRONMENT}
       API_URL: ${API_URL}
@@ -15,13 +17,17 @@ services:
       DJANGO_SUPERUSER_PASSWORD: ${DJANGO_SUPERUSER_PASSWORD}
       DJANGO_SUPERUSER_EMAIL: ${DJANGO_SUPERUSER_EMAIL}
       IS_AUTHENTICATION_REQUIRED: ${IS_AUTHENTICATION_REQUIRED}
+      CELERY_RESULT_BACKEND: ${CELERY_RESULT_BACKEND}
+      REDIS_BROKER_URL: ${REDIS_BROKER_URL}
+      DETECTION_SERVICE_PLATFORM: ${DETECTION_SERVICE_PLATFORM}
+      AWS_LAMBDA_URL: ${AWS_LAMBDA_URL}
     volumes:
       - sqliteDB:/code/db:rw
-    network_mode: "host"
-
+      - djangoStaticFiles:/home/staticfiles:rw
   cueo-alerts:
-    image: cuebook/cue-observe-alerts:latest
-    network_mode: "host"
+    build:
+      context: alerts-api
+      dockerfile: Dockerfile
 
   cueo-search:
     build:
@@ -39,15 +45,30 @@ services:
     network_mode: "host"
 
   cueo-frontend:
-    image: cuebook/cue-observe-frontend:latest
+    build:
+      context: ui
+      dockerfile: Dockerfile
+    env_file:
+      - .env
     depends_on:
       - cueo-backend
-    network_mode: "host"
-
+    command:
+      bash -c "./etc/nginx/conf.d/nginx-entrypoint.sh && nginx -g 'daemon off;'"
+    ports:
+      - "3000:3000"
+    links:
+      - "cueo-alerts"
+      - "cueo-backend"
+      - "cueo-redis"
+    volumes:
+      - djangoStaticFiles:/home/staticfiles:rw
+      
   cueo-redis:
     image: redis
-    network_mode: "host"
 
 volumes:
   sqliteDB:
+  djangoStaticFiles:
+
+
     

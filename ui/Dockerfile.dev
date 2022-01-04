@@ -5,5 +5,5 @@ WORKDIR /app
 COPY package.json ./
 RUN yarn install --silent
 COPY . ./
-EXPOSE 3000
+EXPOSE 3030
 CMD ["yarn", "start"]
