@@ -1,22 +1,48 @@
-// Import the functions you need from the SDKs you need
-import  { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-import firebase from "firebase/compat/app";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+import React, { useState, useEffect, useRef } from "react";
+import { Button, Form, Input, message, Select } from "antd";
+import Analytics from 'analytics'
+import segmentPlugin from '@analytics/segment'
+import installationServices from "services/installation.js"
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-export const firebaseConfig = {
-  apiKey: "AIzaSyACE4Kid9-ue0Sdfh39kgVLrh13qPYsZl4",
-  authDomain: "cueobserve-3b1e1.firebaseapp.com",
-  projectId: "cueobserve-3b1e1",
-  storageBucket: "cueobserve-3b1e1.appspot.com",
-  messagingSenderId: "551390041392",
-  appId: "1:551390041392:web:df6373ea8fe8178476a4f5",
-  measurementId: "G-SHS7Q15FSS"
-};
+export const analytics = Analytics({
+  app: 'CueObserve',
+  plugins: [
+    segmentPlugin({
+      writeKey: 'Ap3yeUlzhDpVeGH0hXAJjaWZbZnQzp9x'
+    })
+  ]
+})
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-export const firebaseAnalytics = getAnalytics(app);
+export const telemetry = (title, url, installationId) => {
+
+  const initiateTelemetry = async() => {
+      analytics.page({
+        title:title,
+        url: url,
+        "installationId": installationId,
+      })
+  }
+  initiateTelemetry()
+}
+/* Track a page view */
+// analytics.page()
+
+/* Track a custom event */
+// analytics.track( {
+//   installationId:"7C35C4PZ5MCIJTT8"
+// })
+
+/* Identify a visitor */
+// analytics.identify( {
+//   installationId:"7C35C4PZ5MCIJTT8"
+// })
+
+
+
+
+
+
+
+
+
+
