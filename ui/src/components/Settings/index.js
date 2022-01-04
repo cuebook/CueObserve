@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Form, Input, Button } from 'antd';
 import style from "./style.module.scss";
-
 import settingService from "services/settings";
 const {TextArea} = Input;
 

@@ -15,7 +15,6 @@ import {
 } from "antd";
 import { EyeOutlined } from '@ant-design/icons';
 import PopconfirmButton from "components/Utils/PopconfirmButton";
-
 const {Search} = Input
 
 const granularity = {
