@@ -14,11 +14,6 @@ FROM nginx:1.17
 COPY --from=builder /app/build /app/build
 
 # # Copy nginx configuration
-<<<<<<< HEAD
-ADD nginx.conf /etc/nginx/conf.d/default.conf
-CMD ["nginx", "-g", "daemon off;"]
-=======
 ADD nginx-entrypoint.sh /etc/nginx/conf.d/
 ADD nginx-dev.conf.template /etc/nginx/conf.d/
 ADD nginx.conf.template /etc/nginx/conf.d/
->>>>>>> latest_release
