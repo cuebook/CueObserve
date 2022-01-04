@@ -19,6 +19,7 @@ def test_anomalyDefinition(client, mocker):
     path = reverse('anomalyDefs')
     response = client.get(path)
     assert response.status_code == 200
+    
     assert not response.data['data']["anomalyDefinition"]
     assert response.data["data"]["count"] == 0
 
