@@ -26,7 +26,6 @@ class MySQL:
             password=password
             )
             curs = conn.cursor()
-
         except Exception as ex:
             logger.error("Can't connect to db with this credentials ")
             res = False
