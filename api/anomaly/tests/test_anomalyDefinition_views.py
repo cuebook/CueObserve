@@ -85,6 +85,7 @@ def test_anomalyDefinition(client, mocker):
         "value":"10"
         
     }
+    
     response = client.post(path, data=data, content_type="application/json")
     assert response.status_code == 200
     assert response.data['success'] 
