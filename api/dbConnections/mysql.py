@@ -2,7 +2,6 @@ from dbConnections.utils import limitSql
 import json
 import logging
 import pandas as pd
-from MySQLdb import connect
 logger = logging.getLogger(__name__)
 
 
@@ -11,6 +10,8 @@ class MySQL:
     Class to support functionalities on MySQL connection
     """
     def checkConnection(params):
+        from MySQLdb import connect
+
         res = True
         try:
             host = params.get("host", "")
@@ -33,6 +34,8 @@ class MySQL:
         return res
 
     def fetchDataframe(params: str, sql: str, limit: bool = False):
+        from MySQLdb import connect
+
         dataframe = None
         try:
             host = params.get("host", "")
