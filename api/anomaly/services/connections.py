@@ -1,7 +1,7 @@
 import logging
 from typing import List
 from utils.apiResponse import ApiResponse
-import dbConnections
+from dbConnections import BigQuery, Redshift, Snowflake, Druid, MySQL, Postgres, MSSQL, ClickHouse
 from anomaly.models import (
     Connection,
     ConnectionParam,
@@ -66,21 +66,21 @@ class Connections:
         # Do this verification using Querys service
 
         if connectionName == "BigQuery":
-            connectionResponse = dbConnections.BigQuery.checkConnection(payload["params"])
+            connectionResponse = BigQuery.checkConnection(payload["params"])
         elif connectionName == "Redshift":
-            connectionResponse = dbConnections.Redshift.checkConnection(payload["params"])
+            connectionResponse = Redshift.checkConnection(payload["params"])
         elif connectionName == "Snowflake":
-            connectionResponse = dbConnections.Snowflake.checkConnection(payload["params"])
+            connectionResponse = Snowflake.checkConnection(payload["params"])
         elif connectionName == "Druid":
-            connectionResponse = dbConnections.Druid.checkConnection(payload["params"])
+            connectionResponse = Druid.checkConnection(payload["params"])
         elif connectionName == "MySQL":
-            connectionResponse = dbConnections.MySQL.checkConnection(payload["params"])
+            connectionResponse = MySQL.checkConnection(payload["params"])
         elif connectionName == "Postgres":
-            connectionResponse = dbConnections.Postgres.checkConnection(payload["params"])
+            connectionResponse = Postgres.checkConnection(payload["params"])
         elif connectionName == "MSSQL":
-            connectionResponse = dbConnections.MSSQL.checkConnection(payload["params"])
+            connectionResponse = MSSQL.checkConnection(payload["params"])
         elif connectionName == "ClickHouse":
-            connectionResponse = dbConnections.ClickHouse.checkConnection(payload["params"])
+            connectionResponse = ClickHouse.checkConnection(payload["params"])
         else:
             connectionResponse = True
 
