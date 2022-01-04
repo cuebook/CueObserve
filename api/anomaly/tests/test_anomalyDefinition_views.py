@@ -85,7 +85,7 @@ def test_anomalyDefinition(client, mocker):
         "value":"10"
         
     }
-    
+
     response = client.post(path, data=data, content_type="application/json")
     assert response.status_code == 200
     assert response.data['success'] 
@@ -104,6 +104,7 @@ def test_anomalyDefinition(client, mocker):
     sorter = {"columnKey":"lastRunStatus", "order":"ascend"}
     res = AnomalyDefinitions.getAllAnomalyDefinition(offset=0,limit=50,searchQuery=None,sorter=sorter)
     res.success == True
+    
 
     # Delete anomalys
     path = reverse('anomalyDef', kwargs={"anomalyId": anomaly["id"]})
