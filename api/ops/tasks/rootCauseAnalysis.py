@@ -120,8 +120,8 @@ def _anomalyDetectionForDimension(anomalyId: int, dimension: str, data: list):
         }
         anomaly.rootcauseanalysis.save()
 
-        if not all([x["success"] for x in results]):
-            return False
+        # if not all([x["success"] for x in results]):
+        #     return False
     except Exception as ex:
 
         anomaly.rootcauseanalysis.logs = {

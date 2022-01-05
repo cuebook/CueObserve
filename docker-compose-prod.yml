@@ -17,6 +17,8 @@ services:
       IS_AUTHENTICATION_REQUIRED: ${IS_AUTHENTICATION_REQUIRED}
       REDIS_BROKER_URL: ${REDIS_BROKER_URL}
       CELERY_RESULT_BACKEND: ${CELERY_RESULT_BACKEND}
+    env_file:
+      - .env
     volumes:
       - sqliteDB:/code/db:rw
       - djangoStaticFiles:/home/staticfiles:rw

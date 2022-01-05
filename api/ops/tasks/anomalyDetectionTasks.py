@@ -93,6 +93,8 @@ def saveAnomalyObjects(anomalyResult):
     :param anomalyResult: List of anomaly detection outputs
     """
     for obj in anomalyResult:
+        if not obj['success']:
+            continue
         anomalyObj = Anomaly.objects.get(id=obj["anomalyId"])
         anomalyObj.data = obj["data"]
         anomalyObj.published = obj["published"]
@@ -202,8 +204,8 @@ def anomalyDetectionJob(anomalyDef_id: int, manualRun: bool = False):
         runStatusObj.status = ANOMALY_DETECTION_ERROR
     else:
         runStatusObj.status = ANOMALY_DETECTION_SUCCESS
-    if not allTasksSucceeded:
-        runStatusObj.status = ANOMALY_DETECTION_ERROR
+    # if not allTasksSucceeded:
+    #     runStatusObj.status = ANOMALY_DETECTION_ERROR
     runStatusObj.logs = logs
     runStatusObj.endTimestamp = dt.datetime.now()
     runStatusObj.save()
