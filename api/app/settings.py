@@ -43,7 +43,9 @@ LOGGING = {
             "format": "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] [%(threadName)s] %(message)s",
             "datefmt": "%d/%b/%Y %H:%M:%S",
         },
-        "console": {"format": "%(asctime)s [%(name)s:%(lineno)s] %(levelname)-8s %(message)s"},
+        "console": {
+            "format": "%(asctime)s [%(name)s:%(lineno)s] %(levelname)-8s %(message)s"
+        },
     },
     "handlers": {
         "console": {
@@ -190,14 +192,34 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static_root")
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 REDIS_BROKER_URL = os.environ.get("REDIS_BROKER_URL", "redis://localhost:6379/0")
-CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND", "redis://localhost:6379/1")
+CELERY_RESULT_BACKEND = os.environ.get(
+    "CELERY_RESULT_BACKEND", "redis://localhost:6379/1"
+)
 CELERY_IMPORTS = ("ops.tasks",)
-CELERY_TASK_ROUTES = {"ops.tasks.anomalyDetectionTasks._anomalyDetectionSubTask": {"queue": "anomalySubTask"}}
+# CELERY_TASK_ROUTES = ({"ops.tasks.anomalyDetectionTasks._anomalyDetectionSubTask": {"queue": "anomalySubTask"}})
+CELERY_TASK_ROUTES = (
+    [
+        (
+            "ops.tasks.anomalyDetectionTasks._anomalyDetectionSubTask",
+            {"queue": "anomalySubTask"},
+        ),
+        ("ops.tasks.telemetryTask.telemetryJob", {"queue": "telemetry"}),
+    ],
+)
+CELERY_ROUTES = (
+    [
+        (
+            "ops.tasks.anomalyDetectionTasks._anomalyDetectionSubTask",
+            {"queue": "anomalySubTask"},
+        ),
+        ("ops.tasks.telemetryTask.telemetryJob", {"queue": "telemetry"}),
+    ],
+)
 
-# EMAIL 
+# EMAIL
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = os.environ.get("EMAIL_HOST","")
+EMAIL_HOST = os.environ.get("EMAIL_HOST", "")
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
-EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER","")
-EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD","")
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
