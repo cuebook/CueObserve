@@ -23,7 +23,6 @@ class MySQL:
             conn = connect(
                 host=host, port=port, db=database, user=username, password=password
             )
-            curs = conn.cursor()
 
         except Exception as ex:
             logger.error("Can't connect to db with this credentials ")
@@ -43,7 +42,6 @@ class MySQL:
             conn = connect(
                 host=host, port=port, db=database, user=username, password=password
             )
-            curs = conn.cursor()
             if limit:
                 sql = limitSql(sql)
             chunksize = None
