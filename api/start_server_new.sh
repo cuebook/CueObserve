@@ -19,7 +19,7 @@ then
     (celery -A app worker --concurrency=2 -Q telemetry -n telemetryNode -l INFO --purge) &
 else 
     echo "autoscaling disabled, will run everything"
-    (celery -A app worker --concurrency=2 -l -n main INFO --purge) &
+    (celery -A app worker --concurrency=2 -n main -l INFO --purge) &
     (celery -A app worker --concurrency=4 -Q anomalySubTask -n sub -l INFO --purge) &
 fi
 
