@@ -10,6 +10,7 @@ class MySQL:
     """
     Class to support functionalities on MySQL connection
     """
+
     def checkConnection(params):
         from MySQLdb import connect
 
@@ -18,14 +19,10 @@ class MySQL:
             host = params.get("host", "")
             port = int(params.get("port", 25060))
             database = params.get("database", "")
-            username= params.get("username","")
+            username = params.get("username", "")
             password = params.get("password", "")
             conn = connect(
-            host=host,
-            port=port,
-            db=database,
-            user=username,
-            password=password
+                host=host, port=port, db=database, user=username, password=password
             )
             curs = conn.cursor()
 
@@ -42,21 +39,17 @@ class MySQL:
             host = params.get("host", "")
             port = int(params.get("port", 25060))
             database = params.get("database", "")
-            username= params.get("username","")
+            username = params.get("username", "")
             password = params.get("password", "")
             conn = connect(
-            host=host,
-            port=port,
-            db=database,
-            user=username,
-            password=password
+                host=host, port=port, db=database, user=username, password=password
             )
             curs = conn.cursor()
             if limit:
                 sql = limitSql(sql)
-            chunksize =  None
+            chunksize = None
             dataframe = pd.read_sql(sql, conn, chunksize=chunksize)
-            
+
         except Exception as ex:
             logger.error("Can't connect to db with this credentials %s", str(ex))
 
