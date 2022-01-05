@@ -1,0 +1,69 @@
+name: Pylint
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  Pylint:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Check if code is in sync with main branch
+      run: |
+        echo ${{github.event.pull_request.head.ref}}
+        git fetch
+        git rev-list --left-right --count origin/main...origin/${{github.event.pull_request.head.ref}}
+        if [[ "$(git rev-list --left-right --count origin/main...origin/${{github.event.pull_request.head.ref}} | cut -f1)" > 0 ]]; then exit 1; fi
+        
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.7
+
+    - name: Install Pylint
+      run: |
+        python -m pip install --upgrade pip
+        pip install pylint==2.11.1
+        pip install pylint-django==2.4.4
+        cat api/requirements.txt | xargs -n 1 pip install || true
+        
+    - name: Run Pylint
+      run: |
+        cd api
+        export DJANGO_SETTINGS_MODULE=app.settings
+        URL="https://api.github.com/repos/${GITHUB_REPOSITORY}/pulls/${{ github.event.pull_request.number }}/files"
+        echo "************ Getting files for this PR **********"
+        git fetch 
+        x=$(git diff --name-only origin/main origin/${GITHUB_HEAD_REF} | grep "\.py" | grep -v test | grep -v serializer | grep -v __init__.py | grep -v migrations | grep -v removed || echo 0)
+        
+        echo "************ Files Fetched **********"
+        [[ -z $x ]] && exit 0;    # this also fails the job
+        
+
+        echo "************ Files in API folder in this PR **********"
+        echo "removing non main api folder files"
+        x=$(echo "$x" | grep "^api/" || echo 0)
+        
+        PYLINT_STATUS="SUCCESS";
+        SUCCESS="SUCCESS";
+        FAILED="FAILED";
+        if [ ! "$x" = "0" ]; then
+          for file in $x; do
+            file=$(echo $file | cut -d ':' -f 1)
+            echo "Running Pylint on: "$file;
+            python ./lint.py --path ../$file --threshold 8
+            ret=$?
+            if [ $ret -ne 0 ]; then
+                echo " ----------------------------- Pylint failed for file: "$file
+                PYLINT_STATUS="FAILED"
+            fi
+          done
+        fi
+        if [ "$PYLINT_STATUS" = "$FAILED" ]; then
+             echo " ----------------------------- Pylint Process Failed";
+             return 1;
+        fi
