@@ -22,16 +22,22 @@ import Login from "components/System/User/Login/index"
 // contexts
 import { GlobalContextProvider } from "./GlobalContext";
 import userServices from "services/user.js"
+import installationServices from "services/installation.js"
+import { telemetry } from "telemetry/index.js";
 
 export default function Admin() {
   const [ isLoggedIn, setIsLoggedIn] = useState(false)
   const [loader, setLoader] = useState(false)
   const [ isAuthRequired, setIsAuthRequired ] = useState(false)
   const [isLogout, setIsLogout] = useState(false)
+  const [installationId, setInstallationId] = useState()
    
   useEffect(() => {
     if (!isLoggedIn) {
       getUser();
+    }
+    if(!installationId){
+      getInstallationIdForTelemetry()
     }
   }, []);
 
@@ -71,6 +77,22 @@ export default function Admin() {
     }
 
   }
+
+  const getInstallationIdForTelemetry = async() => {
+    const res = await installationServices.getInstallationId()
+    if (res && res.success == true){
+      let id = res.data["installationId"]
+      setInstallationId(id)
+    }
+  }
+  let installId = installationId
+  if(installId){
+    let title = window.location.hash
+    title = title.replace("#/","")
+    let url = window.location.href
+    telemetry(title, url, installId)
+  }
+
   return (
     <>
     { ( isAuthRequired && isLoggedIn )  ?

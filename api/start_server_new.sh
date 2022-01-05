@@ -15,6 +15,6 @@ rm -rf static_root/
 (celery -A app worker --concurrency=2 -l INFO --purge) &
 (celery -A app worker --concurrency=4 -Q anomalySubTask -l INFO --purge) &
 (celery -A app beat -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler) &
-python telemetry.py &
+python manage.py shell -c  "from anomaly.runTelemetry import create_installation_userId; create_installation_userId()" &
 
 gunicorn app.wsgi --reload --user www-data --bind 0.0.0.0:8000 --workers 3 --timeout 300

@@ -1,8 +1,15 @@
 import logging
 from typing import List
 from utils.apiResponse import ApiResponse
-from dbConnections import BigQuery
-from anomaly.models import AnomalyDefinition, Dataset, CustomSchedule as Schedule, DetectionRule, DetectionRuleParam, DetectionRuleParamValue, RunStatus
+from anomaly.models import (
+    AnomalyDefinition,
+    Dataset,
+    CustomSchedule as Schedule,
+    DetectionRule,
+    DetectionRuleParam,
+    DetectionRuleParamValue,
+    RunStatus,
+)
 from anomaly.serializers import AnomalyDefinitionSerializer, RunStatusSerializer
 from django_celery_beat.models import PeriodicTask, PeriodicTasks, CrontabSchedule
 from ops.tasks import anomalyDetectionJob
@@ -10,26 +17,32 @@ from django.db.models import Q, Max
 
 RUN_STATUS_LIMIT = 10
 
-class AnomalyDefinitions:
 
+class AnomalyDefinitions:
     @staticmethod
-    def getAllAnomalyDefinition(offset: int=0, limit: int=50, searchQuery: str=None, sorter: dict={}):
+    def getAllAnomalyDefinition(
+        offset: int = 0, limit: int = 50, searchQuery: str = None, sorter: dict = {}
+    ):
         """
         This method is used to get all anomlayObj
         """
         response = ApiResponse("Error in getting Anomaly Definition !")
         anomalyDefObjs = AnomalyDefinition.objects.all().order_by("-id")
-        count =  anomalyDefObjs.count()
+        count = anomalyDefObjs.count()
 
         if searchQuery:
-            anomalyDefObjs = AnomalyDefinitions.searchOnAnomalyDefinition(anomalyDefObjs, searchQuery)
+            anomalyDefObjs = AnomalyDefinitions.searchOnAnomalyDefinition(
+                anomalyDefObjs, searchQuery
+            )
             count = anomalyDefObjs.count()
         if sorter.get("order", False):
-            anomalyDefObjs = AnomalyDefinitions.sortOnAnomalyDefinition(anomalyDefObjs, sorter)
-        anomalyDefObjs = anomalyDefObjs[offset:offset+limit]
+            anomalyDefObjs = AnomalyDefinitions.sortOnAnomalyDefinition(
+                anomalyDefObjs, sorter
+            )
+        anomalyDefObjs = anomalyDefObjs[offset : offset + limit]
         anomalyDefData = AnomalyDefinitionSerializer(anomalyDefObjs, many=True).data
-        data={"anomalyDefinition":anomalyDefData, "count":count}
-        
+        data = {"anomalyDefinition": anomalyDefData, "count": count}
+
         response.update(True, "AnomalyDefinitions retrived successfully !", data)
 
         return response
@@ -37,16 +50,17 @@ class AnomalyDefinitions:
     @staticmethod
     def searchOnAnomalyDefinition(anomalyDefObjs, searchQuery):
         """
-        Search on AnomalyDefinition 
+        Search on AnomalyDefinition
         """
         return anomalyDefObjs.filter(
-            Q(dataset__name__icontains=searchQuery) |
-            Q(dataset__granularity__icontains=searchQuery) | 
-            Q(metric__icontains=searchQuery) | 
-            Q(highOrLow__icontains=searchQuery) | 
-            Q(dimension__icontains=searchQuery)| 
-            Q(value__icontains=searchQuery) |
-            Q(operation__icontains=searchQuery)) 
+            Q(dataset__name__icontains=searchQuery)
+            | Q(dataset__granularity__icontains=searchQuery)
+            | Q(metric__icontains=searchQuery)
+            | Q(highOrLow__icontains=searchQuery)
+            | Q(dimension__icontains=searchQuery)
+            | Q(value__icontains=searchQuery)
+            | Q(operation__icontains=searchQuery)
+        )
 
     @staticmethod
     def sortOnAnomalyDefinition(anomalyDefObjs: List[AnomalyDefinition], sorter):
@@ -55,28 +69,43 @@ class AnomalyDefinitions:
         """
         columnToSort = sorter.get("columnKey", "")
         order = sorter.get("order", "")
-        sortingPrefix = "" if order=="ascend" else "-"
+        sortingPrefix = "" if order == "ascend" else "-"
 
         if columnToSort == "datasetName":
             anomalyDefObjs = anomalyDefObjs.order_by(sortingPrefix + "dataset__name")
 
         if columnToSort == "granularity":
-            anomalyDefObjs = anomalyDefObjs.order_by(sortingPrefix + "dataset__granularity")
+            anomalyDefObjs = anomalyDefObjs.order_by(
+                sortingPrefix + "dataset__granularity"
+            )
 
         if columnToSort == "anomalyDef":
             anomalyDefObjs = anomalyDefObjs.order_by(sortingPrefix + "metric")
 
-        if columnToSort == "lastRun" :
-            anomalyDefObjs = anomalyDefObjs.annotate(latestRun=Max('runstatus__startTimestamp')).order_by(sortingPrefix + 'latestRun')
+        if columnToSort == "lastRun":
+            anomalyDefObjs = anomalyDefObjs.annotate(
+                latestRun=Max("runstatus__startTimestamp")
+            ).order_by(sortingPrefix + "latestRun")
             return anomalyDefObjs
 
         if columnToSort == "lastRunStatus":
-            anomalyDefObjs = anomalyDefObjs.annotate(latestRun=Max('runstatus__status')).order_by(sortingPrefix + 'latestRun')
-        
+            anomalyDefObjs = anomalyDefObjs.annotate(
+                latestRun=Max("runstatus__status")
+            ).order_by(sortingPrefix + "latestRun")
+
         return anomalyDefObjs
 
     @staticmethod
-    def addAnomalyDefinition(metric: str = None, dimension: str = None, operation: str=None, highOrLow: str = None, value: int = 0, datasetId: int = 0, detectionRuleTypeId: int = 1, detectionRuleParams: dict = {}):
+    def addAnomalyDefinition(
+        metric: str = None,
+        dimension: str = None,
+        operation: str = None,
+        highOrLow: str = None,
+        value: int = 0,
+        datasetId: int = 0,
+        detectionRuleTypeId: int = 1,
+        detectionRuleParams: dict = {},
+    ):
         """
         This method is used to add anomaly to AnomalyDefinition table
         """
@@ -87,15 +116,23 @@ class AnomalyDefinitions:
             dimension=dimension,
             highOrLow=highOrLow,
             value=value,
-            operation=operation
+            operation=operation,
         )
-        detectionRule = DetectionRule.objects.create(detectionRuleType_id=detectionRuleTypeId, anomalyDefinition=anomalyObj)
+        detectionRule = DetectionRule.objects.create(
+            detectionRuleType_id=detectionRuleTypeId, anomalyDefinition=anomalyObj
+        )
         detectionParams = []
         for param in detectionRuleParams.keys():
-            detectionRuleParamObj = DetectionRuleParam.objects.filter(name=param).first()
+            detectionRuleParamObj = DetectionRuleParam.objects.filter(
+                name=param
+            ).first()
             if detectionRuleParamObj:
                 detectionParams.append(
-                    DetectionRuleParamValue(param=detectionRuleParamObj, detectionRule=detectionRule, value=str(detectionRuleParams[param]))
+                    DetectionRuleParamValue(
+                        param=detectionRuleParamObj,
+                        detectionRule=detectionRule,
+                        value=str(detectionRuleParams[param]),
+                    )
                 )
         DetectionRuleParamValue.objects.bulk_create(detectionParams)
         response.update(True, "Anomaly Definition created successfully !")
@@ -109,11 +146,13 @@ class AnomalyDefinitions:
         response = ApiResponse("Error in creating Anomaly Definition !")
         anomalyObj = AnomalyDefinition.objects.get(id=anomalyId)
         anomalyObj.delete()
-        response.update(True,"Anomaly Definition successfully deleted !")
+        response.update(True, "Anomaly Definition successfully deleted !")
         return response
 
     @staticmethod
-    def editAnomalyDefinition(anomalyId: int = 0, highOrLow: str = None, detectionRuleParams: dict = {}):
+    def editAnomalyDefinition(
+        anomalyId: int = 0, highOrLow: str = None, detectionRuleParams: dict = {}
+    ):
         """
         Update anomaly objects of given anomalyId
         """
@@ -122,14 +161,16 @@ class AnomalyDefinitions:
         anomalyObj.highOrLow = highOrLow
         anomalyObj.save()
         if detectionRuleParams:
-            originalParams = list(anomalyObj.detectionrule.detectionruleparamvalue_set.all())
+            originalParams = list(
+                anomalyObj.detectionrule.detectionruleparamvalue_set.all()
+            )
             for param in originalParams:
                 if detectionRuleParams.get(param.param.name):
                     param.value = detectionRuleParams.get(param.param.name)
             DetectionRuleParamValue.objects.bulk_update(originalParams, ["value"])
         response.update(True, "Anomaly Definition updated successfully !")
         return response
-    
+
     @staticmethod
     def runAnomalyDetection(anomalyDefId: int):
         """
@@ -150,8 +191,14 @@ class AnomalyDefinitions:
         """
         res = ApiResponse()
         runStatusData = {}
-        runStatuses = RunStatus.objects.filter(anomalyDefinition_id=anomalyDefId).order_by("-startTimestamp")[runStatusOffset: runStatusOffset + RUN_STATUS_LIMIT]
-        runStatuseCount = RunStatus.objects.filter(anomalyDefinition_id=anomalyDefId).count()
+        runStatuses = RunStatus.objects.filter(
+            anomalyDefinition_id=anomalyDefId
+        ).order_by("-startTimestamp")[
+            runStatusOffset : runStatusOffset + RUN_STATUS_LIMIT
+        ]
+        runStatuseCount = RunStatus.objects.filter(
+            anomalyDefinition_id=anomalyDefId
+        ).count()
         runStatusData["runStatuses"] = RunStatusSerializer(runStatuses, many=True).data
         runStatusData["count"] = runStatuseCount
         res.update(True, "Run statuses retrieved successfully", runStatusData)
@@ -165,12 +212,13 @@ class AnomalyDefinitions:
         """
         res = ApiResponse()
         lastRunStatus = RunStatus.objects.filter(anomalyDefinition_id=anomalyDefId).order_by("-startTimestamp").first()
+        
         taskRunning = False
         if lastRunStatus:
             taskRunning = lastRunStatus.status == "RUNNING"
         res.update(True, "Task Running status checked.", {"isRunning": taskRunning})
         return res
-    
+
     @staticmethod
     def runStatusAnomalies(runStatusId: int):
         """
@@ -179,11 +227,13 @@ class AnomalyDefinitions:
         """
         res = ApiResponse()
         runStatus = RunStatus.objects.get(id=runStatusId)
-        anomaliesData = list(runStatus.anomaly_set.all().values("dimensionVal", "id", "published"))
+        anomaliesData = list(
+            runStatus.anomaly_set.all().values("dimensionVal", "id", "published")
+        )
         res.update(True, "Run status anomalies retrieved successfully", anomaliesData)
         return res
 
-        
+
 class AnomalyDefJobServices:
     @staticmethod
     def addAnomalyDefJob(anomalyDefId: str, scheduleId: int):
@@ -195,7 +245,14 @@ class AnomalyDefJobServices:
         res = ApiResponse()
         scheduleObj = Schedule.objects.get(id=scheduleId)
         cronSchedule = scheduleObj.cronSchedule
-        ptask = PeriodicTask.objects.update_or_create(name = anomalyDefId ,defaults={"crontab" : cronSchedule, "task" : anomalyDetectionJob.name, "args" : f'["{anomalyDefId}"]'})
+        ptask = PeriodicTask.objects.update_or_create(
+            name=anomalyDefId,
+            defaults={
+                "crontab": cronSchedule,
+                "task": anomalyDetectionJob.name,
+                "args": f'["{anomalyDefId}"]',
+            },
+        )
         anomalyDefObj = AnomalyDefinition.objects.get(id=anomalyDefId)
         anomalyDefObj.periodicTask = ptask
         anomalyDefObj.periodicTask.save()

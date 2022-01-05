@@ -17,6 +17,7 @@ from anomaly.services import (
     DetectionRules,
     RootCauseAnalyses,
 )
+from anomaly.services.telemetry import getInstallationId
 
 
 class AnomalysView(APIView):
@@ -374,4 +375,10 @@ class RCAView(APIView):
     def delete(self, request, anomalyId: int):
         """make RCA request"""
         res = RootCauseAnalyses.abortRCA(anomalyId)
+        return Response(res.json())
+
+class InstallationView(APIView):
+    """ Provides views on Installation """
+    def get(self, request):
+        res = getInstallationId()
         return Response(res.json())

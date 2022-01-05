@@ -17,6 +17,8 @@ services:
       IS_AUTHENTICATION_REQUIRED: ${IS_AUTHENTICATION_REQUIRED}
       REDIS_BROKER_URL: ${REDIS_BROKER_URL}
       CELERY_RESULT_BACKEND: ${CELERY_RESULT_BACKEND}
+      DETECTION_SERVICE_PLATFORM: 
+      AWS_LAMBDA_URL: 
     volumes:
       - sqliteDB:/code/db:rw
       - djangoStaticFiles:/home/staticfiles:rw
@@ -41,7 +43,7 @@ services:
       - "cueo-backend"
       - "cueo-redis"
     volumes:
-      - djangoStaticFiles:/home/staticfiles:rw
+      - djangoStaticFiles:/home/staticfiles:ro
       
   cueo-redis:
     image: redis
