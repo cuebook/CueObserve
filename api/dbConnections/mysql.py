@@ -1,4 +1,3 @@
-import json
 import logging
 import pandas as pd
 from dbConnections.utils import limitSql
