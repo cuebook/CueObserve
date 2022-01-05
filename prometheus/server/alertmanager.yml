@@ -2,28 +2,28 @@
 route:
   group_wait: 10s
   group_interval: 10s
-  repeat_interval: 10s
+  repeat_interval: 10m
   group_by: [alertname]
 
-  receiver: 'email-notifications'
+  receiver: 'slack-notifications'
 
-receivers: 
-  - name: 'email-notifications'
-    email_configs:
-    - to: praveen@cuebook.ai
-      from: cuebook.ai@gmail.com
-      smarthost: smtp.gmail.com:587
-      auth_username: cuebook.ai@gmail.com
-      auth_identity: cuebook.ai@gmail.com
-      auth_password: cuebook.ai@123
-      send_resolved: false
+# receivers: 
+#   - name: 'email-notifications'
+#     email_configs:
+#     - to: 
+#       from: cuebook.ai@gmail.com
+#       smarthost: smtp.gmail.com:587
+#       auth_username: cuebook.ai@gmail.com
+#       auth_identity: cuebook.ai@gmail.com
+#       auth_password: 
+#       send_resolved: false
 
-# receivers:
-#   - name: 'slack-notifications'
-#     slack_configs:
-#       - send_resolved: false
-#         text: "{{ .CommonAnnotations.description }}"
-#         title: "{{ .CommonAnnotations.summary }} "
-#         username: 'Prometheus'
-#         api_url: "https://hooks.slack.com/services/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"
-#         channel: '#test'
+receivers:
+  - name: 'slack-notifications'
+    slack_configs:
+      - send_resolved: false
+        text: "{{ .CommonAnnotations.description }}"
+        title: "{{ .CommonAnnotations.summary }} "
+        username: 'Prometheus'
+        api_url: 
+        channel: '#test'
