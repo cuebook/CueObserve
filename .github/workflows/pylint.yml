@@ -43,8 +43,6 @@ jobs:
         echo "************ Files Fetched **********"
         [[ -z $x ]] && exit 0;    # this also fails the job
         
-        touch ../search-api/__init__.py
-        pylint ../search-api --rcfile ../search-api/pylintrc --fail-under=8
 
         echo "************ Files in API folder in this PR **********"
         echo "removing non main api folder files"
