@@ -19,6 +19,8 @@ app.conf.task_routes = (
     ],
 )
 
+app.conf.task_acks_late = True
+app.conf.worker_prefetch_multiplier = 1
 
 app.autodiscover_tasks()
 
