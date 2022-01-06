@@ -1,4 +1,5 @@
 import os
+import time
 import json
 import asyncio
 import traceback
@@ -182,6 +183,8 @@ def anomalyDetectionJob(anomalyDef_id: int, manualRun: bool = False):
             float(anomalyDefinition.value),
             anomalyDefinition.dataset.isNonRollup,
         )
+
+        time.sleep(200)
 
         result = distributeSubTasks(dimValsData, anomalyDefinition)
 
