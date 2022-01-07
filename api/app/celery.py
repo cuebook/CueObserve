@@ -9,18 +9,10 @@ app = Celery(
 )
 
 # app.config_from_object("django.conf:settings")
-app.conf.task_routes = (
-    [
-        (
-            "ops.tasks.anomalyDetectionTasks._anomalyDetectionSubTask",
-            {"queue": "anomalySubTask"},
-        ),
-        ("ops.tasks.telemetryTask.telemetryJob", {"queue": "telemetry"}),
-    ],
-)
+app.conf.task_routes = settings.CELERY_TASK_ROUTES
 
-app.conf.task_acks_late = True
-app.conf.worker_prefetch_multiplier = 1
+app.conf.task_acks_late = settings.CELERY_TASKS_ACKS_LATE
+app.conf.worker_prefetch_multiplier = settings.CELERY_WORKER_PREFETCH_MULTIPLIER
 
 app.autodiscover_tasks()
 

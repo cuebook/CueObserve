@@ -196,24 +196,21 @@ CELERY_RESULT_BACKEND = os.environ.get(
     "CELERY_RESULT_BACKEND", "redis://localhost:6379/1"
 )
 CELERY_IMPORTS = ("ops.tasks",)
-# CELERY_TASK_ROUTES = ({"ops.tasks.anomalyDetectionTasks._anomalyDetectionSubTask": {"queue": "anomalySubTask"}})
-CELERY_TASK_ROUTES = (
-    [
-        (
-            "ops.tasks.anomalyDetectionTasks._anomalyDetectionSubTask",
-            {"queue": "anomalySubTask"},
-        ),
-        ("ops.tasks.telemetryTask.telemetryJob", {"queue": "telemetry"}),
-    ],
+CELERY_TASK_ROUTES = os.environ.get(
+    "CELERY_TASK_ROUTES",
+    (
+        [
+            (
+                "ops.tasks.anomalyDetectionTasks._anomalyDetectionSubTask",
+                {"queue": "anomalySubTask"},
+            ),
+            ("ops.tasks.telemetryTask.telemetryJob", {"queue": "telemetry"}),
+        ],
+    ),
 )
-CELERY_ROUTES = (
-    [
-        (
-            "ops.tasks.anomalyDetectionTasks._anomalyDetectionSubTask",
-            {"queue": "anomalySubTask"},
-        ),
-        ("ops.tasks.telemetryTask.telemetryJob", {"queue": "telemetry"}),
-    ],
+CELERY_TASKS_ACKS_LATE = os.environ.get("CELERY_TASKS_ACKS_LATE", True)
+CELERY_WORKER_PREFETCH_MULTIPLIER = os.environ.get(
+    "CELERY_WORKER_PREFETCH_MULTIPLIER", 1
 )
 
 # EMAIL
