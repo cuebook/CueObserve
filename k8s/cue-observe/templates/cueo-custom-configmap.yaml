@@ -1,0 +1,15 @@
+apiVersion: v1
+data:
+  {{- range $key, $value := .Values.environmentVariables }}
+    {{ $key }}: {{ $value}}
+  {{- end}}
+  {{- if .Values.autoscaling.enabled }}
+    AUTOSCALING_ENABLED: 'true'
+    REDIS_HOST_PORT: "{{ .Values.environmentVariables.REDIS_HOST }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.environmentVariables.REDIS_PORT }}"
+  {{- end }}
+
+kind: ConfigMap
+metadata:
+  labels:
+    app: cueo-custom
+  name: cueo-custom

@@ -1,0 +1,31 @@
+{{- if .Values.autoscaling.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: cueo-celery
+  name: cueo-celery
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cueo-celery
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: cueo-celery
+    spec:
+      containers:
+        - image: {{ .Values.image.repository }}/cue-observe-backend:{{ .Values.image.tag }}
+          name: cueo-celery
+          args: 
+            - /bin/sh 
+            - -c 
+            - "celery -A app worker --concurrency=2 -l INFO & celery -A app worker --concurrency=4 -Q anomalySubTask -l INFO"
+          envFrom:
+            - configMapRef: 
+                name: cueo-custom
+      restartPolicy: Always
+{{- end }}

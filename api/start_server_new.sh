@@ -12,9 +12,19 @@ python ./manage.py collectstatic
 mkdir -p /home/staticfiles
 mv static_root/* /home/staticfiles
 rm -rf static_root/
-(celery -A app worker --concurrency=2 -l INFO --purge) &
-(celery -A app worker --concurrency=4 -Q anomalySubTask -l INFO --purge) &
+
+if [ $AUTOSCALING_ENABLED == true ]
+then 
+    echo "autoscaling enabled, will only run telemetry queue"
+    (celery -A app worker --concurrency=2 -Q telemetry -n telemetryNode -l INFO --purge) &
+else 
+    echo "autoscaling disabled, will run everything"
+    (celery -A app worker --concurrency=2 -n main -l INFO --purge) &
+    (celery -A app worker --concurrency=4 -Q anomalySubTask -n sub -l INFO --purge) &
+fi
+
 (celery -A app beat -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler) &
+
 python manage.py shell -c  "from anomaly.runTelemetry import create_installation_userId; create_installation_userId()" &
 
 gunicorn app.wsgi --reload --user www-data --bind 0.0.0.0:8000 --workers 3 --timeout 300
