@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: cueo-backend
+  name: cueo-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cueo-backend
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: cueo-backend
+    spec:
+      containers:
+        - image: {{ .Values.image.repository }}/cue-observe-backend:{{ .Values.image.tag }}
+          name: cueo-backend
+          ports: 
+            - containerPort: 8000
+              protocol: TCP
+          envFrom:
+            - configMapRef: 
+                name: cueo-custom
+      restartPolicy: Always
+

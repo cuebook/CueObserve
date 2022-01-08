@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: cueo-redis
+  name: cueo-redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cueo-redis
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: cueo-redis
+    spec:
+      containers:
+        - name: redis
+          image: redis:alpine
+          resources:
+            requests:
+              cpu: 100m
+              memory: 500M
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: IfNotPresent
+
+      restartPolicy: Always
+
