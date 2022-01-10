@@ -89,7 +89,8 @@ services:
     image: prom/alertmanager:v0.22.2
     container_name: alertmanager
     volumes:
-      - ./prometheus/server/alertmanager.yml:/etc/alertmanager/alertmanager.yml
+      - ./prometheus/server:/etc/alertmanager
+
     network_mode: "host"
 volumes:
   pgdata:

@@ -27,80 +27,26 @@ class SlackAlert:
         appAlertChannelId = ""
         try:
 
-            # settings = Setting.objects.all()
-            # for setting in settings.values():
-            #     if setting["name"] == ANOMALY_ALERT_SLACK_ID:
-            #         anomalyAlertChannelId = setting["value"]
-            #     elif setting["name"] == APP_ALERTS_SLACK_ID:
-            #         appAlertChannelId = setting["value"]
-            #     elif setting["name"] == SLACK_BOT_TOKEN:
-            #         token = setting["value"]
+            settings = Setting.objects.all()
+            for setting in settings.values():
+                if setting["name"] == ANOMALY_ALERT_SLACK_ID:
+                    anomalyAlertChannelId = setting["value"]
+                elif setting["name"] == APP_ALERTS_SLACK_ID:
+                    appAlertChannelId = setting["value"]
+                elif setting["name"] == SLACK_BOT_TOKEN:
+                    token = setting["value"]
             # Anomaly Detection Alert
             if name == "anomalyAlert":
-                # url = f'{ALERTMANAGER_API_URL}/alerts/anamoly-alert'
-                # fileImg = PlotChartService.anomalyChartToImgStr(anomalyId)
-                # payload = {
-                #     "token": token,
-                #     "anomalyAlertChannelId": anomalyAlertChannelId,
-                #     "title": title,
-                #     "message": message,
-                #     "details": details,
-                # }
-                # requests.post(url, data=payload, files={'fileImg': fileImg})
-                url = "http://localhost:9093/api/v1/alerts"
-                testdata = [
-                                {
-                                    "status": "firing",
-                                    "labels": {
-                                    "alertname": "anomalyAlert",
-                                    "service": "api",
-                                    "severity": "warning",
-                                    "instance": "0"
-                                    },
-                                    "annotations": {
-                                    "summary": title,
-                                    "description": message+details
-                                    },
-                                    "generatorURL": "http://prometheus.int.example.net/<generating_expression>",
-                                    "startsAt": "2020-07-23T01:05:36+00:00"
-                                }
-                                ]
-
-                requests.request("POST", url ,json=testdata)
-                
-            # AppAlert
-            if name == "appAlert":
-                # url = f'{ALERTMANAGER_API_URL}/alerts/app-alert'
-                url = "http://localhost:9093/api/v1/alerts"
-                logger.info("url %s", url)
-                print("url", url )
-                # breakpoint()
-                testdata = [
-                                {
-                                    "status": "firing",
-                                    "labels": {
-                                    "alertname": "App Alert",
-                                    "service": "curl",
-                                    "severity": "warning",
-                                    "instance": "0"
-                                    },
-                                    "annotations": {
-                                    "summary": title,
-                                    "description": message
-                                    },
-                                    "generatorURL": "http://prometheus.int.example.net/<generating_expression>",
-                                    "startsAt": "2020-07-23T01:05:36+00:00"
-                                }
-                                ]
+                url = f'{ALERT_API_URL}/alerts/anamoly-alert'
+                fileImg = PlotChartService.anomalyChartToImgStr(anomalyId)
                 payload = {
                     "token": token,
-                    "appAlertChannelId": appAlertChannelId,
+                    "anomalyAlertChannelId": anomalyAlertChannelId,
                     "title": title,
-                    "message": message
+                    "message": message,
+                    "details": details,
                 }
-
-                # requests.request("POST", url, data=payload)
-                requests.request("POST", url ,json=testdata)
+                requests.post(url, data=payload, files={'fileImg': fileImg})
 
         except Exception as ex:
             logger.error("Slack URL not given or wrong URL given:%s", str(ex))
