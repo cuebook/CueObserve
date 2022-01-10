@@ -15,6 +15,7 @@ from anomaly.models import Anomaly, RootCauseAnalysis, RCAAnomaly
 from anomaly.serializers import AnomalySerializer
 from access.data import Data
 from access.utils import prepareAnomalyDataframes
+from anomaly.services.telemetry import rca_event_log
 
 # ANOMALY_DAILY_TEMPLATE = "Anomaly Daily Template"
 # ANOMALY_HOURLY_TEMPLATE = "Anomaly Hourly Template"
@@ -207,4 +208,5 @@ def rootCauseAnalysisJob(anomalyId: int):
         rootCauseAnalysis.status = RootCauseAnalysis.STATUS_ERROR
     rootCauseAnalysis.endTimestamp = dt.datetime.now()
     rootCauseAnalysis.save()
+    rca_event_log(rootCauseAnalysis.status)
     return True

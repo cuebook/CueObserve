@@ -3,8 +3,8 @@ import traceback
 import datetime as dt
 import dateutil.parser as dp
 from django.template import Template, Context
-from utils.apiResponse import ApiResponse
 from django.db.models import Q
+from utils.apiResponse import ApiResponse
 from anomaly.models import Anomaly, AnomalyCardTemplate
 from anomaly.serializers import AnomalySerializer
 

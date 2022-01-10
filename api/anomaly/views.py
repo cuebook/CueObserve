@@ -18,6 +18,7 @@ from anomaly.services import (
     RootCauseAnalyses,
     search,
 )
+from anomaly.services.telemetry import getInstallationId
 
 
 class AnomalysView(APIView):
@@ -404,4 +405,12 @@ class DimValsView(APIView):
     def post(self, request):
         payload = request.data
         res = search.SearchUtils.getDimValues(payload)
+        return Response(res.json())
+
+        
+
+class InstallationView(APIView):
+    """ Provides views on Installation """
+    def get(self, request):
+        res = getInstallationId()
         return Response(res.json())

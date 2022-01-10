@@ -1,0 +1,22 @@
+{{- if .Values.autoscaling.enabled }}
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: cueo-celery-scaledobject
+spec:
+  scaleTargetRef:
+    kind: Deployment
+    name: cueo-celery
+  pollingInterval: {{ .Values.autoscaling.pollingInterval }}
+  cooldownPeriod: {{ .Values.autoscaling.cooldownPeriod }}
+  minReplicaCount: {{ .Values.autoscaling.minReplicas }}
+  maxReplicaCount: {{ .Values.autoscaling.maxReplicas }}
+  triggers:
+    - type: redis
+      metadata:
+        addressFromEnv: REDIS_HOST_PORT
+        passwordFromEnv: REDIS_PASSWORD
+        # enableTLS: "false"
+        listName: celery
+        listLength: {{ .Values.autoscaling.celery.listLength }}
+{{- end }}

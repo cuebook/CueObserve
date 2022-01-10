@@ -1,2 +1,3 @@
 from .anomalyDetectionTasks import anomalyDetectionJob
 from .rootCauseAnalysis import rootCauseAnalysisJob
+from .telemetryTask import telemetryJob

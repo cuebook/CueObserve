@@ -1,24 +1,44 @@
 version: '3.3'
 services:
+  cueo-nginx:
+    container_name: "cueo-nginx"
+    image: nginx:1.17
+    volumes:
+      - ./ui/nginx-dev.conf.template:/etc/nginx/conf.d/nginx-dev.conf.template
+      - ./ui/nginx-entrypoint.sh:/etc/nginx/conf.d/nginx-entrypoint.sh
+    command:
+      bash -c "./etc/nginx/conf.d/nginx-entrypoint.sh && nginx -g 'daemon off;'"
+    environment:
+      ENVIRONMENT:
+      NGINX_API_URL:
+      NGINX_ALERT_API_URL:
+      NGINX_UI_URL:
+    network_mode: "host"
+
   cueo-backend:
-    image: cuebook/cue-observe-backend:dev
+    build:
+      context: api
+      dockerfile: Dockerfile
     volumes:
       - ./api:/code:rw
     command:
       bash -c "chmod +x /code/start_server_new.sh && /code/start_server_new.sh"
     environment:
-      - ENVIRONMENT
-      - API_URL
-      - ALERT_API_URL
-      - POSTGRES_DB_HOST
-      - POSTGRES_DB_USERNAME
-      - POSTGRES_DB_PASSWORD
-      - POSTGRES_DB_SCHEMA
-      - POSTGRES_DB_PORT
-      - DJANGO_SUPERUSER_USERNAME
-      - DJANGO_SUPERUSER_PASSWORD
-      - DJANGO_SUPERUSER_EMAIL
-      - IS_AUTHENTICATION_REQUIRED
+      ENVIRONMENT: ${ENVIRONMENT}
+      API_URL: ${API_URL}
+      ALERT_API_URL: ${ALERT_API_URL}
+      POSTGRES_DB_HOST: ${POSTGRES_DB_HOST}
+      POSTGRES_DB_USERNAME: ${POSTGRES_DB_USERNAME}
+      POSTGRES_DB_PASSWORD: ${POSTGRES_DB_PASSWORD}
+      POSTGRES_DB_SCHEMA: ${POSTGRES_DB_SCHEMA}
+      POSTGRES_DB_PORT: ${POSTGRES_DB_PORT}
+      DJANGO_SUPERUSER_USERNAME: ${DJANGO_SUPERUSER_USERNAME}
+      DJANGO_SUPERUSER_PASSWORD: ${DJANGO_SUPERUSER_PASSWORD}
+      DJANGO_SUPERUSER_EMAIL: ${DJANGO_SUPERUSER_EMAIL}
+      IS_AUTHENTICATION_REQUIRED: ${IS_AUTHENTICATION_REQUIRED}
+      CELERY_RESULT_BACKEND: ${CELERY_RESULT_BACKEND}
+      DETECTION_SERVICE_PLATFORM:
+      AWS_LAMBDA_URL:
     network_mode: "host"
 
   cueo-alerts:
@@ -69,3 +89,7 @@ services:
 
 volumes:
   pgdata:
+
+networks:
+  backend:
+    driver: bridge

@@ -1,0 +1,30 @@
+{{- if .Values.alerts.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: cueo-alerts
+  name: cueo-alerts
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cueo-alerts
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: cueo-alerts
+    spec:
+      containers:
+        - image: {{ .Values.image.repository }}/cue-observe-alerts:{{ .Values.image.tag }}
+          name: cueo-alerts
+          ports: 
+            - containerPort: 8100
+              protocol: TCP
+          envFrom:
+            - configMapRef: 
+                name: cueo-custom
+      restartPolicy: Always
+{{- end }}

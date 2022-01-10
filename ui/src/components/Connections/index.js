@@ -5,7 +5,6 @@ import connectionService from "services/main/connection.js";
 import AddConnection from "./AddConnection.js";
 import ViewConnection from "./ViewConnection.js";
 import { EyeOutlined, DeleteOutlined } from '@ant-design/icons';
-
 const { Search } = Input;
 const ButtonGroup = Button.Group;
 
