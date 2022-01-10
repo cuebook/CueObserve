@@ -7,7 +7,7 @@ receivers:
         text: "{{ .CommonAnnotations.description }}"
         title: "{{ .CommonAnnotations.title }} "
         username: 'Prometheus'
-        api_url: "https://hooks.slack.com/services/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"
+        api_url: ""
         channel: '#test'
 
   - name: 'slack-2'
@@ -16,17 +16,17 @@ receivers:
         text: "{{ .CommonAnnotations.description }}"
         title: "{{ .CommonAnnotations.title }} "
         username: 'Prometheus'
-        api_url: "https://hooks.slack.com/services/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"
+        api_url: ""
         channel: '#testapp'
     
   - name: 'email-notifications'
     email_configs:
-    - to: praveen@cuebook.ai,kumarpraveen7393@gmail.com
-      from: cuebook.ai@gmail.com
+    - to: 
+      from: 
       smarthost: smtp.gmail.com:587
-      auth_username: cuebook.ai@gmail.com
-      auth_identity: cuebook.ai@gmail.com
-      auth_password: cuebook.ai@123
+      auth_username: 
+      auth_identity: 
+      auth_password:
       send_resolved: false
 
 route:

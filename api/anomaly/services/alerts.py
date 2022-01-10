@@ -12,8 +12,6 @@ from django.core.mail import EmailMultiAlternatives
 
 logger = logging.getLogger(__name__)
 ALERT_API_URL = os.environ.get("ALERT_API_URL", "http://localhost:8100")
-ALERTMANAGER_API_URL = os.environ.get("ALERTMANAGER_API_URL", "http://localhost:9093/api/v1/alerts")
-
 
 
 class SlackAlert:

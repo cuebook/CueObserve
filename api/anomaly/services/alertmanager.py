@@ -1,12 +1,15 @@
 
 import requests
+import os
 
+
+ALERTMANAGER_API_URL = os.environ.get("ALERTMANAGER_API_URL", "http://localhost:9093")
 
 class AlertManagers:
 
     def cueObserveAlerts(name, message):
 
-        url = "http://localhost:9093/api/v1/alerts"
+        url = 'f{ALERTMANAGER_API_URL}/api/v1/alerts'
         data = [
                     {
                         "status": "firing",
@@ -28,7 +31,7 @@ class AlertManagers:
 
     def anomalyAlert(name, message, details,subject):
 
-        url = "http://localhost:9093/api/v1/alerts"
+        url = 'f{ALERTMANAGER_API_URL}/api/v1/alerts'
         data = [
                     {
                         "status": "firing",
