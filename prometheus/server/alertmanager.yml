@@ -1,29 +1,11 @@
-
-route:
-  group_wait: 10s
-  group_interval: 10s
-  repeat_interval: 10m
-  group_by: [alertname]
-
-  receiver: 'slack-notifications'
-
-# receivers: 
-#   - name: 'email-notifications'
-#     email_configs:
-#     - to: 
-#       from: cuebook.ai@gmail.com
-#       smarthost: smtp.gmail.com:587
-#       auth_username: cuebook.ai@gmail.com
-#       auth_identity: cuebook.ai@gmail.com
-#       auth_password: 
-#       send_resolved: false
-
+global:
+  resolve_timeout: 2s 
 receivers:
   - name: 'slack-notifications'
     slack_configs:
       - send_resolved: false
         text: "{{ .CommonAnnotations.description }}"
-        title: "{{ .CommonAnnotations.summary }} "
+        title: "{{ .CommonAnnotations.title }} "
         username: 'Prometheus'
         api_url: ""
         channel: '#test'
@@ -44,7 +26,7 @@ receivers:
       smarthost: smtp.gmail.com:587
       auth_username: 
       auth_identity: 
-      auth_password:
+      auth_password: 
       send_resolved: false
 
 route:
