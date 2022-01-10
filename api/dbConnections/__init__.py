@@ -6,3 +6,4 @@ from .mysql import MySQL
 from .postgres import Postgres
 from .mssql import MSSQL
 from .clickhouse import ClickHouse
+from .pinot import Pinot

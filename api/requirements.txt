@@ -30,6 +30,7 @@ psycopg2-binary==2.9.1
 ptyprocess==0.7.0
 py==1.10.0
 pydruid==0.6.2
+pinotdb==0.3.8
 pylint==2.11.1
 pylint-django==2.4.4
 pylint-plugin-utils==0.6

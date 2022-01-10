@@ -91,6 +91,28 @@ def testDbConnection(client, mocker ):
 	assert response.data["success"]
 	assert Connection.objects.all().count() == 3
 
+	""" Test DB connection"""
+	# Test cases for Pinot connection
+	connectionType = mixer.blend("anomaly.connectionType", name="Pinot")
+	mixer.blend("anomaly.connectionParam", connectionType=connectionType, name="host")
+	mixer.blend("anomaly.connectionParam", connectionType=connectionType, name="port")
+	path = reverse("connections")
+
+	mockResponse = mocker.patch(
+		"dbConnections.pinot.Pinot.checkConnection",
+		new=mock.MagicMock(
+			autospec=True, return_value=True
+		),
+	)
+	mockResponse.start()
+	data = {'name': 'test pinot', 'description': '', 'connectionType_id': connectionType.id,
+			'params': {'host': 'localhost', 'port': '8000'}}
+	response = client.post(path, data, content_type="application/json")
+	mockResponse.stop()
+	assert response.status_code == 200
+	assert response.data["success"]
+	assert Connection.objects.all().count() == 1
+
 
 @pytest.mark.django_db()
 def test_MSSQLConnection(client, populate_seed_data, mocker):

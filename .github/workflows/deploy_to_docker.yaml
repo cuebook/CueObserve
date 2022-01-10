@@ -22,7 +22,7 @@ jobs:
     - name: Build, tag, and push image to Docker Hub
       id: build-image
       env:
-        REGISTRY: cuebook
+        REGISTRY: venkatvghub
         REPOSITORY: cue-observe-frontend
         IMAGE_TAG: ${{ github.sha }}
       run: |
@@ -30,7 +30,7 @@ jobs:
         # Build a docker container and
         # push it to ECR so that it can
         # be deployed to ECS.
-        docker login -u vincue -p ${{ secrets.DOCKER_TOKEN }}
+        docker login -u venkatvghub -p ${{ secrets.DOCKER_PASSWORD }}
         TAGNAME=latest
         if [[ ${{ github.event_name == 'workflow_dispatch' }} ]]; then TAGNAME=${{ github.event.inputs.tagName }}; fi
         docker build -t $REGISTRY/$REPOSITORY:$TAGNAME .
@@ -47,7 +47,7 @@ jobs:
     - name: Build, tag, and push image to Docker Hub
       id: build-image
       env:
-        REGISTRY: cuebook
+        REGISTRY: venkatvghub
         REPOSITORY: cue-observe-backend
         IMAGE_TAG: ${{ github.sha }}
       run: |
@@ -55,7 +55,7 @@ jobs:
         # Build a docker container and
         # push it to ECR so that it can
         # be deployed to ECS.
-        docker login -u vincue -p ${{ secrets.DOCKER_TOKEN }}
+        docker login -u venkatvghub -p ${{ secrets.DOCKER_PASSWORD }}
         TAGNAME=latest
         if [[ ${{ github.event_name == 'workflow_dispatch' }} ]]; then TAGNAME=${{ github.event.inputs.tagName }}; fi
         docker build -t $REGISTRY/$REPOSITORY:$TAGNAME .
@@ -72,7 +72,7 @@ jobs:
     - name: Build, tag, and push image to Docker Hub
       id: build-image
       env:
-        REGISTRY: cuebook
+        REGISTRY: venkatvghub
         REPOSITORY: cue-observe-alerts
         IMAGE_TAG: ${{ github.sha }}
       run: |
@@ -80,7 +80,7 @@ jobs:
         # Build a docker container and
         # push it to ECR so that it can
         # be deployed to ECS.
-        docker login -u vincue -p ${{ secrets.DOCKER_TOKEN }}
+        docker login -u venkatvghub -p ${{ secrets.DOCKER_PASSWORD }}
         echo ${{ github.event_name }}
         TAGNAME=latest
         if [[ ${{ github.event_name == 'workflow_dispatch' }} ]]; then TAGNAME=${{ github.event.inputs.tagName }}; fi

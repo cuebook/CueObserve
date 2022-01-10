@@ -1,6 +1,5 @@
 from dbConnections import (
     BigQuery,
-    Druid,
     Redshift,
     Snowflake,
     Druid,
@@ -8,6 +7,7 @@ from dbConnections import (
     Postgres,
     MSSQL,
     ClickHouse,
+    Pinot
 )
 from anomaly.serializers import ConnectionDetailSerializer
 
@@ -41,6 +41,9 @@ class Data:
         if connectionType == "ClickHouse":
             params = connectionParams
             dataframe = ClickHouse.fetchDataframe(params, query, limit=limit)
+        if connectionType == "Pinot":
+            params = connectionParams
+            dataframe = Pinot.fetchDataframe(params, query, limit=limit)
 
         return dataframe
 

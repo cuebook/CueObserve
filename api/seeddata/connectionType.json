@@ -54,5 +54,12 @@
         "fields": {
             "name": "ClickHouse"
         }
-    }
+    },
+    {
+        "model": "anomaly.connectiontype",
+        "pk": 9,
+        "fields": {
+            "name": "Pinot"
+        }
+    },
 ]
