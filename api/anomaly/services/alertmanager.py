@@ -9,7 +9,7 @@ class AlertManagers:
 
     def cueObserveAlerts(name, message):
 
-        url = 'f{ALERTMANAGER_API_URL}/api/v1/alerts'
+        url = f'{ALERTMANAGER_API_URL}/api/v1/alerts'
         data = [
                     {
                         "status": "firing",
@@ -31,7 +31,7 @@ class AlertManagers:
 
     def anomalyAlert(name, message, details,subject):
 
-        url = 'f{ALERTMANAGER_API_URL}/api/v1/alerts'
+        url = f'{ALERTMANAGER_API_URL}/api/v1/alerts'
         data = [
                     {
                         "status": "firing",
