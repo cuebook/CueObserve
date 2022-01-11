@@ -1,27 +1,9 @@
-FROM python:3.9-slim-buster AS compile-image
+FROM cuebook/cue-observe-backend:base
 
-RUN apt-get update && ACCEPT_EULA=Y apt-get install -y --no-install-recommends build-essential gcc default-libmysqlclient-dev libodbc1 unixodbc unixodbc-dev
-
-
-RUN python -m venv /opt/venv
-# Make sure we use the virtualenv:
-ENV PATH="/opt/venv/bin:$PATH"
+WORKDIR /code
 
 COPY requirements.txt .
 RUN pip install -r requirements.txt
-
-FROM python:3.9-slim-buster
-ENV PYTHONUNBUFFERED=1
-COPY --from=compile-image /opt/venv /opt/venv
-ENV PATH="/opt/venv/bin:$PATH"
-
-RUN apt-get update && apt-get install -y gnupg2 curl
-RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
-RUN curl https://packages.microsoft.com/config/ubuntu/18.04/prod.list > /etc/apt/sources.list.d/mssql-release.list
-RUN apt-get update && ACCEPT_EULA=Y apt-get install -y --no-install-recommends unixodbc msodbcsql17 mssql-tools unixodbc-dev
-RUN apt-get install -y --no-install-recommends nginx default-libmysqlclient-dev
-
-WORKDIR /code
 
 COPY . ./
 RUN chmod +x /code/start_server_new.sh

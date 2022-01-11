@@ -60,7 +60,7 @@ server {
 	}
 
   location / {
-    proxy_pass ${NGINX_UI_URL}/alerts;
+    proxy_pass ${NGINX_UI_URL};
     proxy_redirect off;
     proxy_set_header Host $host;
     proxy_connect_timeout 120;
