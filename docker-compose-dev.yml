@@ -58,6 +58,8 @@ services:
     build:
       context: search-api
       dockerfile: Dockerfile
+    env_file:
+      - .env.dev
     # environment:
     #   - SEARCH_POSTGRES_DB_HOST
     #   - SEARCH_POSTGRES_DB_SCHEMA
