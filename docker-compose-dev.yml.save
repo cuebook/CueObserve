@@ -13,7 +13,6 @@ services:
       NGINX_API_URL:
       NGINX_ALERT_API_URL:
       NGINX_UI_URL:
-      NGINX_SEARCH_API_URL:
     network_mode: "host"
 
   cueo-backend:
@@ -44,7 +43,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 4120M
+          memory
 
   cueo-alerts:
     build:
@@ -68,14 +67,14 @@ services:
       - ./search-api:/code:rw
     network_mode: "host"
 
-  # cueo-frontend:
-  #   build:
-  #     context: ui
-  #     dockerfile: Dockerfile.dev
-  #   stdin_open: true
-  #   volumes:
-  #     - ./ui/src:/app/src:rw
-  #   network_mode: "host"
+  cueo-frontend:
+    build:
+      context: ui
+      dockerfile: Dockerfile.dev
+    stdin_open: true
+    volumes:
+      - ./ui/src:/app/src:rw
+    network_mode: "host"
     
   # cueo-postgresql:
   #   image: postgres:13

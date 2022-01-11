@@ -49,6 +49,18 @@ server {
       send_timeout 120;
   }
 
+
+  location /search {
+      auth_request /auth/auth;
+      proxy_pass ${NGINX_SEARCH_API_URL}/search;
+      proxy_redirect off;
+      proxy_set_header Host $host;
+      proxy_connect_timeout 120;
+      proxy_send_timeout 120;
+      proxy_read_timeout 120;
+      send_timeout 120;
+  }
+
   location /static/admin/ {
       alias /home/staticfiles/admin/;
   }
@@ -60,7 +72,7 @@ server {
 	}
 
   location / {
-    proxy_pass ${NGINX_UI_URL}/alerts;
+    proxy_pass ${NGINX_UI_URL};
     proxy_redirect off;
     proxy_set_header Host $host;
     proxy_connect_timeout 120;

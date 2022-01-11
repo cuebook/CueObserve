@@ -96,7 +96,7 @@ export default function AnomalysTable(props) {
 
   const columns = [
     {
-      title: "Dataset",
+      title: "Datsdsdaset",
       dataIndex: "datasetName",
       key: "datasetName",
       sorter: () => {},
