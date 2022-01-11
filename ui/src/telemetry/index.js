@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Button, Form, Input, message, Select } from "antd";
 import Analytics from 'analytics'
 import segmentPlugin from '@analytics/segment'
-import installationServices from "services/installation.js"
+import installationServices from "services/main/installation.js"
 
 export const analytics = Analytics({
   app: 'CueObserve',

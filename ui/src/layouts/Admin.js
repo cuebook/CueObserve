@@ -29,7 +29,7 @@ import SearchResultPage from "views/admin/SearchResults"
 import SearchCardPage from "views/admin/SearchCard"
 
 // Telemetry
-import installationServices from "services/installation.js"
+import installationServices from "services/main/installation"
 import { telemetry } from "telemetry/index.js";
 
 export default function Admin() {
