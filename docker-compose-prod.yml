@@ -1,7 +1,7 @@
 version: '3.1'
 services:
   cueo-backend:
-    image: cuebook/cue-observe-backend:0.3.1
+    image: cuebook/cue-observe-backend:0.3.2
     environment:
       ENVIRONMENT: ${ENVIRONMENT}
       API_URL: ${API_URL}
@@ -26,10 +26,10 @@ services:
       - cueo-redis
 
   cueo-alerts:
-    image: cuebook/cue-observe-alerts:0.3.1
+    image: cuebook/cue-observe-alerts:0.3.2
 
   cueo-frontend:
-    image: cuebook/cue-observe-frontend:0.3.1
+    image: cuebook/cue-observe-frontend:0.3.2
     env_file:
       - .env
     depends_on:
