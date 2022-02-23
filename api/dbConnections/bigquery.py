@@ -60,6 +60,6 @@ class BigQuery:
             dataJob = client.query(sql)
             dataframe = dataJob.to_dataframe()
         except Exception as ex:
-            logger.error("Can't connect to db with this credentials %s", str(ex))
+            logger.error("Error in fetching data. Error:%s", str(ex))
 
         return dataframe
