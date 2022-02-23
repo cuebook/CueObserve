@@ -105,6 +105,28 @@ DETECTION_SERVICE_PLATFORM=AWS
 AWS_LAMBDA_URL=<lambda function API gateway endpoint>
 ```
 
+## Install on Kubernetes&#x20;
+
+To install CueObserve on [kubernetes](https://kubernetes.io) you need [helm](https://helm.sh) installed. To install follow these steps
+
+```
+git clone https://github.com/cuebook/cueobserve
+cd cueobserve/k8s/
+kubectl create namespace cue-observe
+helm install cue-observe cue-observe -n cue-observe
+```
+
+## Scaling Application
+
+Scaling is only supported only in [Kubernetes](installation.md#install-on-kubernetes) deployment and you need [Keda 2.0.0](https://keda.sh/docs/2.0/deploy/) installed. It is enabled by default, to disable scaling, update following variables in `k8s/cue-observe/values.yml` before [installing CueObserve](installation.md#install-on-kubernetes) on kubernetes.
+
+```
+autoscaling:
+    enabled: false
+```
+
+Whenever an anomaly detection is ran it scales up celery-workers & scales down in [some time](https://keda.sh/docs/1.4/concepts/scaling-deployments/#long-running-executions) when finished.
+
 ## Infra Requirements
 
 The minimum infrastructure requirement for CueObserve is _1 GB RAM/ 1 CPU_. If Multiple CPUs(cores) are provided, they can be utilized by tasks like Anomaly Detection & Root Cause Analysis for faster processing.

@@ -16,14 +16,20 @@ CueObserve works with data in your SQL data warehouses and databases. It current
 
 ### Getting Started
 
-Install via Docker
+Install via docker-compose
 
 ```
-wget https://raw.githubusercontent.com/cuebook/CueObserve/latest_release/docker-compose.yml -q -O cueobserve-docker-compose.yml
-docker-compose -f cueobserve-docker-compose.yml up -d
+mkdir -p ~/cuebook
+wget https://raw.githubusercontent.com/cuebook/CueObserve/latest_release/docker-compose-prod.yml -q -O ~/cuebook/docker-compose-prod.yml
+wget https://raw.githubusercontent.com/cuebook/CueObserve/latest_release/.env -q -O ~/cuebook/.env
+cd ~/cuebook
 ```
 
-Now visit [http://localhost:3000](http://localhost:3000) in your browser.
+```
+docker-compose -f docker-compose-prod.yml --env-file .env up -d
+```
+
+Now visit [localhost:3000](http://localhost:3000) in your browser.&#x20;
 
 ### Demo Video
 
