@@ -20,7 +20,7 @@ services:
       context: api
       dockerfile: Dockerfile
     volumes:
-      - ./api:/code:rw
+      - ./api:/app:rw
     command:
       bash -c "chmod +x /code/start_server_new.sh && /code/start_server_new.sh"
     environment:
@@ -73,6 +73,24 @@ services:
     image: redis
     network_mode: "host"
 
+  # prometheus:
+  #   image: prom/prometheus:v2.28.1
+  #   container_name: prometheus
+  #   volumes:
+  #     - ./prometheus/server/prometheus.yml:/etc/prometheus/prometheus.yml
+  #     - ./prometheus/server/rules.yml:/etc/prometheus/rules.yml
+  #   network_mode: "host"
+
+  # node-exporter:
+  #   image: prom/node-exporter
+  #   network_mode: "host"
+
+  alertmanager:
+    image: prom/alertmanager:v0.22.2
+    container_name: alertmanager
+    volumes:
+      - ./prometheus/server/alertmanager.yml:/etc/alertmanager/alertmanager.yml
+    network_mode: "host"
 volumes:
   pgdata:
 

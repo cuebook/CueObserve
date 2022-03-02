@@ -1,6 +1,7 @@
 import logging
 import os
 from email.mime.image import MIMEImage
+import re
 import requests
 from anomaly.services.settings import ANOMALY_ALERT_SLACK_ID, APP_ALERTS_SLACK_ID, SLACK_BOT_TOKEN, SEND_EMAIL_TO, WEBHOOK_URL
 from anomaly.models import Setting
@@ -13,7 +14,6 @@ logger = logging.getLogger(__name__)
 ALERT_API_URL = os.environ.get("ALERT_API_URL", "http://localhost:8100")
 
 
-
 class SlackAlert:
     @staticmethod
     def slackAlertHelper(title, message, name, details="", anomalyId: int = None):
@@ -24,6 +24,7 @@ class SlackAlert:
         anomalyAlertChannelId = ""
         appAlertChannelId = ""
         try:
+
             settings = Setting.objects.all()
             for setting in settings.values():
                 if setting["name"] == ANOMALY_ALERT_SLACK_ID:
@@ -44,16 +45,6 @@ class SlackAlert:
                     "details": details,
                 }
                 requests.post(url, data=payload, files={'fileImg': fileImg})
-            # AppAlert
-            if name == "appAlert":
-                url = f'{ALERT_API_URL}/alerts/app-alert'
-                payload = {
-                    "token": token,
-                    "appAlertChannelId": appAlertChannelId,
-                    "title": title,
-                    "message": message
-                }
-                requests.request("POST", url, data=payload)
 
         except Exception as ex:
             logger.error("Slack URL not given or wrong URL given:%s", str(ex))

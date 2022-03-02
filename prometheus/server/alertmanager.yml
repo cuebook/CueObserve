@@ -1,0 +1,60 @@
+global:
+  resolve_timeout: 2s 
+receivers:
+  - name: 'slack-notifications'
+    slack_configs:
+      - send_resolved: false
+        text: "{{ .CommonAnnotations.description }}"
+        title: "{{ .CommonAnnotations.title }} "
+        username: 'Prometheus'
+        api_url: ""
+        channel: '#test'
+
+  - name: 'slack-2'
+    slack_configs:
+      - send_resolved: false
+        text: "{{ .CommonAnnotations.description }}"
+        title: "{{ .CommonAnnotations.title }} "
+        username: 'Prometheus'
+        api_url: ""
+        channel: '#testapp'
+    
+  - name: 'email-notifications'
+    email_configs:
+    - to: 
+      from: 
+      smarthost: smtp.gmail.com:587
+      auth_username: 
+      auth_identity: 
+      auth_password: 
+      send_resolved: false
+
+route:
+  group_wait: 1s
+  group_interval: 1s
+  repeat_interval: 24h
+  group_by: ['alertname']
+  receiver: 'slack-notifications'
+
+  routes:
+  - receiver: 'slack-notifications'
+    group_wait: 1s
+    match_re:
+      service: anomalyAlert
+    continue: true
+
+  - receiver: 'email-notifications'
+    group_wait: 1s
+    match_re:
+      service: anomalyAlert
+    continue: true
+
+  - receiver: 'slack-2'
+    group_wait: 1s
+    match_re:
+      service: appAlert
+    continue: true
+
+
+  
+
